@@ -1,0 +1,1220 @@
+{
+    "item": [
+        {
+            "name": "auth",
+            "description": "",
+            "item": [
+                {
+                    "name": "google",
+                    "description": "",
+                    "item": [
+                        {
+                            "id": "bb291dd4-c582-4c3d-93b2-3a776d685b9d",
+                            "name": "Google Sign In",
+                            "request": {
+                                "name": "Google Sign In",
+                                "description": {},
+                                "url": {
+                                    "path": [
+                                        "auth",
+                                        "google"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"idToken\": \"<string>\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "headerFamily": "json",
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "auth": null
+                            },
+                            "response": [
+                                {
+                                    "id": "2eda95f9-f21e-4389-99c1-d832fbaaa409",
+                                    "name": "Success",
+                                    "originalRequest": {
+                                        "url": {
+                                            "path": [
+                                                "auth",
+                                                "google"
+                                            ],
+                                            "host": [
+                                                "{{baseUrl}}"
+                                            ],
+                                            "query": [],
+                                            "variable": []
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Content-Type",
+                                                "value": "application/json"
+                                            },
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            },
+                                            {
+                                                "description": {
+                                                    "content": "Added as a part of security scheme: bearer",
+                                                    "type": "text/plain"
+                                                },
+                                                "key": "Authorization",
+                                                "value": "Bearer <token>"
+                                            }
+                                        ],
+                                        "method": "POST",
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": "{\n  \"idToken\": \"<string>\"\n}",
+                                            "options": {
+                                                "raw": {
+                                                    "headerFamily": "json",
+                                                    "language": "json"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "status": "OK",
+                                    "code": 200,
+                                    "header": [
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        }
+                                    ],
+                                    "body": "",
+                                    "cookie": [],
+                                    "_postman_previewlanguage": "json"
+                                }
+                            ],
+                            "event": [],
+                            "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "me",
+                    "description": "",
+                    "item": [
+                        {
+                            "id": "20971857-8484-420b-9d6e-110800cc2177",
+                            "name": "Current User",
+                            "request": {
+                                "name": "Current User",
+                                "description": {},
+                                "url": {
+                                    "path": [
+                                        "auth",
+                                        "me"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "method": "GET",
+                                "body": {},
+                                "auth": null
+                            },
+                            "response": [
+                                {
+                                    "id": "75661f8c-001d-4ec1-aadc-402647e2ace8",
+                                    "name": "User Details",
+                                    "originalRequest": {
+                                        "url": {
+                                            "path": [
+                                                "auth",
+                                                "me"
+                                            ],
+                                            "host": [
+                                                "{{baseUrl}}"
+                                            ],
+                                            "query": [],
+                                            "variable": []
+                                        },
+                                        "header": [
+                                            {
+                                                "description": {
+                                                    "content": "Added as a part of security scheme: bearer",
+                                                    "type": "text/plain"
+                                                },
+                                                "key": "Authorization",
+                                                "value": "Bearer <token>"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {}
+                                    },
+                                    "status": "OK",
+                                    "code": 200,
+                                    "header": [],
+                                    "cookie": [],
+                                    "_postman_previewlanguage": "text"
+                                }
+                            ],
+                            "event": [],
+                            "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "onboarding",
+            "description": "",
+            "item": [
+                {
+                    "id": "216f657d-8151-48b9-b7a6-d4218781df2f",
+                    "name": "Complete onboarding",
+                    "request": {
+                        "name": "Complete onboarding",
+                        "description": {},
+                        "url": {
+                            "path": [
+                                "onboarding"
+                            ],
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "",
+                            "options": {
+                                "raw": {
+                                    "headerFamily": "json",
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": null
+                    },
+                    "response": [
+                        {
+                            "id": "d8183ee9-0dc5-49eb-a0d1-e9e31b2a7991",
+                            "name": "Onboarding Completed",
+                            "originalRequest": {
+                                "url": {
+                                    "path": [
+                                        "onboarding"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "description": {
+                                            "content": "Added as a part of security scheme: bearer",
+                                            "type": "text/plain"
+                                        },
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                    }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "",
+                                    "options": {
+                                        "raw": {
+                                            "headerFamily": "json",
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [],
+                            "cookie": [],
+                            "_postman_previewlanguage": "text"
+                        }
+                    ],
+                    "event": [],
+                    "protocolProfileBehavior": {
+                        "disableBodyPruning": true
+                    }
+                }
+            ]
+        },
+        {
+            "name": "users",
+            "description": "",
+            "item": [
+                {
+                    "name": "me",
+                    "description": "",
+                    "item": [
+                        {
+                            "id": "fc8bc01d-17ae-463c-9a9f-216578b3d202",
+                            "name": "Logged in profile",
+                            "request": {
+                                "name": "Logged in profile",
+                                "description": {},
+                                "url": {
+                                    "path": [
+                                        "users",
+                                        "me"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "method": "GET",
+                                "body": {},
+                                "auth": null
+                            },
+                            "response": [],
+                            "event": [],
+                            "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                            }
+                        },
+                        {
+                            "id": "f8f70852-27df-4350-8a4d-9ce3065e1af2",
+                            "name": "Update profile",
+                            "request": {
+                                "name": "Update profile",
+                                "description": {},
+                                "url": {
+                                    "path": [
+                                        "users",
+                                        "me"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "method": "PATCH",
+                                "body": {},
+                                "auth": null
+                            },
+                            "response": [],
+                            "event": [],
+                            "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "{userId}",
+                    "description": "",
+                    "item": [
+                        {
+                            "id": "d52c61ac-1944-4dd2-95b0-d0b3c50a77b3",
+                            "name": "Public Profile",
+                            "request": {
+                                "name": "Public Profile",
+                                "description": {},
+                                "url": {
+                                    "path": [
+                                        "users",
+                                        ":userId"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": [
+                                        {
+                                            "type": "any",
+                                            "value": "<string>",
+                                            "key": "userId",
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "(Required) ",
+                                                "type": "text/plain"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "body": {},
+                                "auth": null
+                            },
+                            "response": [],
+                            "event": [],
+                            "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "collaborations",
+            "description": "",
+            "item": [
+                {
+                    "id": "3692214d-b0ae-4943-8237-9a5e01790b84",
+                    "name": "Collaboration Feed",
+                    "request": {
+                        "name": "Collaboration Feed",
+                        "description": {},
+                        "url": {
+                            "path": [
+                                "collaborations"
+                            ],
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "query": [
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "page",
+                                    "value": "<integer>"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "limit",
+                                    "value": "<integer>"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": " (This can only be one of CARPOOLING,EVENTS,STUDY,PROFESSIONAL,SPORTS,TRIPS,OTHER)",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "category",
+                                    "value": "EVENTS"
+                                }
+                            ],
+                            "variable": []
+                        },
+                        "method": "GET",
+                        "body": {},
+                        "auth": null
+                    },
+                    "response": [],
+                    "event": [],
+                    "protocolProfileBehavior": {
+                        "disableBodyPruning": true
+                    }
+                },
+                {
+                    "id": "bbe544e7-d5f0-4bfe-b701-45e080ec6d2e",
+                    "name": "Create Collaboration",
+                    "request": {
+                        "name": "Create Collaboration",
+                        "description": {},
+                        "url": {
+                            "path": [
+                                "collaborations"
+                            ],
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"category\": \"OTHER\",\n  \"title\": \"<string>\",\n  \"description\": \"<string>\",\n  \"fromLocation\": {\n    \"name\": \"<string>\",\n    \"lat\": \"<number>\",\n    \"lng\": \"<number>\"\n  },\n  \"toLocation\": {\n    \"name\": \"<string>\",\n    \"lat\": \"<number>\",\n    \"lng\": \"<number>\"\n  },\n  \"scheduledAt\": \"<dateTime>\",\n  \"maxMembers\": \"<integer>\"\n}",
+                            "options": {
+                                "raw": {
+                                    "headerFamily": "json",
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": null
+                    },
+                    "response": [
+                        {
+                            "id": "f2635a22-d778-4e29-88fe-d64926eff15f",
+                            "name": "Created",
+                            "originalRequest": {
+                                "url": {
+                                    "path": [
+                                        "collaborations"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "description": {
+                                            "content": "Added as a part of security scheme: bearer",
+                                            "type": "text/plain"
+                                        },
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                    }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"category\": \"OTHER\",\n  \"title\": \"<string>\",\n  \"description\": \"<string>\",\n  \"fromLocation\": {\n    \"name\": \"<string>\",\n    \"lat\": \"<number>\",\n    \"lng\": \"<number>\"\n  },\n  \"toLocation\": {\n    \"name\": \"<string>\",\n    \"lat\": \"<number>\",\n    \"lng\": \"<number>\"\n  },\n  \"scheduledAt\": \"<dateTime>\",\n  \"maxMembers\": \"<integer>\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "headerFamily": "json",
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "",
+                            "cookie": [],
+                            "_postman_previewlanguage": "json"
+                        }
+                    ],
+                    "event": [],
+                    "protocolProfileBehavior": {
+                        "disableBodyPruning": true
+                    }
+                },
+                {
+                    "name": "{id}",
+                    "description": "",
+                    "item": [
+                        {
+                            "id": "76a269b4-9021-4302-935a-ca8245e9e04b",
+                            "name": "Collaboration Details",
+                            "request": {
+                                "name": "Collaboration Details",
+                                "description": {},
+                                "url": {
+                                    "path": [
+                                        "collaborations",
+                                        ":id"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": [
+                                        {
+                                            "type": "any",
+                                            "key": "id"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "body": {},
+                                "auth": null
+                            },
+                            "response": [],
+                            "event": [],
+                            "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                            }
+                        },
+                        {
+                            "id": "a464a461-c291-4c1b-9d3d-480abfab2e1c",
+                            "name": "Update Collaboration",
+                            "request": {
+                                "name": "Update Collaboration",
+                                "description": {},
+                                "url": {
+                                    "path": [
+                                        "collaborations",
+                                        ":id"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": [
+                                        {
+                                            "type": "any",
+                                            "key": "id"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "body": {},
+                                "auth": null
+                            },
+                            "response": [],
+                            "event": [],
+                            "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                            }
+                        },
+                        {
+                            "id": "28c1dfea-6e4d-45df-9449-7b1612e9eef8",
+                            "name": "Soft Delete Collaboration",
+                            "request": {
+                                "name": "Soft Delete Collaboration",
+                                "description": {},
+                                "url": {
+                                    "path": [
+                                        "collaborations",
+                                        ":id"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": [
+                                        {
+                                            "type": "any",
+                                            "key": "id"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "body": {},
+                                "auth": null
+                            },
+                            "response": [],
+                            "event": [],
+                            "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                            }
+                        },
+                        {
+                            "name": "join",
+                            "description": "",
+                            "item": [
+                                {
+                                    "id": "1d7e633d-ce78-4723-ac56-fbd24b7bd29c",
+                                    "name": "Request Join",
+                                    "request": {
+                                        "name": "Request Join",
+                                        "description": {},
+                                        "url": {
+                                            "path": [
+                                                "collaborations",
+                                                ":id",
+                                                "join"
+                                            ],
+                                            "host": [
+                                                "{{baseUrl}}"
+                                            ],
+                                            "query": [],
+                                            "variable": [
+                                                {
+                                                    "type": "any",
+                                                    "key": "id"
+                                                }
+                                            ]
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Content-Type",
+                                                "value": "application/json"
+                                            }
+                                        ],
+                                        "method": "POST",
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": "{\n  \"message\": \"<string>\"\n}",
+                                            "options": {
+                                                "raw": {
+                                                    "headerFamily": "json",
+                                                    "language": "json"
+                                                }
+                                            }
+                                        },
+                                        "auth": null
+                                    },
+                                    "response": [],
+                                    "event": [],
+                                    "protocolProfileBehavior": {
+                                        "disableBodyPruning": true
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "requests",
+                            "description": "",
+                            "item": [
+                                {
+                                    "id": "b214ec07-075e-4433-bc5d-64476ce030f6",
+                                    "name": "Pending Join Requests",
+                                    "request": {
+                                        "name": "Pending Join Requests",
+                                        "description": {},
+                                        "url": {
+                                            "path": [
+                                                "collaborations",
+                                                ":id",
+                                                "requests"
+                                            ],
+                                            "host": [
+                                                "{{baseUrl}}"
+                                            ],
+                                            "query": [],
+                                            "variable": [
+                                                {
+                                                    "type": "any",
+                                                    "key": "id"
+                                                }
+                                            ]
+                                        },
+                                        "method": "GET",
+                                        "body": {},
+                                        "auth": null
+                                    },
+                                    "response": [],
+                                    "event": [],
+                                    "protocolProfileBehavior": {
+                                        "disableBodyPruning": true
+                                    }
+                                },
+                                {
+                                    "name": "{requestId}",
+                                    "description": "",
+                                    "item": [
+                                        {
+                                            "name": "approve",
+                                            "description": "",
+                                            "item": [
+                                                {
+                                                    "id": "9a3c8106-848c-4c42-ab8e-7d9388a4aec1",
+                                                    "name": "Approve Request",
+                                                    "request": {
+                                                        "name": "Approve Request",
+                                                        "description": {},
+                                                        "url": {
+                                                            "path": [
+                                                                "collaborations",
+                                                                ":id",
+                                                                "requests",
+                                                                ":requestId",
+                                                                "approve"
+                                                            ],
+                                                            "host": [
+                                                                "{{baseUrl}}"
+                                                            ],
+                                                            "query": [],
+                                                            "variable": [
+                                                                {
+                                                                    "type": "any",
+                                                                    "key": "id"
+                                                                },
+                                                                {
+                                                                    "type": "any",
+                                                                    "key": "requestId"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "method": "POST",
+                                                        "body": {},
+                                                        "auth": null
+                                                    },
+                                                    "response": [],
+                                                    "event": [],
+                                                    "protocolProfileBehavior": {
+                                                        "disableBodyPruning": true
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "reject",
+                                            "description": "",
+                                            "item": [
+                                                {
+                                                    "id": "996c5a8c-f7da-4ccb-aa3f-a834863729ff",
+                                                    "name": "Reject Request",
+                                                    "request": {
+                                                        "name": "Reject Request",
+                                                        "description": {},
+                                                        "url": {
+                                                            "path": [
+                                                                "collaborations",
+                                                                ":id",
+                                                                "requests",
+                                                                ":requestId",
+                                                                "reject"
+                                                            ],
+                                                            "host": [
+                                                                "{{baseUrl}}"
+                                                            ],
+                                                            "query": [],
+                                                            "variable": [
+                                                                {
+                                                                    "type": "any",
+                                                                    "key": "id"
+                                                                },
+                                                                {
+                                                                    "type": "any",
+                                                                    "key": "requestId"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "method": "POST",
+                                                        "body": {},
+                                                        "auth": null
+                                                    },
+                                                    "response": [],
+                                                    "event": [],
+                                                    "protocolProfileBehavior": {
+                                                        "disableBodyPruning": true
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "leave",
+                            "description": "",
+                            "item": [
+                                {
+                                    "id": "3af3051b-a9b0-4087-bfae-2432115654d0",
+                                    "name": "Leave Collaboration",
+                                    "request": {
+                                        "name": "Leave Collaboration",
+                                        "description": {},
+                                        "url": {
+                                            "path": [
+                                                "collaborations",
+                                                ":id",
+                                                "leave"
+                                            ],
+                                            "host": [
+                                                "{{baseUrl}}"
+                                            ],
+                                            "query": [],
+                                            "variable": [
+                                                {
+                                                    "type": "any",
+                                                    "key": "id"
+                                                }
+                                            ]
+                                        },
+                                        "method": "POST",
+                                        "body": {},
+                                        "auth": null
+                                    },
+                                    "response": [],
+                                    "event": [],
+                                    "protocolProfileBehavior": {
+                                        "disableBodyPruning": true
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "chat",
+            "description": "",
+            "item": [
+                {
+                    "name": "rooms",
+                    "description": "",
+                    "item": [
+                        {
+                            "id": "a858a3d7-89ed-49bd-9c58-e9c4471cce1f",
+                            "name": "User Chat Rooms",
+                            "request": {
+                                "name": "User Chat Rooms",
+                                "description": {},
+                                "url": {
+                                    "path": [
+                                        "chat",
+                                        "rooms"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "method": "GET",
+                                "body": {},
+                                "auth": null
+                            },
+                            "response": [],
+                            "event": [],
+                            "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                            }
+                        },
+                        {
+                            "name": "{roomId}",
+                            "description": "",
+                            "item": [
+                                {
+                                    "name": "messages",
+                                    "description": "",
+                                    "item": [
+                                        {
+                                            "id": "34491d68-e61c-41c9-839e-758d8fbf2b45",
+                                            "name": "Room Messages",
+                                            "request": {
+                                                "name": "Room Messages",
+                                                "description": {},
+                                                "url": {
+                                                    "path": [
+                                                        "chat",
+                                                        "rooms",
+                                                        ":roomId",
+                                                        "messages"
+                                                    ],
+                                                    "host": [
+                                                        "{{baseUrl}}"
+                                                    ],
+                                                    "query": [
+                                                        {
+                                                            "disabled": false,
+                                                            "description": {
+                                                                "content": "",
+                                                                "type": "text/plain"
+                                                            },
+                                                            "key": "page",
+                                                            "value": ""
+                                                        },
+                                                        {
+                                                            "disabled": false,
+                                                            "description": {
+                                                                "content": "",
+                                                                "type": "text/plain"
+                                                            },
+                                                            "key": "limit",
+                                                            "value": ""
+                                                        }
+                                                    ],
+                                                    "variable": [
+                                                        {
+                                                            "type": "any",
+                                                            "key": "roomId"
+                                                        }
+                                                    ]
+                                                },
+                                                "method": "GET",
+                                                "body": {},
+                                                "auth": null
+                                            },
+                                            "response": [],
+                                            "event": [],
+                                            "protocolProfileBehavior": {
+                                                "disableBodyPruning": true
+                                            }
+                                        },
+                                        {
+                                            "id": "535e57f7-16f1-4bf3-a305-0c24dd4892c5",
+                                            "name": "Send Message",
+                                            "request": {
+                                                "name": "Send Message",
+                                                "description": {},
+                                                "url": {
+                                                    "path": [
+                                                        "chat",
+                                                        "rooms",
+                                                        ":roomId",
+                                                        "messages"
+                                                    ],
+                                                    "host": [
+                                                        "{{baseUrl}}"
+                                                    ],
+                                                    "query": [],
+                                                    "variable": [
+                                                        {
+                                                            "type": "any",
+                                                            "key": "roomId"
+                                                        }
+                                                    ]
+                                                },
+                                                "header": [
+                                                    {
+                                                        "key": "Content-Type",
+                                                        "value": "application/json"
+                                                    }
+                                                ],
+                                                "method": "POST",
+                                                "body": {
+                                                    "mode": "raw",
+                                                    "raw": "",
+                                                    "options": {
+                                                        "raw": {
+                                                            "headerFamily": "json",
+                                                            "language": "json"
+                                                        }
+                                                    }
+                                                },
+                                                "auth": null
+                                            },
+                                            "response": [],
+                                            "event": [],
+                                            "protocolProfileBehavior": {
+                                                "disableBodyPruning": true
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "ratings",
+            "description": "",
+            "item": [
+                {
+                    "id": "3df40393-86ec-47b4-abde-b84558f02078",
+                    "name": "Submit Rating",
+                    "request": {
+                        "name": "Submit Rating",
+                        "description": {},
+                        "url": {
+                            "path": [
+                                "ratings"
+                            ],
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "",
+                            "options": {
+                                "raw": {
+                                    "headerFamily": "json",
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": null
+                    },
+                    "response": [],
+                    "event": [],
+                    "protocolProfileBehavior": {
+                        "disableBodyPruning": true
+                    }
+                }
+            ]
+        },
+        {
+            "name": "notifications",
+            "description": "",
+            "item": [
+                {
+                    "id": "7fcb5d65-d067-4f28-adca-522453442124",
+                    "name": "Notifications",
+                    "request": {
+                        "name": "Notifications",
+                        "description": {},
+                        "url": {
+                            "path": [
+                                "notifications"
+                            ],
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "GET",
+                        "body": {},
+                        "auth": null
+                    },
+                    "response": [],
+                    "event": [],
+                    "protocolProfileBehavior": {
+                        "disableBodyPruning": true
+                    }
+                },
+                {
+                    "name": "{id}",
+                    "description": "",
+                    "item": [
+                        {
+                            "name": "read",
+                            "description": "",
+                            "item": [
+                                {
+                                    "id": "7c659777-dba7-413e-aaa9-6b01eea8107f",
+                                    "name": "Mark Read",
+                                    "request": {
+                                        "name": "Mark Read",
+                                        "description": {},
+                                        "url": {
+                                            "path": [
+                                                "notifications",
+                                                ":id",
+                                                "read"
+                                            ],
+                                            "host": [
+                                                "{{baseUrl}}"
+                                            ],
+                                            "query": [],
+                                            "variable": [
+                                                {
+                                                    "type": "any",
+                                                    "key": "id"
+                                                }
+                                            ]
+                                        },
+                                        "method": "PATCH",
+                                        "body": {},
+                                        "auth": null
+                                    },
+                                    "response": [],
+                                    "event": [],
+                                    "protocolProfileBehavior": {
+                                        "disableBodyPruning": true
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "read-all",
+                    "description": "",
+                    "item": [
+                        {
+                            "id": "3c558d28-62f7-4f24-93c7-04a6af8ad637",
+                            "name": "Mark All Read",
+                            "request": {
+                                "name": "Mark All Read",
+                                "description": {},
+                                "url": {
+                                    "path": [
+                                        "notifications",
+                                        "read-all"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "method": "PATCH",
+                                "body": {},
+                                "auth": null
+                            },
+                            "response": [],
+                            "event": [],
+                            "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "type": "any",
+                "value": "{{bearerToken}}",
+                "key": "token"
+            }
+        ]
+    },
+    "event": [],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:5000/api/v1"
+        }
+    ],
+    "info": {
+        "_postman_id": "047e1ce2-d86c-489a-aef5-42dbc019348c",
+        "name": "Connectify API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": {
+            "content": "Connectify Collaboration Platform API\n\nFeatures:\n  - Google Authentication\n  - User Onboarding\n  - Collaborations\n  - Membership Requests\n  - Group Chat\n  - Ratings\n  - Notifications\n",
+            "type": "text/plain"
+        }
+    }
+}

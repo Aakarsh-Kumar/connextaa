@@ -1,0 +1,614 @@
+openapi: 3.1.0
+
+info:
+  title: Connectify API
+  version: 1.0.0
+  description: |
+    Connectify Collaboration Platform API
+
+    Features:
+      - Google Authentication
+      - User Onboarding
+      - Collaborations
+      - Membership Requests
+      - Group Chat
+      - Ratings
+      - Notifications
+
+servers:
+  - url: http://localhost:5000/api/v1
+    description: Local Development
+
+tags:
+  - name: Auth
+  - name: Onboarding
+  - name: Users
+  - name: Collaborations
+  - name: Memberships
+  - name: Chat
+  - name: Ratings
+  - name: Notifications
+
+security:
+  - bearerAuth: []
+
+components:
+
+  securitySchemes:
+
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    ErrorResponse:
+      type: object
+
+      properties:
+        success:
+          type: boolean
+          example: false
+
+        message:
+          type: string
+          example: Unauthorized
+
+    PaginationMeta:
+      type: object
+
+      properties:
+        page:
+          type: integer
+
+        limit:
+          type: integer
+
+        total:
+          type: integer
+
+        hasMore:
+          type: boolean
+
+    Category:
+      type: string
+
+      enum:
+        - CARPOOLING
+        - EVENTS
+        - STUDY
+        - PROFESSIONAL
+        - SPORTS
+        - TRIPS
+        - OTHER
+
+    CollaborationStatus:
+      type: string
+
+      enum:
+        - OPEN
+        - FULL
+        - COMPLETED
+        - CANCELLED
+
+    JoinStatus:
+      type: string
+
+      enum:
+        - PENDING
+        - APPROVED
+        - REJECTED
+        - LEFT
+
+    User:
+
+      type: object
+
+      properties:
+
+        id:
+          type: string
+          format: uuid
+
+        name:
+          type: string
+
+        email:
+          type: string
+
+        username:
+          type: string
+
+        avatarUrl:
+          type: string
+          nullable: true
+
+        bio:
+          type: string
+          nullable: true
+
+    Location:
+
+      type: object
+
+      properties:
+
+        name:
+          type: string
+
+        lat:
+          type: number
+
+        lng:
+          type: number
+
+    Collaboration:
+
+      type: object
+
+      properties:
+
+        id:
+          type: string
+
+        category:
+          $ref: '#/components/schemas/Category'
+
+        title:
+          type: string
+
+        description:
+          type: string
+
+        fromLocation:
+          $ref: '#/components/schemas/Location'
+
+        toLocation:
+          $ref: '#/components/schemas/Location'
+
+        scheduledAt:
+          type: string
+          format: date-time
+
+        maxMembers:
+          type: integer
+
+        status:
+          $ref: '#/components/schemas/CollaborationStatus'
+
+        creator:
+          $ref: '#/components/schemas/User'
+
+    CreateCollaborationRequest:
+
+      type: object
+
+      required:
+        - category
+        - title
+        - description
+        - fromLocation
+        - toLocation
+        - scheduledAt
+        - maxMembers
+
+      properties:
+
+        category:
+          $ref: '#/components/schemas/Category'
+
+        title:
+          type: string
+
+        description:
+          type: string
+
+        fromLocation:
+          $ref: '#/components/schemas/Location'
+
+        toLocation:
+          $ref: '#/components/schemas/Location'
+
+        scheduledAt:
+          type: string
+          format: date-time
+
+        maxMembers:
+          type: integer
+
+    JoinRequest:
+
+      type: object
+
+      properties:
+
+        message:
+          type: string
+          example: Interested in joining
+
+paths:
+
+  /auth/google:
+
+    post:
+
+      tags:
+        - Auth
+
+      summary: Google Sign In
+
+      requestBody:
+
+        required: true
+
+        content:
+
+          application/json:
+
+            schema:
+
+              type: object
+
+              required:
+                - idToken
+
+              properties:
+
+                idToken:
+                  type: string
+
+      responses:
+
+        "200":
+
+          description: Success
+
+          content:
+
+            application/json:
+
+              example:
+
+                success: true
+
+                token: jwt_token
+
+                onboardingCompleted: false
+
+                user:
+
+                  id: uuid
+
+                  name: Aakarsh
+
+                  email: aakarsh@gmail.com
+
+  /auth/me:
+
+    get:
+
+      tags:
+        - Auth
+
+      summary: Current User
+
+      responses:
+
+        "200":
+
+          description: User Details
+
+  /onboarding:
+
+    post:
+
+      tags:
+        - Onboarding
+
+      summary: Complete onboarding
+
+      requestBody:
+
+        required: true
+
+        content:
+
+          application/json:
+
+            example:
+
+              username: aakarsh
+
+              bio: Building Connectify
+
+              categories:
+                - STUDY
+                - PROFESSIONAL
+                - TRIPS
+
+      responses:
+
+        "200":
+
+          description: Onboarding Completed
+
+  /users/me:
+
+    get:
+
+      tags:
+        - Users
+
+      summary: Logged in profile
+
+    patch:
+
+      tags:
+        - Users
+
+      summary: Update profile
+
+  /users/{userId}:
+
+    get:
+
+      tags:
+        - Users
+
+      summary: Public Profile
+
+      parameters:
+
+        - name: userId
+
+          in: path
+
+          required: true
+
+          schema:
+            type: string
+
+  /collaborations:
+
+    get:
+
+      tags:
+        - Collaborations
+
+      summary: Collaboration Feed
+
+      parameters:
+
+        - name: page
+          in: query
+          schema:
+            type: integer
+
+        - name: limit
+          in: query
+          schema:
+            type: integer
+
+        - name: category
+          in: query
+          schema:
+            $ref: '#/components/schemas/Category'
+
+    post:
+
+      tags:
+        - Collaborations
+
+      summary: Create Collaboration
+
+      requestBody:
+
+        required: true
+
+        content:
+
+          application/json:
+
+            schema:
+              $ref: '#/components/schemas/CreateCollaborationRequest'
+
+      responses:
+
+        "201":
+
+          description: Created
+
+          content:
+
+            application/json:
+
+              example:
+
+                success: true
+
+                collaborationId: uuid
+
+  /collaborations/{id}:
+
+    get:
+
+      tags:
+        - Collaborations
+
+      summary: Collaboration Details
+
+    patch:
+
+      tags:
+        - Collaborations
+
+      summary: Update Collaboration
+
+    delete:
+
+      tags:
+        - Collaborations
+
+      summary: Soft Delete Collaboration
+
+  /collaborations/{id}/join:
+
+    post:
+
+      tags:
+        - Memberships
+
+      summary: Request Join
+
+      requestBody:
+
+        required: true
+
+        content:
+
+          application/json:
+
+            schema:
+              $ref: '#/components/schemas/JoinRequest'
+
+  /collaborations/{id}/requests:
+
+    get:
+
+      tags:
+        - Memberships
+
+      summary: Pending Join Requests
+
+  /collaborations/{id}/requests/{requestId}/approve:
+
+    post:
+
+      tags:
+        - Memberships
+
+      summary: Approve Request
+
+  /collaborations/{id}/requests/{requestId}/reject:
+
+    post:
+
+      tags:
+        - Memberships
+
+      summary: Reject Request
+
+  /collaborations/{id}/leave:
+
+    post:
+
+      tags:
+        - Memberships
+
+      summary: Leave Collaboration
+
+  /chat/rooms:
+
+    get:
+
+      tags:
+        - Chat
+
+      summary: User Chat Rooms
+
+  /chat/rooms/{roomId}/messages:
+
+    get:
+
+      tags:
+        - Chat
+
+      summary: Room Messages
+
+      parameters:
+
+        - name: page
+          in: query
+
+        - name: limit
+          in: query
+
+    post:
+
+      tags:
+        - Chat
+
+      summary: Send Message
+
+      requestBody:
+
+        required: true
+
+        content:
+
+          application/json:
+
+            example:
+
+              message: Hello everyone
+
+  /ratings:
+
+    post:
+
+      tags:
+        - Ratings
+
+      summary: Submit Rating
+
+      requestBody:
+
+        required: true
+
+        content:
+
+          application/json:
+
+            example:
+
+              collaborationId: uuid
+
+              reviewedUserId: uuid
+
+              showUpRating: 5
+
+              friendlyRating: 5
+
+              safeRating: 5
+
+              collaborativeRating: 5
+
+              comment: Great teammate
+
+  /notifications:
+
+    get:
+
+      tags:
+        - Notifications
+
+      summary: Notifications
+
+  /notifications/{id}/read:
+
+    patch:
+
+      tags:
+        - Notifications
+
+      summary: Mark Read
+
+  /notifications/read-all:
+
+    patch:
+
+      tags:
+        - Notifications
+
+      summary: Mark All Read
