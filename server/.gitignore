@@ -20,3 +20,6 @@ redis-setup.js
 
 #bun
 bun.lockb
+
+#typescript
+tsconfig.tsbuildinfo

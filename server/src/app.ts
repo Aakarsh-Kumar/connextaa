@@ -9,6 +9,7 @@ import { extractClientIP, isPrivateOrLocalIP } from './utils/ipUtils';
 import HealthRoutes from './routes/health';
 import SampleRoutes from './routes/sample-route';
 import AuthRoutes from './routes/auth-route';
+import OnboardingRoutes from './routes/onboarding-route'
 import './types';
 
 const app = express();
@@ -118,6 +119,7 @@ app.use('/api/health', HealthRoutes);
 app.use('/api/sample', SampleRoutes);
 
 app.use(`/api/${config.apiVersion}/auth`, AuthRoutes)
+app.use(`/api/${config.apiVersion}/onboarding`, OnboardingRoutes)
 
 
 
