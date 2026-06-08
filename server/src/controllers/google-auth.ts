@@ -1,7 +1,8 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import logger from '../utils/logger';
 import prisma from '../models';
 import { signToken } from '../utils/jwt';
+import { GoogleAuthRequest } from '../middlewares/verifyGoogleAuthToken';
 
 // Helper function to generate a unique username
 const generateUniqueUsername = async (email: string, name: string): Promise<string> => {
@@ -40,9 +41,9 @@ const generateUniqueUsername = async (email: string, name: string): Promise<stri
     return username;
 };
 
-const googleAuthController = async (req: Request, res: Response) => {
+const googleAuthController = async (req: GoogleAuthRequest, res: Response) => {
     try {
-        const payload = req.user;
+        const payload = req.googleUser;
         if (!payload) {
             res.status(401).json({ message: 'Unauthorized: Google token payload missing' });
             return;

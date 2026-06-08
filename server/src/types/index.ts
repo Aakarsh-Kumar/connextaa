@@ -1,10 +1,14 @@
-import { TokenPayload } from 'google-auth-library';
 import { components } from './api';
+
+export interface UserSession {
+  id: string;
+  email: string;
+}
 
 declare global {
   namespace Express {
     interface Request {
-      user?: TokenPayload;
+      user?: UserSession;
     }
   }
 }

@@ -1,12 +1,14 @@
-import { OAuth2Client } from "google-auth-library";
+import { OAuth2Client, TokenPayload } from "google-auth-library";
 import { Request, Response, NextFunction } from "express";
 import { config } from "../config/config";
 
 const client = new OAuth2Client(
     config.googleClientId,
-
 );
 
+export interface GoogleAuthRequest extends Request {
+    googleUser?: TokenPayload;
+}
 
 export const verifyGoogleAuthToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -24,7 +26,7 @@ export const verifyGoogleAuthToken = async (req: Request, res: Response, next: N
             res.status(401).json({ message: 'Unauthorized' });
             return;
         }
-        req.user = payload;
+        (req as GoogleAuthRequest).googleUser = payload;
         next();
     } catch (error) {
         console.error('Error verifying Google authentication token:', error); //TODO: to be removed in production
