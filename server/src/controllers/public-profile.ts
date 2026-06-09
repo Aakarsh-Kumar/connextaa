@@ -4,13 +4,12 @@ import prisma from '../models';
 
 const publicProfileController = async (req: Request, res: Response) => {
     try {
-        console.log(req.params.userId);
         if (!req.params.userId) {
             res.status(401).json({ success: false, message: 'Unauthorized' });
             return;
         }
 
-        const userId = Array.isArray(req.params.userId)?req.params.userId[0]:req.params.userId;
+    const userId = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId;
 
         // Fetch user profile with categories in a single query
         const user = await prisma.user.findUnique({
@@ -34,51 +33,48 @@ const publicProfileController = async (req: Request, res: Response) => {
 
         // Fetch stats in parallel for performance
         const [createdCount, joinedCount, completedCount, ratingAgg] = await Promise.all([
-          prisma.collaboration.count({ where: { creatorId: userId } }),
-          prisma.collaborationMember.count({
-            where: { userId, joinStatus: 'APPROVED' },
-          }),
-          prisma.collaboration.count({
-            where: {
-              status: 'COMPLETED',
-              OR: [
-                { creatorId: userId },
-                {
-                  members: {
-                    some: { userId, joinStatus: 'APPROVED' },
-                  },
+            prisma.collaboration.count({ where: { creatorId: userId } }),
+            prisma.collaborationMember.count({
+                where: { userId, joinStatus: 'APPROVED' },
+            }),
+            prisma.collaboration.count({
+                where: {
+                    status: 'COMPLETED',
+                    OR: [
+                        { creatorId: userId },
+                        {
+                            members: {
+                                some: { userId, joinStatus: 'APPROVED' },
+                            },
+                        },
+                    ],
                 },
-              ],
-            },
-          }),
-          prisma.rating.aggregate({
-            where: { reviewedUserId: userId },
-            _avg: {
-              showUpRating: true,
-              friendlyRating: true,
-              collaborativeRating: true,
-              safeRating: true,
-            },
-            _count: { _all: true },
-          }),
+            }),
+            prisma.rating.aggregate({
+                where: { reviewedUserId: userId },
+                _avg: {
+                    showUpRating: true,
+                    friendlyRating: true,
+                    collaborativeRating: true,
+                    safeRating: true,
+                },
+                _count: { _all: true },
+            }),
         ]);
 
         const showUp = ratingAgg._avg.showUpRating ?? 0;
         const friendly = ratingAgg._avg.friendlyRating ?? 0;
         const collaborative = ratingAgg._avg.collaborativeRating ?? 0;
         const safe = ratingAgg._avg.safeRating ?? 0;
-
-        const overall = Number(((showUp + friendly + collaborative + safe) / 4).toFixed(1));
+        const overall = Number(((showUp + friendly + collaborative + safe) / 4).toFixed(2));
 
         const rating = {
-          count: ratingAgg._count._all,
-          breakdown: {
-            showUp: Number(showUp.toFixed(1)),
-            friendly: Number(friendly.toFixed(1)),
-            collaborative: Number(collaborative.toFixed(1)),
-            safe: Number(safe.toFixed(1)),
-          },
-          overall,
+            overall,
+            showUpRating: Number(showUp.toFixed(1)),
+            friendlyRating: Number(friendly.toFixed(1)),
+            safeRating: Number(safe.toFixed(1)),
+            collaborativeRating: Number(collaborative.toFixed(1)),
+            totalReviews: ratingAgg._count._all,
         };
 
         // Flatten categories from [{ category: "STUDY" }] to ["STUDY"]
