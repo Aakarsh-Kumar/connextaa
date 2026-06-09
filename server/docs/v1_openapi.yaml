@@ -33,18 +33,23 @@ security:
   - bearerAuth: []
 
 components:
-
   securitySchemes:
-
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
 
   schemas:
+    #################################################
+    # COMMON
+    #################################################
 
     ErrorResponse:
       type: object
+
+      required:
+        - success
+        - message
 
       properties:
         success:
@@ -55,21 +60,236 @@ components:
           type: string
           example: Unauthorized
 
+    SuccessResponse:
+      type: object
+
+      required:
+        - success
+
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Operation successful
+
     PaginationMeta:
       type: object
 
       properties:
         page:
           type: integer
+          example: 1
 
         limit:
           type: integer
+          example: 20
 
         total:
           type: integer
+          example: 145
 
         hasMore:
           type: boolean
+          example: true
+
+    AuthMeResponse:
+      type: object
+
+      properties:
+        success:
+          type: boolean
+
+        user:
+          type: object
+
+          properties:
+            id:
+              type: string
+              format: uuid
+
+            email:
+              type: string
+
+            name:
+              type: string
+
+            username:
+              type: string
+              nullable: true
+
+            avatarUrl:
+              type: string
+              nullable: true
+
+            onboardingCompleted:
+              type: boolean
+
+    ProfileResponse:
+      type: object
+
+      required:
+        - success
+        - user
+        - stats
+        - rating
+
+      properties:
+        success:
+          type: boolean
+          example: true
+
+        user:
+          type: object
+
+          required:
+            - id
+            - name
+            - username
+            - categories
+
+          properties:
+            id:
+              type: string
+              format: uuid
+
+            name:
+              type: string
+              example: Rahul Sharma
+
+            username:
+              type: string
+              example: rahul_23
+
+            avatarUrl:
+              type: string
+              nullable: true
+              example: https://example.com/avatar.jpg
+
+            bio:
+              type: string
+              nullable: true
+              example: Traveller and football enthusiast
+
+            categories:
+              type: array
+
+              items:
+                $ref: "#/components/schemas/Category"
+
+              example:
+                - TRIPS
+                - SPORTS
+                - EVENTS
+
+        stats:
+          type: object
+
+          required:
+            - created
+            - joined
+            - completed
+
+          properties:
+            created:
+              type: integer
+              example: 5
+
+            joined:
+              type: integer
+              example: 17
+
+            completed:
+              type: integer
+              example: 10
+
+        rating:
+          type: object
+
+          required:
+            - overall
+            - showUpRating
+            - friendlyRating
+            - safeRating
+            - collaborativeRating
+            - totalReviews
+
+          properties:
+            overall:
+              type: number
+              format: float
+              example: 3.08
+              description: Average of all four rating categories rounded to 2 decimal places
+
+            showUpRating:
+              type: number
+              format: float
+              example: 4.8
+
+            friendlyRating:
+              type: number
+              format: float
+              example: 2.2
+
+            safeRating:
+              type: number
+              format: float
+              example: 1.2
+
+            collaborativeRating:
+              type: number
+              format: float
+              example: 4.1
+
+            totalReviews:
+              type: integer
+              example: 23
+
+    PendingJoinRequestsResponse:
+      type: object
+
+      properties:
+        success:
+          type: boolean
+
+        data:
+          type: array
+
+          items:
+            type: object
+
+            properties:
+              requestId:
+                type: string
+
+              joinMessage:
+                type: string
+
+              status:
+                $ref: "#/components/schemas/JoinStatus"
+
+              user:
+                type: object
+
+                properties:
+                  id:
+                    type: string
+
+                  name:
+                    type: string
+
+                  username:
+                    type: string
+
+                  avatarUrl:
+                    type: string
+                    nullable: true
+
+    #################################################
+    # ENUMS
+    #################################################
 
     Category:
       type: string
@@ -101,12 +321,14 @@ components:
         - REJECTED
         - LEFT
 
-    User:
+    #################################################
+    # USER
+    #################################################
 
+    User:
       type: object
 
       properties:
-
         id:
           type: string
           format: uuid
@@ -128,12 +350,32 @@ components:
           type: string
           nullable: true
 
-    Location:
-
+    UserStats:
       type: object
 
       properties:
+        created:
+          type: integer
 
+        joined:
+          type: integer
+
+        completed:
+          type: integer
+
+    #################################################
+    # LOCATION
+    #################################################
+
+    Location:
+      type: object
+
+      required:
+        - name
+        - lat
+        - lng
+
+      properties:
         name:
           type: string
 
@@ -143,17 +385,19 @@ components:
         lng:
           type: number
 
-    Collaboration:
+    #################################################
+    # COLLABORATION
+    #################################################
 
+    Collaboration:
       type: object
 
       properties:
-
         id:
           type: string
 
         category:
-          $ref: '#/components/schemas/Category'
+          $ref: "#/components/schemas/Category"
 
         title:
           type: string
@@ -162,10 +406,10 @@ components:
           type: string
 
         fromLocation:
-          $ref: '#/components/schemas/Location'
+          $ref: "#/components/schemas/Location"
 
         toLocation:
-          $ref: '#/components/schemas/Location'
+          $ref: "#/components/schemas/Location"
 
         scheduledAt:
           type: string
@@ -175,13 +419,174 @@ components:
           type: integer
 
         status:
-          $ref: '#/components/schemas/CollaborationStatus'
+          $ref: "#/components/schemas/CollaborationStatus"
 
         creator:
-          $ref: '#/components/schemas/User'
+          $ref: "#/components/schemas/User"
+
+    CollaborationFeedItem:
+      type: object
+
+      properties:
+        id:
+          type: string
+
+        category:
+          $ref: "#/components/schemas/Category"
+
+        title:
+          type: string
+
+        description:
+          type: string
+
+        scheduledAt:
+          type: string
+          format: date-time
+
+        status:
+          $ref: "#/components/schemas/CollaborationStatus"
+
+        currentMembers:
+          type: integer
+
+        maxMembers:
+          type: integer
+
+        distanceMeters:
+          type: number
+          nullable: true
+
+        creator:
+          $ref: "#/components/schemas/User"
+
+        fromLocation:
+          $ref: "#/components/schemas/Location"
+
+        toLocation:
+          $ref: "#/components/schemas/Location"
+
+    #################################################
+    # CHAT
+    #################################################
+
+    ChatRoom:
+      type: object
+
+      properties:
+        roomId:
+          type: string
+
+        collaborationId:
+          type: string
+
+        title:
+          type: string
+
+        unreadCount:
+          type: integer
+
+        lastMessage:
+          type: string
+
+    Message:
+      type: object
+
+      properties:
+        id:
+          type: string
+
+        message:
+          type: string
+
+        createdAt:
+          type: string
+          format: date-time
+
+        sender:
+          $ref: "#/components/schemas/User"
+
+    #################################################
+    # NOTIFICATION
+    #################################################
+
+    Notification:
+      type: object
+
+      properties:
+        id:
+          type: string
+
+        type:
+          type: string
+
+        title:
+          type: string
+
+        body:
+          type: string
+
+        isRead:
+          type: boolean
+
+        createdAt:
+          type: string
+          format: date-time
+
+    #################################################
+    # REQUEST DTOs
+    #################################################
+
+    GoogleAuthRequest:
+      type: object
+
+      required:
+        - idToken
+
+      properties:
+        idToken:
+          type: string
+
+    OnboardingRequest:
+      type: object
+
+      required:
+        - username
+        - categories
+
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 20
+
+        bio:
+          type: string
+          maxLength: 160
+
+        categories:
+          type: array
+
+          items:
+            $ref: "#/components/schemas/Category"
+
+    UpdateProfileRequest:
+      type: object
+
+      properties:
+        name:
+          type: string
+
+        username:
+          type: string
+
+        bio:
+          type: string
+
+        avatarUrl:
+          type: string
 
     CreateCollaborationRequest:
-
       type: object
 
       required:
@@ -194,9 +599,8 @@ components:
         - maxMembers
 
       properties:
-
         category:
-          $ref: '#/components/schemas/Category'
+          $ref: "#/components/schemas/Category"
 
         title:
           type: string
@@ -205,10 +609,28 @@ components:
           type: string
 
         fromLocation:
-          $ref: '#/components/schemas/Location'
+          $ref: "#/components/schemas/Location"
 
         toLocation:
-          $ref: '#/components/schemas/Location'
+          $ref: "#/components/schemas/Location"
+
+        scheduledAt:
+          type: string
+          format: date-time
+
+        maxMembers:
+          type: integer
+          minimum: 2
+
+    UpdateCollaborationRequest:
+      type: object
+
+      properties:
+        title:
+          type: string
+
+        description:
+          type: string
 
         scheduledAt:
           type: string
@@ -218,148 +640,388 @@ components:
           type: integer
 
     JoinRequest:
-
       type: object
 
       properties:
-
         message:
           type: string
+          maxLength: 300
           example: Interested in joining
 
+    SendMessageRequest:
+      type: object
+
+      required:
+        - message
+
+      properties:
+        message:
+          type: string
+
+    SubmitRatingRequest:
+      type: object
+
+      required:
+        - collaborationId
+        - reviewedUserId
+        - showUpRating
+        - friendlyRating
+        - safeRating
+        - collaborativeRating
+
+      properties:
+        collaborationId:
+          type: string
+
+        reviewedUserId:
+          type: string
+
+        showUpRating:
+          type: integer
+          minimum: 1
+          maximum: 5
+
+        friendlyRating:
+          type: integer
+          minimum: 1
+          maximum: 5
+
+        safeRating:
+          type: integer
+          minimum: 1
+          maximum: 5
+
+        collaborativeRating:
+          type: integer
+          minimum: 1
+          maximum: 5
+
+        comment:
+          type: string
+
+    #################################################
+    # RESPONSE DTOs
+    #################################################
+
+    AuthResponse:
+      type: object
+
+      properties:
+        success:
+          type: boolean
+
+        token:
+          type: string
+
+        onboardingCompleted:
+          type: boolean
+
+        user:
+          $ref: "#/components/schemas/User"
+
+    UserProfileResponse:
+      type: object
+
+      properties:
+        success:
+          type: boolean
+
+        user:
+          $ref: "#/components/schemas/User"
+
+        stats:
+          $ref: "#/components/schemas/UserStats"
+
+    CreateCollaborationResponse:
+      type: object
+
+      properties:
+        success:
+          type: boolean
+
+        collaborationId:
+          type: string
+          format: uuid
+
+        chatRoomId:
+          type: string
+
+    CollaborationResponse:
+      type: object
+
+      properties:
+        success:
+          type: boolean
+
+        collaboration:
+          $ref: "#/components/schemas/Collaboration"
+
+        members:
+          type: array
+
+          items:
+            type: object
+
+            properties:
+              id:
+                type: string
+
+              name:
+                type: string
+
+              username:
+                type: string
+
+              avatarUrl:
+                type: string
+                nullable: true
+
+        currentMembers:
+          type: integer
+
+        isCreator:
+          type: boolean
+
+        myJoinStatus:
+          $ref: "#/components/schemas/JoinStatus"
+
+    CollaborationFeedResponse:
+      type: object
+
+      properties:
+        success:
+          type: boolean
+
+        data:
+          type: array
+
+          items:
+            $ref: "#/components/schemas/CollaborationFeedItem"
+
+        pagination:
+          $ref: "#/components/schemas/PaginationMeta"
+
+    ChatRoomsResponse:
+      type: object
+
+      properties:
+        success:
+          type: boolean
+
+        data:
+          type: array
+
+          items:
+            $ref: "#/components/schemas/ChatRoom"
+
+    MessagesResponse:
+      type: object
+
+      properties:
+        success:
+          type: boolean
+
+        data:
+          type: array
+
+          items:
+            $ref: "#/components/schemas/Message"
+
+    NotificationsResponse:
+      type: object
+
+      properties:
+        success:
+          type: boolean
+
+        data:
+          type: array
+
+          items:
+            $ref: "#/components/schemas/Notification"
+
 paths:
+  #################################################
+  # AUTH
+  #################################################
 
   /auth/google:
-
     post:
-
       tags:
         - Auth
 
       summary: Google Sign In
 
-      requestBody:
+      security: []
 
+      requestBody:
         required: true
 
         content:
-
           application/json:
-
             schema:
-
-              type: object
-
-              required:
-                - idToken
-
-              properties:
-
-                idToken:
-                  type: string
+              $ref: "#/components/schemas/GoogleAuthRequest"
 
       responses:
-
         "200":
-
-          description: Success
+          description: Login Success
 
           content:
-
             application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
 
-              example:
+        "400":
+          description: Invalid Google Token
 
-                success: true
-
-                token: jwt_token
-
-                onboardingCompleted: false
-
-                user:
-
-                  id: uuid
-
-                  name: Aakarsh
-
-                  email: aakarsh@gmail.com
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /auth/me:
-
     get:
-
       tags:
         - Auth
 
-      summary: Current User
+      summary: Current Authenticated User
 
       responses:
-
         "200":
+          description: Current User
 
-          description: User Details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthMeResponse"
+
+        "401":
+          description: Unauthorized
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  #################################################
+  # ONBOARDING
+  #################################################
 
   /onboarding:
-
     post:
-
       tags:
         - Onboarding
 
-      summary: Complete onboarding
+      summary: Complete Onboarding
 
       requestBody:
-
         required: true
 
         content:
-
           application/json:
-
-            example:
-
-              username: aakarsh
-
-              bio: Building Connectify
-
-              categories:
-                - STUDY
-                - PROFESSIONAL
-                - TRIPS
+            schema:
+              $ref: "#/components/schemas/OnboardingRequest"
 
       responses:
-
         "200":
-
           description: Onboarding Completed
 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+        "400":
+          description: Validation Error
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "401":
+          description: Unauthorized
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  #################################################
+  # USERS
+  #################################################
+
   /users/me:
-
     get:
-
       tags:
         - Users
 
-      summary: Logged in profile
+      summary: Get My Profile
+
+      responses:
+        "200":
+          description: My Profile
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthMeResponse"
+
+        "401":
+          description: Unauthorized
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
     patch:
-
       tags:
         - Users
 
-      summary: Update profile
+      summary: Update My Profile
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileRequest"
+
+      responses:
+        "200":
+          description: Updated Profile
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthMeResponse"
+
+        "400":
+          description: Validation Error
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "401":
+          description: Unauthorized
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /users/{userId}:
-
     get:
-
       tags:
         - Users
 
-      summary: Public Profile
+      summary: Public User Profile
 
       parameters:
-
         - name: userId
 
           in: path
@@ -368,247 +1030,594 @@ paths:
 
           schema:
             type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Public Profile
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileResponse"
+
+        "404":
+          description: User Not Found
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  #################################################
+  # COLLABORATIONS
+  #################################################
 
   /collaborations:
-
     get:
-
       tags:
         - Collaborations
 
-      summary: Collaboration Feed
+      summary: Get Collaboration Feed
 
       parameters:
-
         - name: page
           in: query
           schema:
             type: integer
+            default: 1
 
         - name: limit
           in: query
           schema:
             type: integer
+            default: 20
 
         - name: category
           in: query
           schema:
-            $ref: '#/components/schemas/Category'
+            $ref: "#/components/schemas/Category"
+
+        - name: lat
+          in: query
+          schema:
+            type: number
+
+        - name: lng
+          in: query
+          schema:
+            type: number
+
+        - name: radius
+          in: query
+          schema:
+            type: number
+            default: 10
+
+      responses:
+        "200":
+          description: Collaboration Feed
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationFeedResponse"
 
     post:
-
       tags:
         - Collaborations
 
       summary: Create Collaboration
 
       requestBody:
-
         required: true
 
         content:
-
           application/json:
-
             schema:
-              $ref: '#/components/schemas/CreateCollaborationRequest'
+              $ref: "#/components/schemas/CreateCollaborationRequest"
 
       responses:
-
         "201":
-
-          description: Created
+          description: Collaboration Created
 
           content:
-
             application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCollaborationResponse"
 
-              example:
+        "400":
+          description: Validation Error
 
-                success: true
-
-                collaborationId: uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /collaborations/{id}:
-
     get:
-
       tags:
         - Collaborations
 
-      summary: Collaboration Details
+      summary: Get Collaboration Details
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Collaboration Details
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationResponse"
+
+        "404":
+          description: Collaboration Not Found
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
     patch:
-
       tags:
         - Collaborations
 
       summary: Update Collaboration
 
-    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
 
-      tags:
-        - Collaborations
-
-      summary: Soft Delete Collaboration
-
-  /collaborations/{id}/join:
-
-    post:
-
-      tags:
-        - Memberships
-
-      summary: Request Join
+          schema:
+            type: string
+            format: uuid
 
       requestBody:
-
         required: true
 
         content:
-
           application/json:
-
             schema:
-              $ref: '#/components/schemas/JoinRequest'
+              $ref: "#/components/schemas/UpdateCollaborationRequest"
+
+      responses:
+        "200":
+          description: Updated Successfully
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationResponse"
+
+        "403":
+          description: Only Creator Can Update
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      tags:
+        - Collaborations
+
+      summary: Delete Collaboration
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Deleted Successfully
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /collaborations/{id}/join:
+    post:
+      tags:
+        - Memberships
+
+      summary: Request To Join Collaboration
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+
+          schema:
+            type: string
+            format: uuid
+
+      requestBody:
+        required: false
+
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoinRequest"
+
+      responses:
+        "200":
+          description: Join Request Submitted
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
 
   /collaborations/{id}/requests:
-
     get:
-
       tags:
         - Memberships
 
-      summary: Pending Join Requests
+      summary: Get Pending Join Requests
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: Pending Requests
+
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  success:
+                    type: boolean
+
+                  data:
+                    type: array
+
+                    items:
+                      type: object
+
+                      properties:
+                        requestId:
+                          type: string
+
+                        joinMessage:
+                          type: string
+
+                        status:
+                          $ref: "#/components/schemas/JoinStatus"
+
+                        user:
+                          $ref: "#/components/schemas/User"
 
   /collaborations/{id}/requests/{requestId}/approve:
-
     post:
-
       tags:
         - Memberships
 
-      summary: Approve Request
+      summary: Approve Join Request
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: Request Approved
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
 
   /collaborations/{id}/requests/{requestId}/reject:
-
     post:
-
       tags:
         - Memberships
 
-      summary: Reject Request
+      summary: Reject Join Request
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: Request Rejected
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
 
   /collaborations/{id}/leave:
-
     post:
-
       tags:
         - Memberships
 
       summary: Leave Collaboration
 
+      parameters:
+        - name: id
+          in: path
+          required: true
+
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: Left Collaboration
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  #################################################
+  # CHAT
+  #################################################
+
   /chat/rooms:
-
     get:
-
       tags:
         - Chat
 
-      summary: User Chat Rooms
+      summary: Get User Chat Rooms
+
+      responses:
+        "200":
+          description: Chat Rooms
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatRoomsResponse"
+
+        "401":
+          description: Unauthorized
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /chat/rooms/{roomId}/messages:
-
     get:
-
       tags:
         - Chat
 
-      summary: Room Messages
+      summary: Get Room Messages
 
       parameters:
+        - name: roomId
+
+          in: path
+
+          required: true
+
+          schema:
+            type: string
+            format: uuid
 
         - name: page
+
           in: query
+
+          schema:
+            type: integer
+            default: 1
 
         - name: limit
+
           in: query
 
-    post:
+          schema:
+            type: integer
+            default: 50
 
+      responses:
+        "200":
+          description: Messages
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessagesResponse"
+
+    post:
       tags:
         - Chat
 
       summary: Send Message
 
-      requestBody:
+      parameters:
+        - name: roomId
 
+          in: path
+
+          required: true
+
+          schema:
+            type: string
+            format: uuid
+
+      requestBody:
         required: true
 
         content:
-
           application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageRequest"
 
-            example:
+      responses:
+        "201":
+          description: Message Sent
 
-              message: Hello everyone
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  #################################################
+  # RATINGS
+  #################################################
 
   /ratings:
-
     post:
-
       tags:
         - Ratings
 
-      summary: Submit Rating
+      summary: Submit User Rating
 
       requestBody:
-
         required: true
 
         content:
-
           application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitRatingRequest"
 
-            example:
+      responses:
+        "201":
+          description: Rating Submitted
 
-              collaborationId: uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
 
-              reviewedUserId: uuid
+        "400":
+          description: Invalid Rating
 
-              showUpRating: 5
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
-              friendlyRating: 5
+        "403":
+          description: Cannot Rate User
 
-              safeRating: 5
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
-              collaborativeRating: 5
-
-              comment: Great teammate
+  #################################################
+  # NOTIFICATIONS
+  #################################################
 
   /notifications:
-
     get:
-
       tags:
         - Notifications
 
-      summary: Notifications
+      summary: Get Notifications
+
+      parameters:
+        - name: page
+
+          in: query
+
+          schema:
+            type: integer
+            default: 1
+
+        - name: limit
+
+          in: query
+
+          schema:
+            type: integer
+            default: 20
+
+      responses:
+        "200":
+          description: Notifications
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationsResponse"
 
   /notifications/{id}/read:
-
     patch:
-
       tags:
         - Notifications
 
-      summary: Mark Read
+      summary: Mark Notification Read
+
+      parameters:
+        - name: id
+
+          in: path
+
+          required: true
+
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Notification Marked Read
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
 
   /notifications/read-all:
-
     patch:
-
       tags:
         - Notifications
 
-      summary: Mark All Read
+      summary: Mark All Notifications Read
+
+      responses:
+        "200":
+          description: All Notifications Read
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"

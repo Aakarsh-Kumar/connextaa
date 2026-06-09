@@ -23,31 +23,26 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": {
-                        idToken: string;
-                    };
+                    "application/json": components["schemas"]["GoogleAuthRequest"];
                 };
             };
             responses: {
-                /** @description Success */
+                /** @description Login Success */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        /**
-                         * @example {
-                         *       "success": true,
-                         *       "token": "jwt_token",
-                         *       "onboardingCompleted": false,
-                         *       "user": {
-                         *         "id": "uuid",
-                         *         "name": "Aakarsh",
-                         *         "email": "aakarsh@gmail.com"
-                         *       }
-                         *     }
-                         */
-                        "application/json": unknown;
+                        "application/json": components["schemas"]["AuthResponse"];
+                    };
+                };
+                /** @description Invalid Google Token */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
                     };
                 };
             };
@@ -65,7 +60,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Current User */
+        /** Current Authenticated User */
         get: {
             parameters: {
                 query?: never;
@@ -75,12 +70,23 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description User Details */
+                /** @description Current User */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": components["schemas"]["AuthMeResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
                 };
             };
         };
@@ -101,7 +107,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Complete onboarding */
+        /** Complete Onboarding */
         post: {
             parameters: {
                 query?: never;
@@ -111,18 +117,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    /**
-                     * @example {
-                     *       "username": "aakarsh",
-                     *       "bio": "Building Connectify",
-                     *       "categories": [
-                     *         "STUDY",
-                     *         "PROFESSIONAL",
-                     *         "TRIPS"
-                     *       ]
-                     *     }
-                     */
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["OnboardingRequest"];
                 };
             };
             responses: {
@@ -131,7 +126,27 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+                /** @description Validation Error */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
                 };
             };
         };
@@ -148,7 +163,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Logged in profile */
+        /** Get My Profile */
         get: {
             parameters: {
                 query?: never;
@@ -157,14 +172,33 @@ export interface paths {
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description My Profile */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AuthMeResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
         };
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** Update profile */
+        /** Update My Profile */
         patch: {
             parameters: {
                 query?: never;
@@ -172,8 +206,40 @@ export interface paths {
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
-            responses: never;
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateProfileRequest"];
+                };
+            };
+            responses: {
+                /** @description Updated Profile */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AuthMeResponse"];
+                    };
+                };
+                /** @description Validation Error */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
         };
         trace?: never;
     };
@@ -184,7 +250,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Public Profile */
+        /** Public User Profile */
         get: {
             parameters: {
                 query?: never;
@@ -195,7 +261,26 @@ export interface paths {
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description Public Profile */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProfileResponse"];
+                    };
+                };
+                /** @description User Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
         };
         put?: never;
         post?: never;
@@ -212,20 +297,33 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Collaboration Feed */
+        /** Get Collaboration Feed */
         get: {
             parameters: {
                 query?: {
                     page?: number;
                     limit?: number;
                     category?: components["schemas"]["Category"];
+                    lat?: number;
+                    lng?: number;
+                    radius?: number;
                 };
                 header?: never;
                 path?: never;
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description Collaboration Feed */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CollaborationFeedResponse"];
+                    };
+                };
+            };
         };
         put?: never;
         /** Create Collaboration */
@@ -242,19 +340,22 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description Created */
+                /** @description Collaboration Created */
                 201: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        /**
-                         * @example {
-                         *       "success": true,
-                         *       "collaborationId": "uuid"
-                         *     }
-                         */
-                        "application/json": unknown;
+                        "application/json": components["schemas"]["CreateCollaborationResponse"];
+                    };
+                };
+                /** @description Validation Error */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
                     };
                 };
             };
@@ -272,29 +373,62 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Collaboration Details */
+        /** Get Collaboration Details */
         get: {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    id: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description Collaboration Details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CollaborationResponse"];
+                    };
+                };
+                /** @description Collaboration Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
         };
         put?: never;
         post?: never;
-        /** Soft Delete Collaboration */
+        /** Delete Collaboration */
         delete: {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    id: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description Deleted Successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+            };
         };
         options?: never;
         head?: never;
@@ -303,11 +437,36 @@ export interface paths {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    id: string;
+                };
                 cookie?: never;
             };
-            requestBody?: never;
-            responses: never;
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateCollaborationRequest"];
+                };
+            };
+            responses: {
+                /** @description Updated Successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CollaborationResponse"];
+                    };
+                };
+                /** @description Only Creator Can Update */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
         };
         trace?: never;
     };
@@ -320,20 +479,32 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Request Join */
+        /** Request To Join Collaboration */
         post: {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    id: string;
+                };
                 cookie?: never;
             };
-            requestBody: {
+            requestBody?: {
                 content: {
                     "application/json": components["schemas"]["JoinRequest"];
                 };
             };
-            responses: never;
+            responses: {
+                /** @description Join Request Submitted */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+            };
         };
         delete?: never;
         options?: never;
@@ -348,16 +519,36 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Pending Join Requests */
+        /** Get Pending Join Requests */
         get: {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    id: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description Pending Requests */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success?: boolean;
+                            data?: {
+                                requestId?: string;
+                                joinMessage?: string;
+                                status?: components["schemas"]["JoinStatus"];
+                                user?: components["schemas"]["User"];
+                            }[];
+                        };
+                    };
+                };
+            };
         };
         put?: never;
         post?: never;
@@ -376,16 +567,29 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Approve Request */
+        /** Approve Join Request */
         post: {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    id: string;
+                    requestId: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description Request Approved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+            };
         };
         delete?: never;
         options?: never;
@@ -402,16 +606,29 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Reject Request */
+        /** Reject Join Request */
         post: {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    id: string;
+                    requestId: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description Request Rejected */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+            };
         };
         delete?: never;
         options?: never;
@@ -433,11 +650,23 @@ export interface paths {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    id: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description Left Collaboration */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+            };
         };
         delete?: never;
         options?: never;
@@ -452,7 +681,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** User Chat Rooms */
+        /** Get User Chat Rooms */
         get: {
             parameters: {
                 query?: never;
@@ -461,7 +690,26 @@ export interface paths {
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description Chat Rooms */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ChatRoomsResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
         };
         put?: never;
         post?: never;
@@ -478,19 +726,31 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Room Messages */
+        /** Get Room Messages */
         get: {
             parameters: {
                 query?: {
-                    page?: string;
-                    limit?: string;
+                    page?: number;
+                    limit?: number;
                 };
                 header?: never;
-                path?: never;
+                path: {
+                    roomId: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description Messages */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MessagesResponse"];
+                    };
+                };
+            };
         };
         put?: never;
         /** Send Message */
@@ -498,20 +758,27 @@ export interface paths {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    roomId: string;
+                };
                 cookie?: never;
             };
             requestBody: {
                 content: {
-                    /**
-                     * @example {
-                     *       "message": "Hello everyone"
-                     *     }
-                     */
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["SendMessageRequest"];
                 };
             };
-            responses: never;
+            responses: {
+                /** @description Message Sent */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Message"];
+                    };
+                };
+            };
         };
         delete?: never;
         options?: never;
@@ -528,7 +795,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Submit Rating */
+        /** Submit User Rating */
         post: {
             parameters: {
                 query?: never;
@@ -538,21 +805,38 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    /**
-                     * @example {
-                     *       "collaborationId": "uuid",
-                     *       "reviewedUserId": "uuid",
-                     *       "showUpRating": 5,
-                     *       "friendlyRating": 5,
-                     *       "safeRating": 5,
-                     *       "collaborativeRating": 5,
-                     *       "comment": "Great teammate"
-                     *     }
-                     */
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["SubmitRatingRequest"];
                 };
             };
-            responses: never;
+            responses: {
+                /** @description Rating Submitted */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+                /** @description Invalid Rating */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Cannot Rate User */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
         };
         delete?: never;
         options?: never;
@@ -567,16 +851,29 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Notifications */
+        /** Get Notifications */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    page?: number;
+                    limit?: number;
+                };
                 header?: never;
                 path?: never;
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description Notifications */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationsResponse"];
+                    };
+                };
+            };
         };
         put?: never;
         post?: never;
@@ -599,16 +896,28 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Mark Read */
+        /** Mark Notification Read */
         patch: {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    id: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description Notification Marked Read */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+            };
         };
         trace?: never;
     };
@@ -625,7 +934,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Mark All Read */
+        /** Mark All Notifications Read */
         patch: {
             parameters: {
                 query?: never;
@@ -634,7 +943,17 @@ export interface paths {
                 cookie?: never;
             };
             requestBody?: never;
-            responses: never;
+            responses: {
+                /** @description All Notifications Read */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+            };
         };
         trace?: never;
     };
@@ -644,15 +963,113 @@ export interface components {
     schemas: {
         ErrorResponse: {
             /** @example false */
-            success?: boolean;
+            success: boolean;
             /** @example Unauthorized */
+            message: string;
+        };
+        SuccessResponse: {
+            /** @example true */
+            success: boolean;
+            /** @example Operation successful */
             message?: string;
         };
         PaginationMeta: {
+            /** @example 1 */
             page?: number;
+            /** @example 20 */
             limit?: number;
+            /** @example 145 */
             total?: number;
+            /** @example true */
             hasMore?: boolean;
+        };
+        AuthMeResponse: {
+            success?: boolean;
+            user?: {
+                /** Format: uuid */
+                id?: string;
+                email?: string;
+                name?: string;
+                username?: string | null;
+                avatarUrl?: string | null;
+                onboardingCompleted?: boolean;
+            };
+        };
+        ProfileResponse: {
+            /** @example true */
+            success: boolean;
+            user: {
+                /** Format: uuid */
+                id: string;
+                /** @example Rahul Sharma */
+                name: string;
+                /** @example rahul_23 */
+                username: string;
+                /** @example https://example.com/avatar.jpg */
+                avatarUrl?: string | null;
+                /** @example Traveller and football enthusiast */
+                bio?: string | null;
+                /**
+                 * @example [
+                 *       "TRIPS",
+                 *       "SPORTS",
+                 *       "EVENTS"
+                 *     ]
+                 */
+                categories: components["schemas"]["Category"][];
+            };
+            stats: {
+                /** @example 5 */
+                created: number;
+                /** @example 17 */
+                joined: number;
+                /** @example 10 */
+                completed: number;
+            };
+            rating: {
+                /**
+                 * Format: float
+                 * @description Average of all four rating categories rounded to 2 decimal places
+                 * @example 3.08
+                 */
+                overall: number;
+                /**
+                 * Format: float
+                 * @example 4.8
+                 */
+                showUpRating: number;
+                /**
+                 * Format: float
+                 * @example 2.2
+                 */
+                friendlyRating: number;
+                /**
+                 * Format: float
+                 * @example 1.2
+                 */
+                safeRating: number;
+                /**
+                 * Format: float
+                 * @example 4.1
+                 */
+                collaborativeRating: number;
+                /** @example 23 */
+                totalReviews: number;
+            };
+        };
+        PendingJoinRequestsResponse: {
+            success?: boolean;
+            data?: {
+                requestId?: string;
+                joinMessage?: string;
+                status?: components["schemas"]["JoinStatus"];
+                user?: {
+                    id?: string;
+                    name?: string;
+                    username?: string;
+                    avatarUrl?: string | null;
+                };
+            }[];
         };
         /** @enum {string} */
         Category: "CARPOOLING" | "EVENTS" | "STUDY" | "PROFESSIONAL" | "SPORTS" | "TRIPS" | "OTHER";
@@ -669,10 +1086,15 @@ export interface components {
             avatarUrl?: string | null;
             bio?: string | null;
         };
+        UserStats: {
+            created?: number;
+            joined?: number;
+            completed?: number;
+        };
         Location: {
-            name?: string;
-            lat?: number;
-            lng?: number;
+            name: string;
+            lat: number;
+            lng: number;
         };
         Collaboration: {
             id?: string;
@@ -687,6 +1109,58 @@ export interface components {
             status?: components["schemas"]["CollaborationStatus"];
             creator?: components["schemas"]["User"];
         };
+        CollaborationFeedItem: {
+            id?: string;
+            category?: components["schemas"]["Category"];
+            title?: string;
+            description?: string;
+            /** Format: date-time */
+            scheduledAt?: string;
+            status?: components["schemas"]["CollaborationStatus"];
+            currentMembers?: number;
+            maxMembers?: number;
+            distanceMeters?: number | null;
+            creator?: components["schemas"]["User"];
+            fromLocation?: components["schemas"]["Location"];
+            toLocation?: components["schemas"]["Location"];
+        };
+        ChatRoom: {
+            roomId?: string;
+            collaborationId?: string;
+            title?: string;
+            unreadCount?: number;
+            lastMessage?: string;
+        };
+        Message: {
+            id?: string;
+            message?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            sender?: components["schemas"]["User"];
+        };
+        Notification: {
+            id?: string;
+            type?: string;
+            title?: string;
+            body?: string;
+            isRead?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        GoogleAuthRequest: {
+            idToken: string;
+        };
+        OnboardingRequest: {
+            username: string;
+            bio?: string;
+            categories: components["schemas"]["Category"][];
+        };
+        UpdateProfileRequest: {
+            name?: string;
+            username?: string;
+            bio?: string;
+            avatarUrl?: string;
+        };
         CreateCollaborationRequest: {
             category: components["schemas"]["Category"];
             title: string;
@@ -697,9 +1171,75 @@ export interface components {
             scheduledAt: string;
             maxMembers: number;
         };
+        UpdateCollaborationRequest: {
+            title?: string;
+            description?: string;
+            /** Format: date-time */
+            scheduledAt?: string;
+            maxMembers?: number;
+        };
         JoinRequest: {
             /** @example Interested in joining */
             message?: string;
+        };
+        SendMessageRequest: {
+            message: string;
+        };
+        SubmitRatingRequest: {
+            collaborationId: string;
+            reviewedUserId: string;
+            showUpRating: number;
+            friendlyRating: number;
+            safeRating: number;
+            collaborativeRating: number;
+            comment?: string;
+        };
+        AuthResponse: {
+            success?: boolean;
+            token?: string;
+            onboardingCompleted?: boolean;
+            user?: components["schemas"]["User"];
+        };
+        UserProfileResponse: {
+            success?: boolean;
+            user?: components["schemas"]["User"];
+            stats?: components["schemas"]["UserStats"];
+        };
+        CreateCollaborationResponse: {
+            success?: boolean;
+            /** Format: uuid */
+            collaborationId?: string;
+            chatRoomId?: string;
+        };
+        CollaborationResponse: {
+            success?: boolean;
+            collaboration?: components["schemas"]["Collaboration"];
+            members?: {
+                id?: string;
+                name?: string;
+                username?: string;
+                avatarUrl?: string | null;
+            }[];
+            currentMembers?: number;
+            isCreator?: boolean;
+            myJoinStatus?: components["schemas"]["JoinStatus"];
+        };
+        CollaborationFeedResponse: {
+            success?: boolean;
+            data?: components["schemas"]["CollaborationFeedItem"][];
+            pagination?: components["schemas"]["PaginationMeta"];
+        };
+        ChatRoomsResponse: {
+            success?: boolean;
+            data?: components["schemas"]["ChatRoom"][];
+        };
+        MessagesResponse: {
+            success?: boolean;
+            data?: components["schemas"]["Message"][];
+        };
+        NotificationsResponse: {
+            success?: boolean;
+            data?: components["schemas"]["Notification"][];
         };
     };
     responses: never;
