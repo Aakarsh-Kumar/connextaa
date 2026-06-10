@@ -11,7 +11,7 @@ const updateMeProfileController = async (req: Request, res: Response) => {
         }
 
         const userId = req.user.id;
-        const { name, username, bio, avatarUrl } = req.body;
+        const { username, bio, categories } = req.body;
 
         // Validate username format
         const validationResult = await isValidUsername(username, userId);
@@ -24,12 +24,21 @@ const updateMeProfileController = async (req: Request, res: Response) => {
         const updatedUser = await prisma.user.update({
             where: { id: userId },
             data: {
-                ...(name && { name }),
                 ...(username && { username }),
                 ...(bio && { bio }),
-                ...(avatarUrl && { avatarUrl }),
+                ...(categories && { categories }),
+            },
+            include: {
+                categories: {
+                    select: { category: true },
+                },
             },
         });
+
+
+
+        // Flatten categories from [{ category: "STUDY" }] to ["STUDY"]
+        const formattedCategories = updatedUser.categories.map((c) => c.category);
 
         res.status(200).json({
             success: true,
@@ -37,6 +46,7 @@ const updateMeProfileController = async (req: Request, res: Response) => {
                 id: updatedUser.id,
                 name: updatedUser.name,
                 username: updatedUser.username,
+                categories: formattedCategories,
                 avatarUrl: updatedUser.avatarUrl,
                 bio: updatedUser.bio,
             },
