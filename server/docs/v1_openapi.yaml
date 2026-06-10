@@ -16,7 +16,7 @@ info:
       - Notifications
 
 servers:
-  - url: http://localhost:5000/api/v1
+  - url: http://localhost:8080/api/v1
     description: Local Development
 
 tags:
@@ -999,7 +999,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthMeResponse"
+                $ref: "#/components/schemas/ProfileResponse"
 
         "400":
           description: Validation Error

@@ -32,38 +32,53 @@ const meProfileController = async (req: Request, res: Response) => {
     }
 
     // Fetch stats in parallel for performance
-    const [createdCount, joinedCount, completedCount] = await Promise.all([
-      // Collaborations created by this user
-      prisma.collaboration.count({
-        where: { creatorId: userId },
-      }),
-
-      // Collaborations the user has joined (approved membership)
-      prisma.collaborationMember.count({
-        where: {
-          userId,
-          joinStatus: 'APPROVED',
-        },
-      }),
-
-      // Completed collaborations where the user is a member (approved) or creator
-      prisma.collaboration.count({
-        where: {
-          status: 'COMPLETED',
-          OR: [
-            { creatorId: userId },
-            {
-              members: {
-                some: {
-                  userId,
-                  joinStatus: 'APPROVED',
+    const [createdCount, joinedCount, completedCount, ratingAgg] =
+      await Promise.all([
+        prisma.collaboration.count({ where: { creatorId: userId } }),
+        prisma.collaborationMember.count({
+          where: { userId, joinStatus: 'APPROVED' },
+        }),
+        prisma.collaboration.count({
+          where: {
+            status: 'COMPLETED',
+            OR: [
+              { creatorId: userId },
+              {
+                members: {
+                  some: { userId, joinStatus: 'APPROVED' },
                 },
               },
-            },
-          ],
-        },
-      }),
-    ]);
+            ],
+          },
+        }),
+        prisma.rating.aggregate({
+          where: { reviewedUserId: userId },
+          _avg: {
+            showUpRating: true,
+            friendlyRating: true,
+            collaborativeRating: true,
+            safeRating: true,
+          },
+          _count: { _all: true },
+        }),
+      ]);
+
+    const showUp = ratingAgg._avg.showUpRating ?? 0;
+    const friendly = ratingAgg._avg.friendlyRating ?? 0;
+    const collaborative = ratingAgg._avg.collaborativeRating ?? 0;
+    const safe = ratingAgg._avg.safeRating ?? 0;
+    const overall = Number(
+      ((showUp + friendly + collaborative + safe) / 4).toFixed(2),
+    );
+
+    const rating = {
+      overall,
+      showUpRating: Number(showUp.toFixed(1)),
+      friendlyRating: Number(friendly.toFixed(1)),
+      safeRating: Number(safe.toFixed(1)),
+      collaborativeRating: Number(collaborative.toFixed(1)),
+      totalReviews: ratingAgg._count._all,
+    };
 
     // Flatten categories from [{ category: "STUDY" }] to ["STUDY"]
     const categories = user.categories.map((c) => c.category);
@@ -83,6 +98,7 @@ const meProfileController = async (req: Request, res: Response) => {
         joined: joinedCount,
         completed: completedCount,
       },
+      rating,
     });
   } catch (error) {
     logger.error('meProfileController error', { error });

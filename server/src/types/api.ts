@@ -218,7 +218,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AuthMeResponse"];
+                        "application/json": components["schemas"]["ProfileResponse"];
                     };
                 };
                 /** @description Validation Error */

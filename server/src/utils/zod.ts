@@ -764,7 +764,7 @@ const endpoints = makeApi([
         schema: UpdateProfileRequest,
       },
     ],
-    response: AuthMeResponse,
+    response: ProfileResponse,
     errors: [
       {
         status: 400,
