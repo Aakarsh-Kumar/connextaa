@@ -574,17 +574,20 @@ components:
       type: object
 
       properties:
-        name:
-          type: string
-
         username:
           type: string
+          minLength: 3
+          maxLength: 20
 
         bio:
           type: string
+          maxLength: 160
 
-        avatarUrl:
-          type: string
+        categories:
+          type: array
+
+          items:
+            $ref: "#/components/schemas/Category"
 
     CreateCollaborationRequest:
       type: object
@@ -965,7 +968,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthMeResponse"
+                $ref: "#/components/schemas/ProfileResponse"
 
         "401":
           description: Unauthorized

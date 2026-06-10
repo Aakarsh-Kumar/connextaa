@@ -179,7 +179,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AuthMeResponse"];
+                        "application/json": components["schemas"]["ProfileResponse"];
                     };
                 };
                 /** @description Unauthorized */
@@ -1156,10 +1156,9 @@ export interface components {
             categories: components["schemas"]["Category"][];
         };
         UpdateProfileRequest: {
-            name?: string;
             username?: string;
             bio?: string;
-            avatarUrl?: string;
+            categories?: components["schemas"]["Category"][];
         };
         CreateCollaborationRequest: {
             category: components["schemas"]["Category"];

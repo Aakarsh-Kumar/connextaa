@@ -1,5 +1,5 @@
-import { makeApi, Zodios, type ZodiosOptions } from "@zodios/core";
-import { z } from "zod";
+import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
+import { z } from 'zod';
 
 const GoogleAuthRequest = z.object({ idToken: z.string() }).passthrough();
 const User = z
@@ -43,13 +43,13 @@ const AuthMeResponse = z
   .partial()
   .passthrough();
 const Category = z.enum([
-  "CARPOOLING",
-  "EVENTS",
-  "STUDY",
-  "PROFESSIONAL",
-  "SPORTS",
-  "TRIPS",
-  "OTHER",
+  'CARPOOLING',
+  'EVENTS',
+  'STUDY',
+  'PROFESSIONAL',
+  'SPORTS',
+  'TRIPS',
+  'OTHER',
 ]);
 const OnboardingRequest = z
   .object({
@@ -60,15 +60,6 @@ const OnboardingRequest = z
   .passthrough();
 const SuccessResponse = z
   .object({ success: z.boolean(), message: z.string().optional() })
-  .passthrough();
-const UpdateProfileRequest = z
-  .object({
-    name: z.string(),
-    username: z.string(),
-    bio: z.string(),
-    avatarUrl: z.string(),
-  })
-  .partial()
   .passthrough();
 const ProfileResponse = z
   .object({
@@ -102,7 +93,15 @@ const ProfileResponse = z
       .passthrough(),
   })
   .passthrough();
-const CollaborationStatus = z.enum(["OPEN", "FULL", "COMPLETED", "CANCELLED"]);
+const UpdateProfileRequest = z
+  .object({
+    username: z.string().min(3).max(20),
+    bio: z.string().max(160),
+    categories: z.array(Category),
+  })
+  .partial()
+  .passthrough();
+const CollaborationStatus = z.enum(['OPEN', 'FULL', 'COMPLETED', 'CANCELLED']);
 const Location = z
   .object({ name: z.string(), lat: z.number(), lng: z.number() })
   .passthrough();
@@ -174,7 +173,7 @@ const Collaboration = z
   })
   .partial()
   .passthrough();
-const JoinStatus = z.enum(["PENDING", "APPROVED", "REJECTED", "LEFT"]);
+const JoinStatus = z.enum(['PENDING', 'APPROVED', 'REJECTED', 'LEFT']);
 const CollaborationResponse = z
   .object({
     success: z.boolean(),
@@ -188,7 +187,7 @@ const CollaborationResponse = z
           avatarUrl: z.string().nullable(),
         })
         .partial()
-        .passthrough()
+        .passthrough(),
     ),
     currentMembers: z.number().int(),
     isCreator: z.boolean(),
@@ -273,8 +272,8 @@ export const schemas = {
   Category,
   OnboardingRequest,
   SuccessResponse,
-  UpdateProfileRequest,
   ProfileResponse,
+  UpdateProfileRequest,
   CollaborationStatus,
   Location,
   CollaborationFeedItem,
@@ -299,14 +298,14 @@ export const schemas = {
 
 const endpoints = makeApi([
   {
-    method: "post",
-    path: "/auth/google",
-    alias: "postAuthgoogle",
-    requestFormat: "json",
+    method: 'post',
+    path: '/auth/google',
+    alias: 'postAuthgoogle',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "body",
-        type: "Body",
+        name: 'body',
+        type: 'Body',
         schema: z.object({ idToken: z.string() }).passthrough(),
       },
     ],
@@ -320,10 +319,10 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "get",
-    path: "/auth/me",
-    alias: "getAuthme",
-    requestFormat: "json",
+    method: 'get',
+    path: '/auth/me',
+    alias: 'getAuthme',
+    requestFormat: 'json',
     response: AuthMeResponse,
     errors: [
       {
@@ -334,10 +333,10 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "get",
-    path: "/chat/rooms",
-    alias: "getChatrooms",
-    requestFormat: "json",
+    method: 'get',
+    path: '/chat/rooms',
+    alias: 'getChatrooms',
+    requestFormat: 'json',
     response: ChatRoomsResponse,
     errors: [
       {
@@ -348,106 +347,106 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "get",
-    path: "/chat/rooms/:roomId/messages",
-    alias: "getChatroomsRoomIdmessages",
-    requestFormat: "json",
+    method: 'get',
+    path: '/chat/rooms/:roomId/messages',
+    alias: 'getChatroomsRoomIdmessages',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "roomId",
-        type: "Path",
+        name: 'roomId',
+        type: 'Path',
         schema: z.string().uuid(),
       },
       {
-        name: "page",
-        type: "Query",
+        name: 'page',
+        type: 'Query',
         schema: z.number().int().optional().default(1),
       },
       {
-        name: "limit",
-        type: "Query",
+        name: 'limit',
+        type: 'Query',
         schema: z.number().int().optional().default(50),
       },
     ],
     response: MessagesResponse,
   },
   {
-    method: "post",
-    path: "/chat/rooms/:roomId/messages",
-    alias: "postChatroomsRoomIdmessages",
-    requestFormat: "json",
+    method: 'post',
+    path: '/chat/rooms/:roomId/messages',
+    alias: 'postChatroomsRoomIdmessages',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "body",
-        type: "Body",
+        name: 'body',
+        type: 'Body',
         schema: z.object({ message: z.string() }).passthrough(),
       },
       {
-        name: "roomId",
-        type: "Path",
+        name: 'roomId',
+        type: 'Path',
         schema: z.string().uuid(),
       },
     ],
     response: Message,
   },
   {
-    method: "get",
-    path: "/collaborations",
-    alias: "getCollaborations",
-    requestFormat: "json",
+    method: 'get',
+    path: '/collaborations',
+    alias: 'getCollaborations',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "page",
-        type: "Query",
+        name: 'page',
+        type: 'Query',
         schema: z.number().int().optional().default(1),
       },
       {
-        name: "limit",
-        type: "Query",
+        name: 'limit',
+        type: 'Query',
         schema: z.number().int().optional().default(20),
       },
       {
-        name: "category",
-        type: "Query",
+        name: 'category',
+        type: 'Query',
         schema: z
           .enum([
-            "CARPOOLING",
-            "EVENTS",
-            "STUDY",
-            "PROFESSIONAL",
-            "SPORTS",
-            "TRIPS",
-            "OTHER",
+            'CARPOOLING',
+            'EVENTS',
+            'STUDY',
+            'PROFESSIONAL',
+            'SPORTS',
+            'TRIPS',
+            'OTHER',
           ])
           .optional(),
       },
       {
-        name: "lat",
-        type: "Query",
+        name: 'lat',
+        type: 'Query',
         schema: z.number().optional(),
       },
       {
-        name: "lng",
-        type: "Query",
+        name: 'lng',
+        type: 'Query',
         schema: z.number().optional(),
       },
       {
-        name: "radius",
-        type: "Query",
+        name: 'radius',
+        type: 'Query',
         schema: z.number().optional().default(10),
       },
     ],
     response: CollaborationFeedResponse,
   },
   {
-    method: "post",
-    path: "/collaborations",
-    alias: "postCollaborations",
-    requestFormat: "json",
+    method: 'post',
+    path: '/collaborations',
+    alias: 'postCollaborations',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "body",
-        type: "Body",
+        name: 'body',
+        type: 'Body',
         schema: CreateCollaborationRequest,
       },
     ],
@@ -461,14 +460,14 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "get",
-    path: "/collaborations/:id",
-    alias: "getCollaborationsId",
-    requestFormat: "json",
+    method: 'get',
+    path: '/collaborations/:id',
+    alias: 'getCollaborationsId',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "id",
-        type: "Path",
+        name: 'id',
+        type: 'Path',
         schema: z.string().uuid(),
       },
     ],
@@ -482,19 +481,19 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "patch",
-    path: "/collaborations/:id",
-    alias: "patchCollaborationsId",
-    requestFormat: "json",
+    method: 'patch',
+    path: '/collaborations/:id',
+    alias: 'patchCollaborationsId',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "body",
-        type: "Body",
+        name: 'body',
+        type: 'Body',
         schema: UpdateCollaborationRequest,
       },
       {
-        name: "id",
-        type: "Path",
+        name: 'id',
+        type: 'Path',
         schema: z.string().uuid(),
       },
     ],
@@ -508,28 +507,28 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "delete",
-    path: "/collaborations/:id",
-    alias: "deleteCollaborationsId",
-    requestFormat: "json",
+    method: 'delete',
+    path: '/collaborations/:id',
+    alias: 'deleteCollaborationsId',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "id",
-        type: "Path",
+        name: 'id',
+        type: 'Path',
         schema: z.string().uuid(),
       },
     ],
     response: SuccessResponse,
   },
   {
-    method: "post",
-    path: "/collaborations/:id/join",
-    alias: "postCollaborationsIdjoin",
-    requestFormat: "json",
+    method: 'post',
+    path: '/collaborations/:id/join',
+    alias: 'postCollaborationsIdjoin',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "body",
-        type: "Body",
+        name: 'body',
+        type: 'Body',
         schema: z
           .object({ message: z.string().max(300) })
           .partial()
@@ -537,36 +536,36 @@ const endpoints = makeApi([
           .optional(),
       },
       {
-        name: "id",
-        type: "Path",
+        name: 'id',
+        type: 'Path',
         schema: z.string().uuid(),
       },
     ],
     response: SuccessResponse,
   },
   {
-    method: "post",
-    path: "/collaborations/:id/leave",
-    alias: "postCollaborationsIdleave",
-    requestFormat: "json",
+    method: 'post',
+    path: '/collaborations/:id/leave',
+    alias: 'postCollaborationsIdleave',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "id",
-        type: "Path",
+        name: 'id',
+        type: 'Path',
         schema: z.string(),
       },
     ],
     response: SuccessResponse,
   },
   {
-    method: "get",
-    path: "/collaborations/:id/requests",
-    alias: "getCollaborationsIdrequests",
-    requestFormat: "json",
+    method: 'get',
+    path: '/collaborations/:id/requests',
+    alias: 'getCollaborationsIdrequests',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "id",
-        type: "Path",
+        name: 'id',
+        type: 'Path',
         schema: z.string(),
       },
     ],
@@ -582,99 +581,99 @@ const endpoints = makeApi([
               user: User,
             })
             .partial()
-            .passthrough()
+            .passthrough(),
         ),
       })
       .partial()
       .passthrough(),
   },
   {
-    method: "post",
-    path: "/collaborations/:id/requests/:requestId/approve",
-    alias: "postCollaborationsIdrequestsRequestIdapprove",
-    requestFormat: "json",
+    method: 'post',
+    path: '/collaborations/:id/requests/:requestId/approve',
+    alias: 'postCollaborationsIdrequestsRequestIdapprove',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "id",
-        type: "Path",
+        name: 'id',
+        type: 'Path',
         schema: z.string(),
       },
       {
-        name: "requestId",
-        type: "Path",
+        name: 'requestId',
+        type: 'Path',
         schema: z.string(),
       },
     ],
     response: SuccessResponse,
   },
   {
-    method: "post",
-    path: "/collaborations/:id/requests/:requestId/reject",
-    alias: "postCollaborationsIdrequestsRequestIdreject",
-    requestFormat: "json",
+    method: 'post',
+    path: '/collaborations/:id/requests/:requestId/reject',
+    alias: 'postCollaborationsIdrequestsRequestIdreject',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "id",
-        type: "Path",
+        name: 'id',
+        type: 'Path',
         schema: z.string(),
       },
       {
-        name: "requestId",
-        type: "Path",
+        name: 'requestId',
+        type: 'Path',
         schema: z.string(),
       },
     ],
     response: SuccessResponse,
   },
   {
-    method: "get",
-    path: "/notifications",
-    alias: "getNotifications",
-    requestFormat: "json",
+    method: 'get',
+    path: '/notifications',
+    alias: 'getNotifications',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "page",
-        type: "Query",
+        name: 'page',
+        type: 'Query',
         schema: z.number().int().optional().default(1),
       },
       {
-        name: "limit",
-        type: "Query",
+        name: 'limit',
+        type: 'Query',
         schema: z.number().int().optional().default(20),
       },
     ],
     response: NotificationsResponse,
   },
   {
-    method: "patch",
-    path: "/notifications/:id/read",
-    alias: "patchNotificationsIdread",
-    requestFormat: "json",
+    method: 'patch',
+    path: '/notifications/:id/read',
+    alias: 'patchNotificationsIdread',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "id",
-        type: "Path",
+        name: 'id',
+        type: 'Path',
         schema: z.string().uuid(),
       },
     ],
     response: SuccessResponse,
   },
   {
-    method: "patch",
-    path: "/notifications/read-all",
-    alias: "patchNotificationsreadAll",
-    requestFormat: "json",
+    method: 'patch',
+    path: '/notifications/read-all',
+    alias: 'patchNotificationsreadAll',
+    requestFormat: 'json',
     response: SuccessResponse,
   },
   {
-    method: "post",
-    path: "/onboarding",
-    alias: "postOnboarding",
-    requestFormat: "json",
+    method: 'post',
+    path: '/onboarding',
+    alias: 'postOnboarding',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "body",
-        type: "Body",
+        name: 'body',
+        type: 'Body',
         schema: OnboardingRequest,
       },
     ],
@@ -693,14 +692,14 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "post",
-    path: "/ratings",
-    alias: "postRatings",
-    requestFormat: "json",
+    method: 'post',
+    path: '/ratings',
+    alias: 'postRatings',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "body",
-        type: "Body",
+        name: 'body',
+        type: 'Body',
         schema: SubmitRatingRequest,
       },
     ],
@@ -719,14 +718,14 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "get",
-    path: "/users/:userId",
-    alias: "getUsersUserId",
-    requestFormat: "json",
+    method: 'get',
+    path: '/users/:userId',
+    alias: 'getUsersUserId',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "userId",
-        type: "Path",
+        name: 'userId',
+        type: 'Path',
         schema: z.string().uuid(),
       },
     ],
@@ -740,11 +739,11 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "get",
-    path: "/users/me",
-    alias: "getUsersme",
-    requestFormat: "json",
-    response: AuthMeResponse,
+    method: 'get',
+    path: '/users/me',
+    alias: 'getUsersme',
+    requestFormat: 'json',
+    response: ProfileResponse,
     errors: [
       {
         status: 401,
@@ -754,14 +753,14 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "patch",
-    path: "/users/me",
-    alias: "patchUsersme",
-    requestFormat: "json",
+    method: 'patch',
+    path: '/users/me',
+    alias: 'patchUsersme',
+    requestFormat: 'json',
     parameters: [
       {
-        name: "body",
-        type: "Body",
+        name: 'body',
+        type: 'Body',
         schema: UpdateProfileRequest,
       },
     ],

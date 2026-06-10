@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../models';
+import { isValidUsername } from '../utils/validators';
 
 /**
  * DB-level validation for onboarding.
@@ -21,15 +22,9 @@ export const validateOnboarding = async (req: Request, res: Response, next: Next
         }
 
         const { username } = req.body as { username: string };
-        const trimmedUsername = username.trim();
-
-        // 1. Username character format (business rule beyond the spec's length check)
-        const usernameRegex = /^[a-zA-Z0-9_]+$/;
-        if (!usernameRegex.test(trimmedUsername)) {
-            res.status(400).json({
-                success: false,
-                message: 'Username can only contain letters, numbers, and underscores',
-            });
+        const validationResult = await isValidUsername(username, req.user.id);
+        if (!validationResult.success) {
+            res.status(400).json(validationResult);
             return;
         }
 
@@ -40,13 +35,7 @@ export const validateOnboarding = async (req: Request, res: Response, next: Next
             return;
         }
 
-        // 3. Username uniqueness check
-        const existingUser = await prisma.user.findUnique({ where: { username: trimmedUsername } });
-        if (existingUser && existingUser.id !== req.user.id) {
-            res.status(400).json({ success: false, message: 'Username is already taken' });
-            return;
-        }
-
+        const trimmedUsername = username.trim();
         // Normalize username for the controller
         req.body.username = trimmedUsername;
         next();

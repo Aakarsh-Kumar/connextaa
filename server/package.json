@@ -12,9 +12,10 @@
     "db:push": "prisma db push --schema prisma/v1.schema.prisma",
     "db:generate": "prisma generate --schema prisma/v1.schema.prisma",
     "db:sync": "npm run db:push && npm run db:generate",
-    "gen:types": "openapi-typescript docs/v1_openapi.yaml -o src/types/api.ts",
-    "gen:zod": "openapi-zod-client docs/v1_openapi.yaml -o src/utils/zod.ts",
-    "gen": "npm run gen:types && npm run gen:zod"
+    "gen:postman": "npx openapi2postmanv2 -s docs/v1_openapi.yaml -o docs/Connectify_V1_Postman_Collection.json",
+    "gen:types": "npx openapi-typescript docs/v1_openapi.yaml -o src/types/api.ts",
+    "gen:zod": "npx openapi-zod-client docs/v1_openapi.yaml -o src/utils/zod.ts",
+    "gen": "npm run gen:postman && npm run gen:types && npm run gen:zod"
   },
   "keywords": [],
   "author": "",
