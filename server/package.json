@@ -11,7 +11,10 @@
     "lint": "eslint 'src/**/*.ts'",
     "db:push": "prisma db push --schema prisma/v1.schema.prisma",
     "db:generate": "prisma generate --schema prisma/v1.schema.prisma",
-    "db:sync": "npm run db:push && npm run db:generate"
+    "db:sync": "npm run db:push && npm run db:generate",
+    "gen:types": "openapi-typescript docs/v1_openapi.yaml -o src/types/api.ts",
+    "gen:zod": "openapi-zod-client docs/v1_openapi.yaml -o src/utils/zod.ts",
+    "gen": "npm run gen:types && npm run gen:zod"
   },
   "keywords": [],
   "author": "",
@@ -40,6 +43,7 @@
     "@prisma/client": "^7.8.0",
     "@types/mongodb": "^4.0.6",
     "@types/uuid": "^10.0.0",
+    "@zodios/core": "^10.9.6",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
@@ -53,6 +57,7 @@
     "prisma": "^7.8.0",
     "uuid": "^13.0.0",
     "winston": "^3.17.0",
-    "winston-loggly-bulk": "^3.3.2"
+    "winston-loggly-bulk": "^3.3.2",
+    "zod": "^3.25.76"
   }
 }
