@@ -37,9 +37,11 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-on-surface: var(--on-surface);
   --color-on-surface-variant: var(--on-surface-variant);
   --color-outline-variant: var(--outline-variant);
   --color-surface-container: var(--surface-container);
+  --color-surface-container-low: var(--surface-container-low);
   --color-primary-container: var(--primary-container);
   --color-on-primary-container: var(--on-primary-container);
   --color-secondary-container: var(--secondary-container);
@@ -66,9 +68,11 @@
   /* Surfaces */
   --card: #FFFFFF;
   --card-foreground: #1F2937;
+  --on-surface: #121c2a;
   --on-surface-variant: #3c4947;
   --outline-variant: #bbcac6;
   --surface-container: #e6eeff;
+  --surface-container-low: #eff4ff;
 
   --popover: #006B5F;
   --popover-foreground: #1F2937;
