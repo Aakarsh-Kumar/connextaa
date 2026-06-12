@@ -34,7 +34,7 @@ jobs:
       - name: Generate Prisma Client
         if: matrix.project == 'server'
         working-directory: ${{ matrix.project }}
-        run: npx prisma generate
+        run: npx prisma generate --config .\src\prisma.config.ts
 
       - name: Build
         working-directory: ${{ matrix.project }}
