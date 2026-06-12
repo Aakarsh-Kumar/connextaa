@@ -47,7 +47,7 @@ export default function TrendingSection() {
   const isMobile = useIsMobile();
 
   return (
-    <section className={`bg-white px-5 md:px-10 ${isMobile ? "py-14" : "py-20"}`}>
+    <section id="features" className={`scroll-mt-16 bg-white px-5 md:px-10 ${isMobile ? "py-14" : "py-20"}`}>
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className={`flex justify-between items-end ${isMobile ? "mb-8" : "mb-12"}`}>

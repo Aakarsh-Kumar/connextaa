@@ -11,12 +11,44 @@ import LogoIcon from "@/../public/logo-icon.png"
 export default function Navbar() {
   const isMobile = useIsMobile();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
-  const [activeTab, setActiveTab] = React.useState("Features");
+  const [activeTab, setActiveTab] = React.useState("");
 
   // Adjust state during render if screen size switches to desktop
   if (!isMobile && isMobileMenuOpen) {
     setIsMobileMenuOpen(false);
   }
+
+  React.useEffect(() => {
+    const sections = ["features", "categories", "how-it-works"];
+    const observerOptions = {
+      root: null,
+      rootMargin: "-40% 0px -40% 0px", // Trigger when section occupies the middle part of the screen
+      threshold: 0,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute("id");
+          if (id === "features") setActiveTab("Features");
+          if (id === "categories") setActiveTab("Categories");
+          if (id === "how-it-works") setActiveTab("How It Works");
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => {
+      sections.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) observer.unobserve(el);
+      });
+    };
+  }, []);
 
   const navLinks = [
     { name: "Features", href: "#features" },

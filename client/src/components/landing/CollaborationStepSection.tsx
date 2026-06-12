@@ -25,7 +25,7 @@ export default function CollaborationStepSection() {
   ];
 
   return (
-    <section id="how-it-works" className={`px-5 md:px-10 ${isMobile ? "py-16" : "py-24"} bg-background`}>
+    <section id="how-it-works" className={`scroll-mt-16 px-5 md:px-10 ${isMobile ? "py-16" : "py-24"} bg-background`}>
       <div className="max-w-7xl mx-auto">
         <h2 className={`font-headline-lg text-headline-lg text-on-surface text-center ${isMobile ? "mb-10" : "mb-16"}`}>
           Collaboration Made Simple

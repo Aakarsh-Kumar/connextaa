@@ -31,7 +31,7 @@ export default function SafetySection() {
   const isMobile = useIsMobile();
 
   return (
-    <section className={`bg-background px-5 md:px-10 ${isMobile ? "py-14" : "py-24"}`}>
+    <section id="safety" className={`scroll-mt-16 bg-background px-5 md:px-10 ${isMobile ? "py-14" : "py-24"}`}>
       <div className="max-w-7xl mx-auto">
         <div className={`text-center ${isMobile ? "mb-10" : "mb-16"}`}>
           <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">

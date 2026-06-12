@@ -53,7 +53,7 @@ export default function CategoriesSection() {
   ];
 
   return (
-    <section className={`bg-surface-container-low px-5 md:px-10 ${isMobile ? "py-12" : "py-20"}`}>
+    <section id="categories" className={`scroll-mt-16 bg-surface-container-low px-5 md:px-10 ${isMobile ? "py-12" : "py-20"}`}>
       <div className="max-w-7xl mx-auto">
         <div className={`text-center ${isMobile ? "mb-10" : "mb-16"}`}>
           <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">

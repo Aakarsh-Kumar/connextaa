@@ -23,9 +23,12 @@ export default function HeroSection() {
             <button className={`bg-popover text-primary-foreground ${isMobile ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"} rounded-[9999px] font-bold card-shadow active:scale-95 hover:bg-primary/95 transition-all cursor-pointer`}>
               Continue with Google
             </button>
-            <button className={`bg-transparent border border-outline-variant text-on-surface-variant ${isMobile ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"} rounded-[9999px] font-bold hover:bg-muted transition-all cursor-pointer`}>
+            <a
+              href="#features"
+              className={`bg-transparent border border-outline-variant text-on-surface-variant ${isMobile ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"} rounded-[9999px] font-bold hover:bg-muted transition-all cursor-pointer flex items-center justify-center`}
+            >
               Explore Activities
-            </button>
+            </a>
           </div>
 
           {/* Stats Sub-section */}
