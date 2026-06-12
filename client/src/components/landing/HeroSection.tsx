@@ -68,6 +68,7 @@ export default function HeroSection() {
                 alt="A sun-drenched wide shot of a festival landscape with colorful tents and distant palm trees against a bright blue sky, capturing the vibrant and energetic mood of a modern outdoor music festival in a clean light-mode aesthetic with warm orange and teal accents." 
                 width={400}
                 height={400}
+                loading="lazy"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTMvSJvG3VQfehuMQ9HTzbH_TRoBpdZjLxRqlPksAUDLPjDq1HweMVaw7MUDVFvVtQMi3JObdJSyU53kxuXL1eD9Raz19TazExb94rQWqSvZeupKGivqpGdONTcSYSeRsRxab-LFgNaiOrKxVvc5VRM2DKBmx-AcK9ady5J1nvnpXS-Xk_FbZBoO-Z2u_JGVhzovFcxpdyXYgo4NE7856lHvINzJqvJI-woM8uBnNe53BhhyOIg9DXe8OlaSXjAMhT8GKfAnWaE1Yz"
               />
               <button className="w-full py-2 bg-primary-container/20 text-on-primary-container rounded-md font-bold transition-colors hover:bg-primary-container/30 cursor-pointer">
@@ -85,7 +86,7 @@ export default function HeroSection() {
                   AL
                 </div>
                 <div>
-                  <h4 className="font-bold text-on-surface">Study at Joe's Coffee</h4>
+                  <h4 className="font-bold text-on-surface">Study at Joe&rsquo;s Coffee</h4>
                   <p className="font-label-sm text-label-sm text-on-surface-variant">Focus: Midterms</p>
                 </div>
               </div>
@@ -94,7 +95,7 @@ export default function HeroSection() {
                 <span className="font-label-sm text-label-sm text-on-surface-variant">Tomorrow, 9:00 AM</span>
               </div>
               <button className="w-full py-2 bg-primary-container/20 text-on-primary-container rounded-md font-bold transition-colors hover:bg-primary-container/30 cursor-pointer">
-                Let's Study
+                Let&rsquo;s Study
               </button>
             </div>
 
@@ -112,10 +113,13 @@ export default function HeroSection() {
                   <p className="font-label-sm text-label-sm text-on-surface-variant">Intermediate Skill</p>
                 </div>
               </div>
-              <img 
+              <Image 
                 className="w-full h-32 object-cover rounded-md mb-4" 
                 alt="A panoramic view of a majestic mountain valley with towering granite cliffs and lush green forests under soft morning light. The composition is balanced and serene, utilizing a clean and high-contrast light-mode style that feels approachable and trustworthy, reflecting a healthy outdoor lifestyle." 
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk_c82F4WA8aqGIlAgPWxUSiTFGwpu53f4T3E_r_QQNKBKTm97wtXiNC7axEpKItvCQ7di7vIJQL5cR6a6e07kM4SDoAynTb5IYmcvRQ-sSQdOpBy_TnFwXoz_wFWWz7O250C4D7kVYo5Mc7L4JZ6-TMi4rW6jy5BRF2Nj4g4PbJVUKuI4jZNZ7bzqp3FDweyC8cVftMchyHbGZFt_q0XLgqpXwEJO7Fshjiw6ZEh-wgQdwN1u2i9P22fmdpBpBVeZai-wTsY5k_i3"
+                width={400}
+                height={400}
+                loading="lazy"
               />
               <button className="w-full py-2 bg-primary-container/20 text-on-primary-container rounded-md font-bold transition-colors hover:bg-primary-container/30 cursor-pointer">
                 Join Hike
