@@ -2,6 +2,9 @@ import Navbar from '../components/utils/Navbar';
 import HeroSection from '../components/landing/HeroSection';
 import CategoriesSection from '../components/landing/CategoriesSection';
 import CollaborationStepSection from '../components/landing/CollaborationStepSection';
+import SafetySection from '@/components/landing/SafetySection';
+import CtaSection from '@/components/landing/CtaSection';
+import Footer from '@/components/utils/Footer';
 
 export default function Home() {
   return (
@@ -10,6 +13,9 @@ export default function Home() {
       <HeroSection />
       <CategoriesSection />
       <CollaborationStepSection />
+      <SafetySection />
+      <CtaSection />
+      <Footer />
     </>
   );
 }
