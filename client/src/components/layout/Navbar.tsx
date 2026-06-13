@@ -15,7 +15,7 @@ export function Navbar() {
       await authApi.logout();
       logout();
       toast.success("Logged out successfully");
-      window.location.href = "/login";
+      window.location.href = "/";
     } catch (error) {
       toast.error("Logout failed");
     }

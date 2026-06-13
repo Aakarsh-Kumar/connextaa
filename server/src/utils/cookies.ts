@@ -13,3 +13,11 @@ export const setAuthCookie = (
         maxAge: ms(config.jwt.expiration as ms.StringValue)
     });
 };
+
+export const clearAuthCookie = (res: Response) => {
+    res.clearCookie("token",{
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+    });
+};

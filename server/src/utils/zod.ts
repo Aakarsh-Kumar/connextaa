@@ -16,7 +16,6 @@ const User = z
 const AuthResponse = z
   .object({
     success: z.boolean(),
-    token: z.string(),
     onboardingCompleted: z.boolean(),
     user: User,
   })
@@ -42,6 +41,9 @@ const AuthMeResponse = z
   })
   .partial()
   .passthrough();
+const SuccessResponse = z
+  .object({ success: z.boolean(), message: z.string().optional() })
+  .passthrough();
 const Category = z.enum([
   'CARPOOLING',
   'EVENTS',
@@ -57,9 +59,6 @@ const OnboardingRequest = z
     bio: z.string().max(160).optional(),
     categories: z.array(Category),
   })
-  .passthrough();
-const SuccessResponse = z
-  .object({ success: z.boolean(), message: z.string().optional() })
   .passthrough();
 const ProfileResponse = z
   .object({
@@ -269,9 +268,9 @@ export const schemas = {
   AuthResponse,
   ErrorResponse,
   AuthMeResponse,
+  SuccessResponse,
   Category,
   OnboardingRequest,
-  SuccessResponse,
   ProfileResponse,
   UpdateProfileRequest,
   CollaborationStatus,
@@ -314,6 +313,20 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid Google Token`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: 'post',
+    path: '/auth/logout',
+    alias: 'postAuthlogout',
+    requestFormat: 'json',
+    response: SuccessResponse,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
         schema: ErrorResponse,
       },
     ],

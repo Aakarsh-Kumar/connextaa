@@ -11,8 +11,9 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       useAuthStore.getState().logout();
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
+      const isAuthMe = error.config?.url?.includes("/auth/me");
+      if (!isAuthMe && typeof window !== "undefined") {
+        window.location.href = "/";
       }
     }
     return Promise.reject(error);
