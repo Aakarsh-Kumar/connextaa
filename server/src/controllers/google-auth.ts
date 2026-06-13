@@ -70,11 +70,11 @@ const googleAuthController = async (req: GoogleAuthRequest, res: Response) => {
             setAuthCookie(res, token);
             res.status(200).json({
                 success: true,
-                onboardingCompleted: user.onboardingCompleted,
                 user: {
                     id: user.id,
                     name: user.name,
-                    email: user.email
+                    email: user.email,
+                    onboardingCompleted: user.onboardingCompleted,
                 },
                 message: 'Existing user found'
             });
@@ -97,11 +97,11 @@ const googleAuthController = async (req: GoogleAuthRequest, res: Response) => {
             setAuthCookie(res, token);
             res.status(200).json({
                 success: true,
-                onboardingCompleted: false,
                 user: {
                     id: user.id,
                     name: user.name,
-                    email: user.email
+                    email: user.email,
+                    onboardingCompleted: false,
                 },
                 message: 'New user registred succesfully'
             });

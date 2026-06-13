@@ -338,6 +338,9 @@ components:
 
         email:
           type: string
+          
+        onboardingCompleted:
+          type: boolean
 
         username:
           type: string
@@ -711,9 +714,6 @@ components:
 
       properties:
         success:
-          type: boolean
-
-        onboardingCompleted:
           type: boolean
 
         user:

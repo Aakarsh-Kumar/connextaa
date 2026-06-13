@@ -7,6 +7,7 @@ const User = z
     id: z.string().uuid(),
     name: z.string(),
     email: z.string(),
+    onboardingCompleted: z.boolean(),
     username: z.string(),
     avatarUrl: z.string().nullable(),
     bio: z.string().nullable(),
@@ -14,11 +15,7 @@ const User = z
   .partial()
   .passthrough();
 const AuthResponse = z
-  .object({
-    success: z.boolean(),
-    onboardingCompleted: z.boolean(),
-    user: User,
-  })
+  .object({ success: z.boolean(), user: User })
   .partial()
   .passthrough();
 const ErrorResponse = z

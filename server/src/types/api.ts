@@ -1127,6 +1127,7 @@ export interface components {
             id?: string;
             name?: string;
             email?: string;
+            onboardingCompleted?: boolean;
             username?: string;
             avatarUrl?: string | null;
             bio?: string | null;
@@ -1240,7 +1241,6 @@ export interface components {
         };
         AuthResponse: {
             success?: boolean;
-            onboardingCompleted?: boolean;
             user?: components["schemas"]["User"];
         };
         UserProfileResponse: {
