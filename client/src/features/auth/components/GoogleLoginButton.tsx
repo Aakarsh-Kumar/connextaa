@@ -3,9 +3,27 @@
 import { GoogleLogin } from "@react-oauth/google";
 import { useGoogleAuth } from "../hooks/useGoogleAuth";
 import { Loader2 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-export function GoogleLoginButton() {
+export function GoogleLoginButton({ compactOnMobile }: { compactOnMobile?: boolean }) {
   const { handleGoogleSuccess, handleGoogleError, loading } = useGoogleAuth();
+  const isMobile = useIsMobile();
+  
+  if (compactOnMobile && isMobile) {
+    return (
+      <div className="transition-transform duration-200 hover:scale-[1.02]">
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={handleGoogleError}
+          useOneTap
+          theme="filled_blue"
+          shape="circle"
+          size="medium"
+          text="signin"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center space-y-4">
@@ -20,10 +38,10 @@ export function GoogleLoginButton() {
             onSuccess={handleGoogleSuccess}
             onError={handleGoogleError}
             useOneTap
-            shape="pill"
             theme="filled_blue"
-            text="signin_with"
-            size="large"
+            shape="circle"
+            size={"large"}
+            text={"signin_with"}
           />
         </div>
       )}

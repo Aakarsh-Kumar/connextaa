@@ -64,9 +64,9 @@ export default function Navbar() {
         
         {/* Logo Wrapper Container */}
         {/* 💡 h-full sets constraints, max-w prevents stretching, flex-shrink-0 keeps it from collapsing */}
-        <Link 
-          href="/" 
-          className="relative h-full w-32 md:w-40 flex-shrink-0 flex items-center group"
+        <Link
+          href="/"
+          className="relative h-12 w-10 md:w-40 flex-shrink-0 flex items-center group"
         >
           <Image
             alt="Connectify Logo"
@@ -109,7 +109,7 @@ export default function Navbar() {
                 Go to Dashboard
                 </Link>
                 ) : (
-                    <GoogleLoginButton />
+                    <GoogleLoginButton compactOnMobile />
             )}
           
           {/* Hamburger Menu Button */}

@@ -1,13 +1,5 @@
 import { create } from "zustand";
-
-export type User = {
-  id: string;
-  name: string;
-  email: string;
-  username?: string;
-  onboardingCompleted: boolean;
-  avatarUrl?: string;
-};
+import { User } from "@/types";
 
 export type AuthState = {
   user: User | null;

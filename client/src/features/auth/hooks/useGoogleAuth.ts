@@ -22,7 +22,7 @@ export const useGoogleAuth = () => {
     setLoading(true);
     try {
       const response = await authApi.googleLogin(idToken);
-      setUser(response.user);
+      setUser(response.user ??null);
       
       toast.success("Logged in successfully!");
       if (response.user.onboardingCompleted) {

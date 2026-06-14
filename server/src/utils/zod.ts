@@ -9,34 +9,18 @@ const User = z
     email: z.string(),
     onboardingCompleted: z.boolean(),
     username: z.string(),
-    avatarUrl: z.string().nullable(),
-    bio: z.string().nullable(),
+    avatarUrl: z.string().nullish(),
+    bio: z.string().nullish(),
   })
-  .partial()
   .passthrough();
 const AuthResponse = z
   .object({ success: z.boolean(), user: User })
-  .partial()
   .passthrough();
 const ErrorResponse = z
   .object({ success: z.boolean(), message: z.string() })
   .passthrough();
 const AuthMeResponse = z
-  .object({
-    success: z.boolean(),
-    user: z
-      .object({
-        id: z.string().uuid(),
-        email: z.string(),
-        name: z.string(),
-        username: z.string().nullable(),
-        avatarUrl: z.string().nullable(),
-        onboardingCompleted: z.boolean(),
-      })
-      .partial()
-      .passthrough(),
-  })
-  .partial()
+  .object({ success: z.boolean(), user: User })
   .passthrough();
 const SuccessResponse = z
   .object({ success: z.boolean(), message: z.string().optional() })

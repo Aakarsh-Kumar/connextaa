@@ -1,5 +1,5 @@
 import { api } from "@/services/api";
-import { AuthResponse } from "../types";
+import { AuthResponse } from "@/types";
 
 export const authApi = {
   googleLogin: async (idToken: string): Promise<AuthResponse> => {

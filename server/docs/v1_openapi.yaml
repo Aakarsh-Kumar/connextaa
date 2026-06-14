@@ -98,35 +98,17 @@ components:
     AuthMeResponse:
       type: object
 
+      required:
+        - success
+        - user
+
       properties:
         success:
           type: boolean
 
         user:
-          type: object
-
-          properties:
-            id:
-              type: string
-              format: uuid
-
-            email:
-              type: string
-
-            name:
-              type: string
-
-            username:
-              type: string
-              nullable: true
-
-            avatarUrl:
-              type: string
-              nullable: true
-
-            onboardingCompleted:
-              type: boolean
-
+          $ref: "#/components/schemas/User"
+          
     ProfileResponse:
       type: object
 
@@ -326,7 +308,12 @@ components:
     #################################################
 
     User:
-      type: object
+      required:
+        - id
+        - email
+        - name
+        - onboardingCompleted
+        - username
 
       properties:
         id:
@@ -712,6 +699,10 @@ components:
     AuthResponse:
       type: object
 
+      required:
+        - success
+        - user
+
       properties:
         success:
           type: boolean
@@ -721,6 +712,11 @@ components:
 
     UserProfileResponse:
       type: object
+
+      required:
+        - success
+        - user
+        - stats
 
       properties:
         success:
