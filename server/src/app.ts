@@ -11,6 +11,7 @@ import SampleRoutes from './routes/sample-route';
 import AuthRoutes from './routes/auth-route';
 import OnboardingRoutes from './routes/onboarding-route'
 import UserRoutes from './routes/user-route'
+import CollaborationRoutes from './routes/collaborations-route'
 import './types';
 
 const app = express();
@@ -123,6 +124,7 @@ app.use(`/api/${config.apiVersion}/auth`, AuthRoutes)
 app.use(`/api/${config.apiVersion}/onboarding`, OnboardingRoutes)
 
 app.use(`/api/${config.apiVersion}/users`, UserRoutes)
+app.use(`/api/${config.apiVersion}/collaborations`, CollaborationRoutes);
 
 // 404 handler
 app.use((req, res) => {
