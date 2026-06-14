@@ -2,41 +2,57 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, PlusSquare, MessageSquare, Bell, User } from "lucide-react";
+import { Home, PlusCircle, MessageSquare, Bell, User } from "lucide-react";
+
+const navItems = [
+  { label: "Home", href: "/dashboard", icon: Home },
+  { label: "Create", href: "/dashboard/collaborations/create", icon: PlusCircle, highlight: true },
+  { label: "Chats", href: "/dashboard/chat", icon: MessageSquare },
+  { label: "Alerts", href: "/dashboard/notifications", icon: Bell },
+  { label: "Profile", href: "/dashboard/profile", icon: User },
+];
 
 export function MobileBottomNav() {
   const pathname = usePathname();
 
-  const navItems = [
-    { label: "Feed", href: "/dashboard", icon: Home },
-    { label: "Create", href: "/dashboard/collaborations/create", icon: PlusSquare },
-    { label: "Chat", href: "/dashboard/chat", icon: MessageSquare },
-    { label: "Alerts", href: "/dashboard/notifications", icon: Bell },
-    { label: "Profile", href: "/dashboard/profile", icon: User },
-  ];
-
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-t border-border px-4 py-2 shadow-lg">
-      <nav className="flex justify-between items-center max-w-md mx-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.href;
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 w-full h-16 bg-surface-container flex justify-around items-center px-4 rounded-t-2xl shadow-[0px_-4px_20px_rgba(31,41,55,0.07)]">
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const isActive = pathname === item.href;
+
+        if (item.highlight) {
           return (
             <Link
               key={item.label}
               href={item.href}
-              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all duration-150 ${
+              className={`flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-150 active:scale-90 ${
                 isActive
-                  ? "text-popover font-bold scale-105"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-primary-container text-on-primary-container"
+                  : "bg-primary-container/70 text-on-primary-container"
               }`}
             >
-              <Icon className="h-5 w-5" />
-              <span className="text-[10px] mt-1 font-medium">{item.label}</span>
+              <Icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 2} />
+              <span className="font-label-sm text-label-sm">{item.label}</span>
             </Link>
           );
-        })}
-      </nav>
-    </div>
+        }
+
+        return (
+          <Link
+            key={item.label}
+            href={item.href}
+            className={`flex flex-col items-center justify-center gap-0.5 p-2 rounded-xl transition-all duration-150 active:scale-90 ${
+              isActive
+                ? "text-primary"
+                : "text-on-surface-variant hover:bg-outline-variant/30"
+            }`}
+          >
+            <Icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 2} />
+            <span className="font-label-sm text-label-sm">{item.label}</span>
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
