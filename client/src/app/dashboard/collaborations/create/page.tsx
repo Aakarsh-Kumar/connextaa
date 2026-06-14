@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CATEGORIES } from "@/constants";
 import { ArrowLeft } from "lucide-react";
+import type { Category } from "@/types";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -11,11 +12,11 @@ export default function CreateCollaborationPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState(CATEGORIES[0]);
+  const [category, setCategory] = useState(CATEGORIES[0].id);
   const [submitting, setSubmitting] = useState(false);
+  
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!title.trim() || !description.trim()) {
       toast.error("Please fill in all fields");
       return;
@@ -78,12 +79,12 @@ export default function CreateCollaborationPage() {
           <select
             id="category"
             value={category}
-            onChange={(e: any) => setCategory(e.target.value)}
+            onChange={(e) => setCategory(e.target.value as Category)}
             className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-50 font-medium cursor-pointer"
           >
             {CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
               </option>
             ))}
           </select>
