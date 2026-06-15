@@ -73,6 +73,7 @@ const googleAuthController = async (req: GoogleAuthRequest, res: Response) => {
                 user: {
                     id: user.id,
                     name: user.name,
+                    username: user.username,
                     email: user.email,
                     onboardingCompleted: user.onboardingCompleted,
                 },
@@ -100,6 +101,7 @@ const googleAuthController = async (req: GoogleAuthRequest, res: Response) => {
                 user: {
                     id: user.id,
                     name: user.name,
+                    username: username,
                     email: user.email,
                     onboardingCompleted: false,
                 },
