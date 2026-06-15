@@ -31,16 +31,16 @@ api.interceptors.response.use(
         }
 
         case 403:
-          toast.error("Access Denied: You do not have permission.");
+          toast.error(errorMessage);
           break;
 
         case 404:
-          toast.error("Requested resource not found.");
+          toast.error(errorMessage);
           break;
 
         case 422:
           // Often used for validation errors (forms)
-          toast.error(errorMessage || "Validation failed.");
+          toast.error(errorMessage);
           break;
 
         case 500:
