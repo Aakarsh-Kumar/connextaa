@@ -3,6 +3,7 @@ import logger from '../utils/logger';
 import prisma from '../models';
 import { signToken } from '../utils/jwt';
 import { GoogleAuthRequest } from '../middlewares/verifyGoogleAuthToken';
+import { setAuthCookie } from "../utils/cookies";
 
 // Helper function to generate a unique username
 const generateUniqueUsername = async (email: string, name: string): Promise<string> => {
@@ -66,14 +67,15 @@ const googleAuthController = async (req: GoogleAuthRequest, res: Response) => {
         if (user) {
             // Existing user
             const token = signToken({ id: user.id, email: user.email });
+            setAuthCookie(res, token);
             res.status(200).json({
                 success: true,
-                token,
-                onboardingCompleted: user.onboardingCompleted,
                 user: {
                     id: user.id,
                     name: user.name,
-                    email: user.email
+                    username: user.username,
+                    email: user.email,
+                    onboardingCompleted: user.onboardingCompleted,
                 },
                 message: 'Existing user found'
             });
@@ -93,14 +95,15 @@ const googleAuthController = async (req: GoogleAuthRequest, res: Response) => {
             });
 
             const token = signToken({ id: user.id, email: user.email });
+            setAuthCookie(res, token);
             res.status(200).json({
                 success: true,
-                token,
-                onboardingCompleted: false,
                 user: {
                     id: user.id,
                     name: user.name,
-                    email: user.email
+                    username: username,
+                    email: user.email,
+                    onboardingCompleted: false,
                 },
                 message: 'New user registred succesfully'
             });

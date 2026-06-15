@@ -5,6 +5,7 @@ import { isAuthenticated } from '../middlewares/auth';
 import { validate, validateResponse } from '../middlewares/validate';
 import { schemas } from '../utils/zod';
 import { Router } from 'express';
+import logoutAuthController from '../controllers/logout-auth';
 
 const router = Router();
 
@@ -35,5 +36,7 @@ router.get(
     validateResponse(schemas.AuthMeResponse),
     userAuth,
 );
+
+router.post('/logout', isAuthenticated, validateResponse(schemas.SuccessResponse), logoutAuthController)
 
 export default router;

@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import { config } from './config/config';
 import { errorHandler } from './middlewares/errorHandler';
 import logger from './utils/logger';
@@ -58,6 +59,7 @@ app.use(
 );
 
 // Security middleware
+app.use(cookieParser());
 app.use(helmet());
 
 // Rate limiting
@@ -120,8 +122,8 @@ app.use('/api/health', HealthRoutes);
 // Sample route
 app.use('/api/sample', SampleRoutes);
 
-app.use(`/api/${config.apiVersion}/auth`, AuthRoutes)
-app.use(`/api/${config.apiVersion}/onboarding`, OnboardingRoutes)
+app.use(`/api/${config.apiVersion}/auth`, AuthRoutes);
+app.use(`/api/${config.apiVersion}/onboarding`, OnboardingRoutes);
 
 app.use(`/api/${config.apiVersion}/users`, UserRoutes)
 app.use(`/api/${config.apiVersion}/collaborations`, CollaborationRoutes);
