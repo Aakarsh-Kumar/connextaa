@@ -8,3 +8,5 @@ export type OnboardingRequest = components["schemas"]["OnboardingRequest"];
 export type AuthMeResponse = components["schemas"]["AuthMeResponse"];
 export type CreateCollaborationRequest = components["schemas"]["CreateCollaborationRequest"];
 export type CreateCollaborationResponse = components["schemas"]["CreateCollaborationResponse"];
+export type ProfileResponse = components["schemas"]["ProfileResponse"];
+export type UpdateProfileRequest = components["schemas"]["UpdateProfileRequest"];

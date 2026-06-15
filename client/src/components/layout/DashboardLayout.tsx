@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { Navbar } from "./Navbar";
 import { MobileBottomNav } from "./MobileBottomNav";
+import Footer from "../utils/Footer";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -16,6 +17,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         {children}
       </main>
       <MobileBottomNav />
+      <Footer/>
     </div>
   );
 }
