@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import Logo from "@/../public/logo.png"
+import LogoIcon from "@/../public/logo-icon.png"
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const NAV_LINKS = [
   { label: "Feed", href: "/dashboard", icon: Home },
@@ -23,6 +26,7 @@ const NAV_LINKS = [
 ];
 
 export function Navbar() {
+  const isMobile = useIsMobile();
   const { user, logout } = useAuthStore();
   const pathname = usePathname();
 
@@ -44,13 +48,16 @@ export function Navbar() {
         {/* ── Brand ── */}
         <Link
           href="/dashboard"
-          className="flex items-center gap-2 shrink-0 font-bold text-xl tracking-tight text-primary"
+          className="relative h-12 w-10 md:w-40 flex-shrink-0 flex items-center group"
         >
-          {/* Simple wordmark – replace with SVG logo if available */}
-          <span className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-sm font-extrabold">
-            C
-          </span>
-          <span className="hidden sm:inline text-on-surface">Connectify</span>
+          <Image
+            alt="Connectify Logo"
+            fill
+            sizes="(max-width: 768px) 128px, 160px"
+            priority
+            className="object-contain object-left transition-transform duration-300 group-hover:scale-105"
+            src={isMobile ? LogoIcon : Logo}
+          />
         </Link>
 
         {/* ── Desktop centre nav ── */}

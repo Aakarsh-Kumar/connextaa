@@ -22,14 +22,15 @@ export const useGoogleAuth = () => {
     setLoading(true);
     try {
       const response = await authApi.googleLogin(idToken);
-      setUser(response.user ??null);
-      
+      setUser(response.user);
+
       toast.success("Logged in successfully!");
-      if (response.user.onboardingCompleted) {
-        router.push("/dashboard");
-      } else {
-        router.push("/onboarding");
-      }
+
+      router.push(
+        response.user.onboardingCompleted
+          ? "/dashboard"
+          : "/onboarding"
+      )
     } catch (error: any) {
       console.error("Google login error:", error);
       toast.error(error.response.message || "Login failed. Please try again.");
