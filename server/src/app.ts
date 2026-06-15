@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import { config } from './config/config';
 import { errorHandler } from './middlewares/errorHandler';
 import logger from './utils/logger';
@@ -9,8 +10,8 @@ import { extractClientIP, isPrivateOrLocalIP } from './utils/ipUtils';
 import HealthRoutes from './routes/health';
 import SampleRoutes from './routes/sample-route';
 import AuthRoutes from './routes/auth-route';
-import OnboardingRoutes from './routes/onboarding-route'
-import UserRoutes from './routes/user-route'
+import OnboardingRoutes from './routes/onboarding-route';
+import UserRoutes from './routes/user-route';
 import './types';
 
 const app = express();
@@ -57,6 +58,7 @@ app.use(
 );
 
 // Security middleware
+app.use(cookieParser());
 app.use(helmet());
 
 // Rate limiting
@@ -119,10 +121,10 @@ app.use('/api/health', HealthRoutes);
 // Sample route
 app.use('/api/sample', SampleRoutes);
 
-app.use(`/api/${config.apiVersion}/auth`, AuthRoutes)
-app.use(`/api/${config.apiVersion}/onboarding`, OnboardingRoutes)
+app.use(`/api/${config.apiVersion}/auth`, AuthRoutes);
+app.use(`/api/${config.apiVersion}/onboarding`, OnboardingRoutes);
 
-app.use(`/api/${config.apiVersion}/users`, UserRoutes)
+app.use(`/api/${config.apiVersion}/users`, UserRoutes);
 
 // 404 handler
 app.use((req, res) => {

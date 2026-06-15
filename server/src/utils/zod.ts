@@ -7,40 +7,23 @@ const User = z
     id: z.string().uuid(),
     name: z.string(),
     email: z.string(),
+    onboardingCompleted: z.boolean(),
     username: z.string(),
-    avatarUrl: z.string().nullable(),
-    bio: z.string().nullable(),
+    avatarUrl: z.string().nullish(),
+    bio: z.string().nullish(),
   })
-  .partial()
   .passthrough();
 const AuthResponse = z
-  .object({
-    success: z.boolean(),
-    token: z.string(),
-    onboardingCompleted: z.boolean(),
-    user: User,
-  })
-  .partial()
+  .object({ success: z.boolean(), user: User })
   .passthrough();
 const ErrorResponse = z
   .object({ success: z.boolean(), message: z.string() })
   .passthrough();
 const AuthMeResponse = z
-  .object({
-    success: z.boolean(),
-    user: z
-      .object({
-        id: z.string().uuid(),
-        email: z.string(),
-        name: z.string(),
-        username: z.string().nullable(),
-        avatarUrl: z.string().nullable(),
-        onboardingCompleted: z.boolean(),
-      })
-      .partial()
-      .passthrough(),
-  })
-  .partial()
+  .object({ success: z.boolean(), user: User })
+  .passthrough();
+const SuccessResponse = z
+  .object({ success: z.boolean(), message: z.string().optional() })
   .passthrough();
 const Category = z.enum([
   'CARPOOLING',
@@ -57,9 +40,6 @@ const OnboardingRequest = z
     bio: z.string().max(160).optional(),
     categories: z.array(Category),
   })
-  .passthrough();
-const SuccessResponse = z
-  .object({ success: z.boolean(), message: z.string().optional() })
   .passthrough();
 const ProfileResponse = z
   .object({
@@ -269,9 +249,9 @@ export const schemas = {
   AuthResponse,
   ErrorResponse,
   AuthMeResponse,
+  SuccessResponse,
   Category,
   OnboardingRequest,
-  SuccessResponse,
   ProfileResponse,
   UpdateProfileRequest,
   CollaborationStatus,
@@ -314,6 +294,20 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid Google Token`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: 'post',
+    path: '/auth/logout',
+    alias: 'postAuthlogout',
+    requestFormat: 'json',
+    response: SuccessResponse,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
         schema: ErrorResponse,
       },
     ],
