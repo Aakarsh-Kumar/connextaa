@@ -381,7 +381,17 @@ components:
 
     Collaboration:
       type: object
-
+      required:
+        - id
+        - title
+        - description
+        - fromLocation
+        - toLocation
+        - scheduledAt
+        - maxMembers
+        - status
+        - creator
+        - category
       properties:
         id:
           type: string
@@ -412,10 +422,25 @@ components:
           $ref: "#/components/schemas/CollaborationStatus"
 
         creator:
-          $ref: "#/components/schemas/User"
+          $ref: "#/components/schemas/User"          
 
     CollaborationFeedItem:
       type: object
+      
+      required:
+        - id
+        - category
+        - title
+        - description
+        - scheduledAt
+        - status
+        - currentMembers
+        - maxMembers
+        - creator
+        - rating
+        - distanceMeters
+        - fromLocation
+        - toLocation
 
       properties:
         id:
@@ -445,6 +470,10 @@ components:
 
         distanceMeters:
           type: number
+          nullable: true
+        
+        rating: 
+          type: integer
           nullable: true
 
         creator:
@@ -1033,7 +1062,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /users/{userId}:
+  /users/{username}:
     get:
       tags:
         - Users
@@ -1041,7 +1070,7 @@ paths:
       summary: Public User Profile
 
       parameters:
-        - name: userId
+        - name: username
 
           in: path
 
@@ -1049,7 +1078,6 @@ paths:
 
           schema:
             type: string
-            format: uuid
 
       responses:
         "200":

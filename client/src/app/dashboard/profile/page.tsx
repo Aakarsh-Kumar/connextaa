@@ -5,7 +5,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { profileApi } from "@/features/profile/api/profileApi";
 import { authApi } from "@/features/auth/api/authApi";
-import { CATEGORIES } from "@/constants";
+import { CATEGORIES, getCategoryStyles } from "@/constants";
 import { type Category, type ProfileResponse } from "@/types";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -27,6 +27,7 @@ import {
   AtSign,
   ChevronRight,
   LogOut,
+  Sparkles,
   Loader2,
   Lock,
   Bell,
@@ -123,25 +124,6 @@ export default function ProfilePage() {
       setIsEditDialogOpen(false);
     } finally {
       setUpdating(false);
-    }
-  };
-
-  const getCategoryStyles = (id: Category) => {
-    switch (id) {
-      case "CARPOOLING":
-        return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800/50";
-      case "EVENTS":
-        return "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-800/50";
-      case "STUDY":
-        return "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-300 dark:border-indigo-800/50";
-      case "PROFESSIONAL":
-        return "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/30 dark:text-orange-300 dark:border-orange-800/50";
-      case "SPORTS":
-        return "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800/50";
-      case "TRIPS":
-        return "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-300 dark:border-teal-800/50";
-      default:
-        return "bg-[var(--surface-container-low)] text-[var(--on-surface-variant)] border-[var(--outline-variant)]";
     }
   };
 
@@ -349,6 +331,12 @@ export default function ProfilePage() {
               variant: "default" as const,
             },
             {
+              icon: <Sparkles className="w-5 h-5 text-[var(--on-surface-variant)]" />,
+              label: "Manage Interests",
+              onClick: openEditDialog,
+              variant: "default" as const,
+            },
+            {
               icon: <Bell className="w-5 h-5 text-[var(--on-surface-variant)]" />,
               label: "Notification Preferences",
               onClick: () => toast("Notification settings coming soon!"),
@@ -471,8 +459,8 @@ export default function ProfilePage() {
                       onClick={() => toggleCategoryInEdit(cat.id)}
                       className={`flex items-center gap-2 p-2.5 border rounded-xl text-left transition-all cursor-pointer ${
                         isSelected
-                          ? "border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--primary)]"
-                          : "border-[var(--border)] hover:bg-[var(--surface-container-low)] text-[var(--muted-foreground)]"
+                          ? getCategoryStyles(cat.id)
+                          : "border-[var(--border)] bg-transparent text-[var(--muted-foreground)] hover:bg-[var(--surface-container-low)]"
                       }`}
                     >
                       <Icon className="w-4 h-4 shrink-0" />

@@ -23,6 +23,7 @@ import {
   Eye,
   Loader2,
 } from "lucide-react";
+import { ActivityCard } from "@/components/dashboard/ActivityCard";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -439,7 +440,7 @@ export default function CreateCollaborationPage() {
             <Eye className="w-4 h-4 text-primary" />
             <h2 className="font-headline-md text-headline-md text-on-surface">Live Preview</h2>
           </div>
-          <LivePreviewCard
+          {/* <LivePreviewCard
             selectedCat={selectedCat}
             title={title}
             date={date}
@@ -448,6 +449,40 @@ export default function CreateCollaborationPage() {
             toLocation={toLocation}
             maxMembers={maxMembers}
             createdBy={user?.name || "You"}
+          /> */}
+          <ActivityCard
+            key={"preview"}
+            activity={{
+            "id": "preview",
+            "category": selectedCat?.id || "STUDY",
+            "title": title || "Title",
+            "description": description || "Description",
+            "scheduledAt": date + "T" + time,
+            "status": "OPEN",
+            "currentMembers": 1,
+            "maxMembers": maxMembers,
+            "distanceMeters": 1500,
+            "creator": {
+              "id": user?.id || "",
+              "email": user?.email || "",
+              "name": user?.name || "You",
+              "onboardingCompleted": true,
+              "username": user?.username || "username",
+              "avatarUrl": user?.avatarUrl || "",
+              "bio": "bio"
+            },
+            "rating":4.8,
+            "fromLocation": {
+              "name": fromLocation?.name || "Location A",
+              "lat": fromLocation?.lat || 0,
+              "lng": fromLocation?.lng || 0
+            },
+            "toLocation": {
+              "name": toLocation?.name || "Location B",
+              "lat": toLocation?.lat || 0,
+              "lng": toLocation?.lng || 0
+            }}}
+            pendingRequests={[]}
           />
         </div>
 
@@ -483,105 +518,105 @@ export default function CreateCollaborationPage() {
   );
 }
 
-// ── Live Preview Card ─────────────────────────────────────────────────────────
+// // ── Live Preview Card ─────────────────────────────────────────────────────────
 
-type LivePreviewCardProps = {
-  selectedCat: { icon: React.ElementType; name: string } | undefined;
-  title: string;
-  date: string;
-  description: string;
-  fromLocation: LocationValue;
-  toLocation: LocationValue;
-  maxMembers: number;
-  createdBy: string;
-};
+// type LivePreviewCardProps = {
+//   selectedCat: { icon: React.ElementType; name: string } | undefined;
+//   title: string;
+//   date: string;
+//   description: string;
+//   fromLocation: LocationValue;
+//   toLocation: LocationValue;
+//   maxMembers: number;
+//   createdBy: string;
+// };
 
-function LivePreviewCard({
-  selectedCat,
-  title,
-  date,
-  description,
-  fromLocation,
-  toLocation,
-  maxMembers,
-  createdBy,
-}: LivePreviewCardProps) {
-  const avatarColors = ["bg-blue-400", "bg-green-400", "bg-orange-400", "bg-purple-400"];
-  const visibleAvatars = avatarColors.slice(0, Math.min(2, maxMembers));
-  const overflow = Math.max(0, maxMembers - 2);
+// function LivePreviewCard({
+//   selectedCat,
+//   title,
+//   date,
+//   description,
+//   fromLocation,
+//   toLocation,
+//   maxMembers,
+//   createdBy,
+// }: LivePreviewCardProps) {
+//   const avatarColors = ["bg-blue-400", "bg-green-400", "bg-orange-400", "bg-purple-400"];
+//   const visibleAvatars = avatarColors.slice(0, Math.min(2, maxMembers));
+//   const overflow = Math.max(0, maxMembers - 2);
 
-  const displayDate = date
-    ? new Date(date).toLocaleDateString("en-US", {year:"2-digit", month: "short", day: "numeric" })
-    : "Date TBD";
+//   const displayDate = date
+//     ? new Date(date).toLocaleDateString("en-US", {year:"2-digit", month: "short", day: "numeric" })
+//     : "Date TBD";
 
-  return (
-    <div className="bg-surface-container-low rounded-[24px] p-6 border border-outline-variant/10 card-shadow transition-all group">
+//   return (
+//     <div className="bg-surface-container-low rounded-[24px] p-6 border border-outline-variant/10 card-shadow transition-all group">
 
-      {/* Top Row: Category Chip + Avatars */}
-      <div className="flex justify-between items-start mb-4">
-        <span className="bg-primary/10 text-primary font-label-sm text-label-sm px-3 py-1 rounded-full font-bold flex items-center gap-1.5">
-          {selectedCat && <selectedCat.icon className="w-3 h-3" />}
-          <span>{selectedCat?.name || "Category"}</span>
-        </span>
-        <div className="flex -space-x-2">
-          {visibleAvatars.map((color, i) => (
-            <div key={i} className={`w-8 h-8 rounded-full border-2 border-white ${color}`} />
-          ))}
-          {overflow > 0 && (
-            <div className="w-8 h-8 rounded-full border-2 border-white bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground">
-              +{overflow}
-            </div>
-          )}
-        </div>
-      </div>
+//       {/* Top Row: Category Chip + Avatars */}
+//       <div className="flex justify-between items-start mb-4">
+//         <span className="bg-primary/10 text-primary font-label-sm text-label-sm px-3 py-1 rounded-full font-bold flex items-center gap-1.5">
+//           {selectedCat && <selectedCat.icon className="w-3 h-3" />}
+//           <span>{selectedCat?.name || "Category"}</span>
+//         </span>
+//         <div className="flex -space-x-2">
+//           {visibleAvatars.map((color, i) => (
+//             <div key={i} className={`w-8 h-8 rounded-full border-2 border-white ${color}`} />
+//           ))}
+//           {overflow > 0 && (
+//             <div className="w-8 h-8 rounded-full border-2 border-white bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground">
+//               +{overflow}
+//             </div>
+//           )}
+//         </div>
+//       </div>
 
-      {/* Created by */}
-      <p className="font-label-sm text-label-sm text-on-surface-variant/60 mb-2">
-        by{" "}
-        <span className="text-on-surface font-semibold">
-          {createdBy || "You"}
-        </span>
-      </p>
+//       {/* Created by */}
+//       <p className="font-label-sm text-label-sm text-on-surface-variant/60 mb-2">
+//         by{" "}
+//         <span className="text-on-surface font-semibold">
+//           {createdBy || "You"}
+//         </span>
+//       </p>
 
-      {/* Title */}
-      <h3 className="font-headline-md text-on-surface mb-2 group-hover:text-primary transition-colors text-lg font-bold break-words">
-        {title || <span className="text-on-surface-variant/40">Activity Title</span>}
-      </h3>
+//       {/* Title */}
+//       <h3 className="font-headline-md text-on-surface mb-2 group-hover:text-primary transition-colors text-lg font-bold break-words">
+//         {title || <span className="text-on-surface-variant/40">Activity Title</span>}
+//       </h3>
 
-      {/* Description */}
-      <p className="text-on-surface-variant font-body-md text-body-md mb-6 min-h-[2.5rem] break-words">
-        {description || <span className="text-on-surface-variant/40">Your description will appear here…</span>}
-      </p>
+//       {/* Description */}
+//       <p className="text-on-surface-variant font-body-md text-body-md mb-6 min-h-[2.5rem] break-words">
+//         {description || <span className="text-on-surface-variant/40">Your description will appear here…</span>}
+//       </p>
 
-      {/* Location & Date */}
-  {/* Location & Date */}
-<div className="flex flex-col gap-1.5 mb-6">
-  <div className="flex items-center gap-1 text-on-surface-variant">
-    <Navigation className="w-3.5 h-3.5 shrink-0" />
-    <span className="font-label-sm text-label-sm">
-      {fromLocation?.name || <span className="text-on-surface-variant/40">Starting point</span>}
-    </span>
-  </div>
-  <div className="flex items-center gap-1 text-on-surface-variant">
-    <MapPin className="w-3.5 h-3.5 shrink-0" />
-    <span className="font-label-sm text-label-sm">
-      {toLocation?.name || <span className="text-on-surface-variant/40">Destination</span>}
-    </span>
-  </div>
-  <div className="flex items-center gap-1 text-on-surface-variant mt-0.5">
-    <CalendarDays className="w-3.5 h-3.5 shrink-0" />
-    <span className="font-label-sm text-label-sm">{displayDate}</span>
-  </div>
-</div>
+//       {/* Location & Date */}
+//   {/* Location & Date */}
+// <div className="flex flex-col gap-1.5 mb-6">
+//   <div className="flex items-center gap-1 text-on-surface-variant">
+//     <Navigation className="w-3.5 h-3.5 shrink-0" />
+//     <span className="font-label-sm text-label-sm">
+//       {fromLocation?.name || <span className="text-on-surface-variant/40">Starting point</span>}
+//     </span>
+//   </div>
+//   <div className="flex items-center gap-1 text-on-surface-variant">
+//     <MapPin className="w-3.5 h-3.5 shrink-0" />
+//     <span className="font-label-sm text-label-sm">
+//       {toLocation?.name || <span className="text-on-surface-variant/40">Destination</span>}
+//     </span>
+//   </div>
+//   <div className="flex items-center gap-1 text-on-surface-variant mt-0.5">
+//     <CalendarDays className="w-3.5 h-3.5 shrink-0" />
+//     <span className="font-label-sm text-label-sm">{displayDate}</span>
+//   </div>
+// </div>
 
-      {/* CTA Button */}
-      <button
-        type="button"
-        disabled
-        className="w-full py-3 bg-popover text-primary-foreground rounded-[16px] font-bold opacity-60 cursor-default"
-      >
-        Request to Join
-      </button>
-    </div>
-  );
-}
+//       {/* CTA Button */}
+//       <button
+//         type="button"
+//         disabled
+//         className="w-full py-3 bg-popover text-primary-foreground rounded-[16px] font-bold opacity-60 cursor-default"
+//       >
+//         Request to Join
+//       </button>
+//     </div>
+//   );
+// }
