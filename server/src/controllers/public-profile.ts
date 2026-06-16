@@ -4,16 +4,16 @@ import prisma from '../models';
 
 const publicProfileController = async (req: Request, res: Response) => {
     try {
-        if (!req.params.userId) {
+        if (!req.params.username) {
             res.status(401).json({ success: false, message: 'Unauthorized' });
             return;
         }
 
-    const userId = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId;
+    const username = Array.isArray(req.params.username) ? req.params.username[0] : req.params.username;
 
         // Fetch user profile with categories in a single query
         const user = await prisma.user.findUnique({
-            where: { id: userId },
+            where: { username: username },
             select: {
                 id: true,
                 name: true,
@@ -33,25 +33,25 @@ const publicProfileController = async (req: Request, res: Response) => {
 
         // Fetch stats in parallel for performance
         const [createdCount, joinedCount, completedCount, ratingAgg] = await Promise.all([
-            prisma.collaboration.count({ where: { creatorId: userId } }),
+            prisma.collaboration.count({ where: { creatorId: user.id } }),
             prisma.collaborationMember.count({
-                where: { userId, joinStatus: 'APPROVED' },
+                where: { userId: user.id, joinStatus: 'APPROVED' },
             }),
             prisma.collaboration.count({
                 where: {
                     status: 'COMPLETED',
                     OR: [
-                        { creatorId: userId },
+                        { creatorId: user.id },
                         {
                             members: {
-                                some: { userId, joinStatus: 'APPROVED' },
+                                some: { userId: user.id, joinStatus: 'APPROVED' },
                             },
                         },
                     ],
                 },
             }),
             prisma.rating.aggregate({
-                where: { reviewedUserId: userId },
+                where: { reviewedUserId: user.id },
                 _avg: {
                     showUpRating: true,
                     friendlyRating: true,

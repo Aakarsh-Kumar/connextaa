@@ -288,7 +288,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/users/{userId}": {
+    "/users/{username}": {
         parameters: {
             query?: never;
             header?: never;
@@ -301,7 +301,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    userId: string;
+                    username: string;
                 };
                 cookie?: never;
             };

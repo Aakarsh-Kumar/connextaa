@@ -1062,7 +1062,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /users/{userId}:
+  /users/{username}:
     get:
       tags:
         - Users
@@ -1070,7 +1070,7 @@ paths:
       summary: Public User Profile
 
       parameters:
-        - name: userId
+        - name: username
 
           in: path
 
@@ -1078,7 +1078,6 @@ paths:
 
           schema:
             type: string
-            format: uuid
 
       responses:
         "200":

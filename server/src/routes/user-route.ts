@@ -35,7 +35,7 @@ router.patch(
   updateMeProfileController,
 );
 router.get(
-  '/:userId',
+  '/:username',
   validateResponse(schemas.ProfileResponse),
   publicProfileController,
 );

@@ -712,14 +712,14 @@ const endpoints = makeApi([
   },
   {
     method: 'get',
-    path: '/users/:userId',
-    alias: 'getUsersUserId',
+    path: '/users/:username',
+    alias: 'getUsersUsername',
     requestFormat: 'json',
     parameters: [
       {
-        name: 'userId',
+        name: 'username',
         type: 'Path',
-        schema: z.string().uuid(),
+        schema: z.string(),
       },
     ],
     response: ProfileResponse,
