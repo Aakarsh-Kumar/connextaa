@@ -1135,32 +1135,33 @@ export interface components {
             lng: number;
         };
         Collaboration: {
-            id?: string;
-            category?: components["schemas"]["Category"];
-            title?: string;
-            description?: string;
-            fromLocation?: components["schemas"]["Location"];
-            toLocation?: components["schemas"]["Location"];
+            id: string;
+            category: components["schemas"]["Category"];
+            title: string;
+            description: string;
+            fromLocation: components["schemas"]["Location"];
+            toLocation: components["schemas"]["Location"];
             /** Format: date-time */
-            scheduledAt?: string;
-            maxMembers?: number;
-            status?: components["schemas"]["CollaborationStatus"];
-            creator?: components["schemas"]["User"];
+            scheduledAt: string;
+            maxMembers: number;
+            status: components["schemas"]["CollaborationStatus"];
+            creator: components["schemas"]["User"];
         };
         CollaborationFeedItem: {
-            id?: string;
-            category?: components["schemas"]["Category"];
-            title?: string;
-            description?: string;
+            id: string;
+            category: components["schemas"]["Category"];
+            title: string;
+            description: string;
             /** Format: date-time */
-            scheduledAt?: string;
-            status?: components["schemas"]["CollaborationStatus"];
-            currentMembers?: number;
-            maxMembers?: number;
-            distanceMeters?: number | null;
-            creator?: components["schemas"]["User"];
-            fromLocation?: components["schemas"]["Location"];
-            toLocation?: components["schemas"]["Location"];
+            scheduledAt: string;
+            status: components["schemas"]["CollaborationStatus"];
+            currentMembers: number;
+            maxMembers: number;
+            distanceMeters: number | null;
+            rating: number | null;
+            creator: components["schemas"]["User"];
+            fromLocation: components["schemas"]["Location"];
+            toLocation: components["schemas"]["Location"];
         };
         ChatRoom: {
             roomId?: string;

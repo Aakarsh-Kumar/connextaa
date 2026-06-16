@@ -10,3 +10,7 @@ export type CreateCollaborationRequest = components["schemas"]["CreateCollaborat
 export type CreateCollaborationResponse = components["schemas"]["CreateCollaborationResponse"];
 export type ProfileResponse = components["schemas"]["ProfileResponse"];
 export type UpdateProfileRequest = components["schemas"]["UpdateProfileRequest"];
+export type CollaborationFeedItem = components["schemas"]["CollaborationFeedItem"];
+export type CollaborationFeedResponse = components["schemas"]["CollaborationFeedResponse"];
+export type CollaborationStatus = components["schemas"]["CollaborationStatus"];
+export type JoinStatus = components["schemas"]["JoinStatus"];

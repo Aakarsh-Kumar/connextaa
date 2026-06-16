@@ -96,11 +96,11 @@ const CollaborationFeedItem = z
     currentMembers: z.number().int(),
     maxMembers: z.number().int(),
     distanceMeters: z.number().nullable(),
+    rating: z.number().int().nullable(),
     creator: User,
     fromLocation: Location,
     toLocation: Location,
   })
-  .partial()
   .passthrough();
 const PaginationMeta = z
   .object({
@@ -151,7 +151,6 @@ const Collaboration = z
     status: CollaborationStatus,
     creator: User,
   })
-  .partial()
   .passthrough();
 const JoinStatus = z.enum(['PENDING', 'APPROVED', 'REJECTED', 'LEFT']);
 const CollaborationResponse = z
