@@ -45,7 +45,25 @@ const createCollaborationsController = async (req: Request, res: Response) => {
                     chatRoom: true,
                 }
             });
-
+            // 2. Populate unsupported geography point columns via raw PostGIS
+            await tx.$executeRaw`
+                UPDATE collaborations
+                SET from_point = ST_SetSRID(
+                    ST_MakePoint(
+                        ${req.body.fromLocation.lng},
+                        ${req.body.fromLocation.lat}
+                    ),
+                    4326
+                )::geography,
+                to_point = ST_SetSRID(
+                    ST_MakePoint(
+                        ${req.body.toLocation.lng},
+                        ${req.body.toLocation.lat}
+                    ),
+                    4326
+                )::geography
+                WHERE id = ${collaboration.id}
+            `;
             return res.status(201).json({
                 success: true,
                 collaborationId: collaboration.id,
