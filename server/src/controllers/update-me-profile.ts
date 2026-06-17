@@ -24,21 +24,7 @@ const updateMeProfileController = async (req: Request, res: Response) => {
 
         // Update user profile and categories in transaction
         const updatedUser = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-            // Update user profile
-            const user = await tx.user.update({
-                where: { id: userId },
-                data: {
-                    ...(username && { username }),
-                    ...(bio && { bio }),
-                },
-                include: {
-                    categories: {
-                        select: { category: true },
-                    },
-                },
-            });
-
-            // 1. Delete existing category relationships
+            // 1. Delete existing category relationships FIRST
             await tx.userCategory.deleteMany({
                 where: { userId },
             });
@@ -57,7 +43,20 @@ const updateMeProfileController = async (req: Request, res: Response) => {
                 );
             }
 
-            // Return updated user data
+            // 3. Update user profile AND fetch with NEW categories
+            const user = await tx.user.update({
+                where: { id: userId },
+                data: {
+                    ...(username && { username }),
+                    ...(bio && { bio }),
+                },
+                include: {
+                    categories: {
+                        select: { category: true },
+                    },
+                },
+            });
+
             return user;
         });
 

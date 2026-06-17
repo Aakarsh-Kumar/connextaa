@@ -1,0 +1,202 @@
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { CATEGORIES, getCategoryStyles } from "@/constants";
+import Link from "next/link";
+import Image from "next/image";
+import { Compass, Star, User, Users, MapPin, Calendar } from "lucide-react";
+import { CollaborationFeedItem } from "@/types";
+import { useState } from "react";
+
+interface ActivityCardProps {
+  activity: CollaborationFeedItem;
+  pendingRequests: string[];
+  onOpenJoin?: (act: CollaborationFeedItem) => void;
+}
+
+const formatDate = (dateString?: string) => {
+if (!dateString) return "Today";
+const date = new Date(dateString);
+return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+});
+};
+
+const formatDistance = (meters?: number | null) => {
+if (meters === undefined || meters === null) return "1.2 km away";
+const km = meters / 1000;
+return `${km.toFixed(1)} km away`;
+};
+
+export function ActivityCard({
+  activity,
+  pendingRequests,
+  onOpenJoin
+}: ActivityCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isPending = activity.id ? pendingRequests.includes(activity.id) : false;
+  const isCarpool = activity.category === "CARPOOLING";
+  const CategoryIcon = CATEGORIES.find((c) => c.id === activity.category)?.icon ?? Compass;
+  const ctaText = isPending
+    ? "⏳ Request Pending"
+    : isCarpool
+    ? "Request Seat"
+    : "Join Activity";
+  const [isLocationExpanded, setIsLocationExpanded] = useState(false);
+  return (
+    <article className="bg-[var(--card)] rounded-2xl p-6 shadow-[0px_4px_20px_rgba(31,41,55,0.05)] hover:shadow-[0px_6px_30px_rgba(31,41,55,0.1)] transition-all border border-[var(--surface-container-high)] flex flex-col gap-4 w-full">
+      <div className="flex justify-between items-center">
+        <span className={`px-3 py-1 rounded-full font-label-sm text-label-sm uppercase tracking-wider font-semibold border flex items-center gap-1.5 ${getCategoryStyles(activity.category)}`}>
+          <CategoryIcon className="w-3.5 h-3.5" />
+          {activity.category ? activity.category.toLowerCase() : "general"}
+        </span>
+        <span className="bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-300 px-3 py-1 rounded-full font-label-sm text-label-sm font-bold flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <span>{activity.status}</span>
+        </span>
+      </div>
+
+      {/* Title — always fully visible, no clamp */}
+      <h3 className="font-headline-md text-headline-md text-[var(--on-surface)] leading-tight break-words [overflow-wrap:anywhere]">
+        {activity.title}
+      </h3>
+
+      {/* Creator info */}
+      <div className="flex items-center gap-2">
+        {activity.creator?.avatarUrl ? (
+          <Image
+            alt="Creator Profile"
+            width={24}
+            height={24}
+            className="rounded-full object-cover border border-[var(--border)] shrink-0"
+            src={activity.creator.avatarUrl}
+          />
+        ) : (
+          <div className="w-8 h-8 rounded-full bg-[var(--surface-container-low)] text-[var(--outline)] border border-[var(--border)] flex items-center justify-center shrink-0">
+            <User className="w-4 h-4" />
+          </div>
+        )}
+        <span className="font-label-md text-label-md text-[var(--on-surface-variant)] truncate">
+          by{" "}
+          <Link href={`/dashboard/profile/${activity.creator?.username}`}>
+            <span className="font-bold text-[var(--on-surface)] underline">
+              {activity.creator?.name || "Neighbor"}
+            </span>
+          </Link>
+        </span>
+        <span className="flex items-center text-yellow-600 font-bold text-label-sm gap-0.5 ml-auto shrink-0">
+          <Star className="w-3.5 h-3.5 fill-yellow-600 text-yellow-600" />
+          <span>{activity.rating?.toFixed(1) || 0}</span>
+        </span>
+      </div>
+
+      {/* Description — expands in place, no fixed height */}
+      <div>
+        <p className={`font-body-md text-body-md text-[var(--on-surface-variant)] break-words [overflow-wrap:anywhere] ${isExpanded ? "" : "line-clamp-3"}`}>
+          {activity.description}
+        </p>
+        {activity.description && activity.description.length > 140 && (
+          <button
+            type="button"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className={`text-xs font-semibold text-[var(--primary)] hover:underline mt-1 disabled`}
+            
+          >
+            {isExpanded ? "View less" : "View more"}
+          </button>
+        )}
+      </div>
+
+      {/* Location Route visualizer */}
+      {/* Location Route visualizer */}
+<button
+  type="button"
+  onClick={() => setIsLocationExpanded((prev) => !prev)}
+  className="bg-[var(--surface-container-low)] p-4 rounded-xl flex items-center gap-4 border border-[var(--border)]/40 text-left w-full cursor-pointer hover:border-[var(--primary)]/40 transition-colors"
+>
+  <div className="flex flex-col items-center gap-1 shrink-0 self-stretch">
+    <MapPin className="text-[var(--primary)] w-4.5 h-4.5" />
+    <div className="w-0.5 flex-1 border-l-2 border-dashed border-[var(--outline-variant)]"></div>
+    <MapPin className="text-[var(--secondary)] w-4.5 h-4.5" />
+  </div>
+  <div className="flex flex-col gap-3.5 justify-center py-0.5 min-w-0 flex-1">
+    <span
+      className={`font-label-md text-label-md text-[var(--on-surface)] font-medium break-words [overflow-wrap:anywhere] ${
+        isLocationExpanded ? "" : "truncate"
+      }`}
+    >
+      {activity.fromLocation?.name || "Starting Point"}
+    </span>
+    <span
+      className={`font-label-md text-label-md text-[var(--on-surface)] font-medium break-words [overflow-wrap:anywhere] ${
+        isLocationExpanded ? "" : "truncate"
+      }`}
+    >
+      {activity.toLocation?.name || "Destination"}
+    </span>
+  </div>
+</button>
+
+      {/* Details Row */}
+      <div className="flex justify-between items-center py-2 border-y border-[var(--outline-variant)]/30">
+        <div className="flex items-center gap-3 text-[var(--outline)]">
+          <div className="flex items-center gap-1 text-xs">
+            <Calendar className="w-4 h-4 shrink-0" />
+            <span className="font-semibold">{formatDate(activity.scheduledAt)}</span>
+          </div>
+          <div className="flex items-center gap-1 text-xs">
+            <Compass className="w-4 h-4 shrink-0" />
+            <span className="font-semibold">{formatDistance(activity.distanceMeters)}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1 text-[var(--primary)]">
+          <Users className="w-4.5 h-4.5 shrink-0" />
+          <span className="text-label-md font-bold">
+            {activity.currentMembers || 1} / {activity.maxMembers || 5} Members
+          </span>
+        </div>
+      </div>
+
+      {/* CTA Trigger — pinned to bottom */}
+      <button
+        disabled={isPending || activity.id === "preview"}
+        onClick={() => onOpenJoin?.(activity)}
+        className={`mt-auto w-full py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] shadow-sm text-sm cursor-pointer disabled:opacity-50 ${
+          isPending
+            ? "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500 cursor-not-allowed border border-[var(--border)]"
+            : "bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90"
+        }`}
+        
+      >
+        {ctaText}
+      </button>
+    </article>
+  );
+}
+/* ─── Skeleton Loading Cards ─────────────────────────────── */
+export function SkeletonCard() {
+  return (
+    <div className="bg-[var(--card)] rounded-2xl p-6 shadow-[0px_4px_20px_rgba(31,41,55,0.05)] border border-[var(--surface-container-high)] space-y-4 animate-pulse">
+      <div className="flex justify-between items-center">
+        <Skeleton className="h-6 w-20 rounded-full" />
+        <Skeleton className="h-6 w-16 rounded-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-2/3" />
+        <div className="flex items-center gap-2">
+          <Skeleton className="w-8 h-8 rounded-full" />
+          <Skeleton className="h-4 w-24" />
+        </div>
+      </div>
+      <Skeleton className="h-16 w-full rounded-xl" />
+      <div className="flex justify-between items-center py-2">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-4 w-20" />
+      </div>
+      <Skeleton className="h-12 w-full rounded-xl" />
+    </div>
+  );
+}

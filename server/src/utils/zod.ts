@@ -96,11 +96,11 @@ const CollaborationFeedItem = z
     currentMembers: z.number().int(),
     maxMembers: z.number().int(),
     distanceMeters: z.number().nullable(),
+    rating: z.number().int().nullable(),
     creator: User,
     fromLocation: Location,
     toLocation: Location,
   })
-  .partial()
   .passthrough();
 const PaginationMeta = z
   .object({
@@ -151,7 +151,6 @@ const Collaboration = z
     status: CollaborationStatus,
     creator: User,
   })
-  .partial()
   .passthrough();
 const JoinStatus = z.enum(['PENDING', 'APPROVED', 'REJECTED', 'LEFT']);
 const CollaborationResponse = z
@@ -713,14 +712,14 @@ const endpoints = makeApi([
   },
   {
     method: 'get',
-    path: '/users/:userId',
-    alias: 'getUsersUserId',
+    path: '/users/:username',
+    alias: 'getUsersUsername',
     requestFormat: 'json',
     parameters: [
       {
-        name: 'userId',
+        name: 'username',
         type: 'Path',
-        schema: z.string().uuid(),
+        schema: z.string(),
       },
     ],
     response: ProfileResponse,
