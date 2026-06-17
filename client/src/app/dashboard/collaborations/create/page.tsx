@@ -212,7 +212,7 @@ export default function CreateCollaborationPage() {
       
       const res = await collaborationApi.createCollaboration(payload);
       toast.success("Collaboration created successfully!");
-      router.push(`/chat/${res.chatRoomId}`);
+      router.push(`/chats/chat/${res.chatRoomId}`);
     } finally {
       setSubmitting(false);
     }
@@ -253,19 +253,19 @@ export default function CreateCollaborationPage() {
               <label className="font-label-md text-label-md text-on-surface-variant" htmlFor="title">
                 Activity Title
               </label>
-              <span className={`font-label-sm text-label-sm tabular-nums ${title.length > 72 ? title.length >= 80 ? "text-error" : "text-warning" : "text-on-surface-variant/40"}`}>
-                {title.length}/80
+              <span className={`font-label-sm text-label-sm tabular-nums ${title.length > 30 ? title.length >= 40 ? "text-error" : "text-warning" : "text-on-surface-variant/40"}`}>
+                {title.length}/40
               </span>
             </div>
             <input
               id="title"
               type="text"
-              maxLength={80}
+              maxLength={40}
               placeholder="e.g. Morning Neighborhood Run"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className={`w-full h-14 px-4 bg-background border rounded-xl font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:ring-2 transition-all ${
-                title.length >= 80
+                title.length >= 40
                   ? "border-error focus:border-error focus:ring-error/10"
                   : "border-outline-variant focus:border-primary focus:ring-primary/10"
               }`}
