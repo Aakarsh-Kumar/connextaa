@@ -368,12 +368,19 @@ components:
       properties:
         name:
           type: string
+          maxLength: 100
+          minLength: 3
+          pattern: "^[a-zA-Z0-9 ]*$"
 
         lat:
           type: number
+          minimum: -90
+          maximum: 90
 
         lng:
           type: number
+          minimum: -180
+          maximum: 180
 
     #################################################
     # COLLABORATION
@@ -401,9 +408,13 @@ components:
 
         title:
           type: string
+          minLength: 3
+          maxLength: 40
 
         description:
           type: string
+          minLength: 10
+          maxLength: 250
 
         fromLocation:
           $ref: "#/components/schemas/Location"
@@ -417,6 +428,8 @@ components:
 
         maxMembers:
           type: integer
+          minLength: 2
+          maxLength: 30
 
         status:
           $ref: "#/components/schemas/CollaborationStatus"
