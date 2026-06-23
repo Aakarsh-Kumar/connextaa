@@ -83,7 +83,15 @@ const UpdateProfileRequest = z
   .passthrough();
 const CollaborationStatus = z.enum(['OPEN', 'FULL', 'COMPLETED', 'CANCELLED']);
 const Location = z
-  .object({ name: z.string(), lat: z.number(), lng: z.number() })
+  .object({
+    name: z
+      .string()
+      .min(3)
+      .max(100)
+      .regex(/^[a-zA-Z0-9 ]*$/),
+    lat: z.number().gte(-90).lte(90),
+    lng: z.number().gte(-180).lte(180),
+  })
   .passthrough();
 const CollaborationFeedItem = z
   .object({
@@ -142,8 +150,8 @@ const Collaboration = z
   .object({
     id: z.string(),
     category: Category,
-    title: z.string(),
-    description: z.string(),
+    title: z.string().min(3).max(40),
+    description: z.string().min(10).max(250),
     fromLocation: Location,
     toLocation: Location,
     scheduledAt: z.string().datetime({ offset: true }),
