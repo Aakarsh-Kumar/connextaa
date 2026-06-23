@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../models';
 import { isValidUsername } from '../utils/validators';
+//during the process of onboarding, it is checking the request's format's validity, username's validity and if the user is already onboarded.
 
 /**
  * DB-level validation for onboarding.
