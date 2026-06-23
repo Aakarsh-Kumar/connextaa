@@ -639,7 +639,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/collaborations/{id}/requests/{requestId}/approve": {
+    "/collaborations/requests/{requestId}/approve": {
         parameters: {
             query?: never;
             header?: never;
@@ -654,7 +654,6 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    id: string;
                     requestId: string;
                 };
                 cookie?: never;
@@ -678,7 +677,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/collaborations/{id}/requests/{requestId}/reject": {
+    "/collaborations/requests/{requestId}/reject": {
         parameters: {
             query?: never;
             header?: never;
@@ -693,7 +692,6 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    id: string;
                     requestId: string;
                 };
                 cookie?: never;
@@ -1134,8 +1132,14 @@ export interface components {
             success: boolean;
             data: {
                 requestId?: string;
-                collaborationId?: string;
-                joinMessage?: string;
+                collaboration?: {
+                    collaborationId?: string;
+                    title?: string;
+                    category?: components["schemas"]["Category"];
+                };
+                joinMessage?: string | null;
+                /** Format: date-time */
+                requestedAt?: string;
                 status?: components["schemas"]["JoinStatus"];
                 user?: {
                     id?: string;

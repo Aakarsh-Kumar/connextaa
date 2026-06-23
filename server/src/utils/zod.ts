@@ -198,8 +198,16 @@ const PendingJoinRequestsResponse = z
       z
         .object({
           requestId: z.string(),
-          collaborationId: z.string(),
-          joinMessage: z.string(),
+          collaboration: z
+            .object({
+              collaborationId: z.string(),
+              title: z.string(),
+              category: Category,
+            })
+            .partial()
+            .passthrough(),
+          joinMessage: z.string().nullable(),
+          requestedAt: z.string().datetime({ offset: true }),
           status: JoinStatus,
           user: z
             .object({
@@ -611,49 +619,39 @@ const endpoints = makeApi([
       .passthrough(),
   },
   {
-    method: 'post',
-    path: '/collaborations/:id/requests/:requestId/approve',
-    alias: 'postCollaborationsIdrequestsRequestIdapprove',
-    requestFormat: 'json',
-    parameters: [
-      {
-        name: 'id',
-        type: 'Path',
-        schema: z.string(),
-      },
-      {
-        name: 'requestId',
-        type: 'Path',
-        schema: z.string(),
-      },
-    ],
-    response: SuccessResponse,
-  },
-  {
-    method: 'post',
-    path: '/collaborations/:id/requests/:requestId/reject',
-    alias: 'postCollaborationsIdrequestsRequestIdreject',
-    requestFormat: 'json',
-    parameters: [
-      {
-        name: 'id',
-        type: 'Path',
-        schema: z.string(),
-      },
-      {
-        name: 'requestId',
-        type: 'Path',
-        schema: z.string(),
-      },
-    ],
-    response: SuccessResponse,
-  },
-  {
     method: 'get',
     path: '/collaborations/requests',
     alias: 'getCollaborationsrequests',
     requestFormat: 'json',
     response: PendingJoinRequestsResponse,
+  },
+  {
+    method: 'post',
+    path: '/collaborations/requests/:requestId/approve',
+    alias: 'postCollaborationsrequestsRequestIdapprove',
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'requestId',
+        type: 'Path',
+        schema: z.string(),
+      },
+    ],
+    response: SuccessResponse,
+  },
+  {
+    method: 'post',
+    path: '/collaborations/requests/:requestId/reject',
+    alias: 'postCollaborationsrequestsRequestIdreject',
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'requestId',
+        type: 'Path',
+        schema: z.string(),
+      },
+    ],
+    response: SuccessResponse,
   },
   {
     method: 'get',
