@@ -375,7 +375,6 @@ components:
           type: string
           maxLength: 100
           minLength: 3
-          pattern: "^[a-zA-Z0-9 ]*$"
 
         lat:
           type: number
