@@ -187,6 +187,31 @@ const JoinRequest = z
   .object({ message: z.string().max(300) })
   .partial()
   .passthrough();
+const PendingJoinRequestsResponse = z
+  .object({
+    success: z.boolean(),
+    data: z.array(
+      z
+        .object({
+          requestId: z.string(),
+          collaborationId: z.string(),
+          joinMessage: z.string(),
+          status: JoinStatus,
+          user: z
+            .object({
+              id: z.string(),
+              name: z.string(),
+              username: z.string(),
+              avatarUrl: z.string().nullable(),
+            })
+            .partial()
+            .passthrough(),
+        })
+        .partial()
+        .passthrough(),
+    ),
+  })
+  .passthrough();
 const ChatRoom = z
   .object({
     roomId: z.string(),
@@ -265,6 +290,7 @@ export const schemas = {
   CollaborationResponse,
   UpdateCollaborationRequest,
   JoinRequest,
+  PendingJoinRequestsResponse,
   ChatRoom,
   ChatRoomsResponse,
   Message,
@@ -617,6 +643,13 @@ const endpoints = makeApi([
       },
     ],
     response: SuccessResponse,
+  },
+  {
+    method: 'get',
+    path: '/collaborations/requests',
+    alias: 'getCollaborationsrequests',
+    requestFormat: 'json',
+    response: PendingJoinRequestsResponse,
   },
   {
     method: 'get',

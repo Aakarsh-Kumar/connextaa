@@ -12,10 +12,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="w-full flex flex-col">
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-      />
       
       {/* Header Section */}
       <header className="mb-stack-lg">

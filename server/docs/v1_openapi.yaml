@@ -231,7 +231,9 @@ components:
 
     PendingJoinRequestsResponse:
       type: object
-
+      required:
+        - success
+        - data
       properties:
         success:
           type: boolean
@@ -244,6 +246,9 @@ components:
 
             properties:
               requestId:
+                type: string
+
+              collaborationId:
                 type: string
 
               joinMessage:
@@ -1357,6 +1362,22 @@ paths:
 
                         user:
                           $ref: "#/components/schemas/User"
+
+  /collaborations/requests:
+    get:
+      tags:
+        - Memberships
+
+      summary: Get Pending Join Requests for current user
+
+      responses:
+        "200":
+          description: Pending Requests
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PendingJoinRequestsResponse"
 
   /collaborations/{id}/requests/{requestId}/approve:
     post:

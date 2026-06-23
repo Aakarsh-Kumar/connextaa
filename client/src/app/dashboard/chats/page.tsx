@@ -4,6 +4,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { getCategoryIcon, getCategoryStyles } from "@/constants";
 import toast from "react-hot-toast";
 import type { Category } from "@/types";
+import { LucideMessageSquare, ArrowRightIcon } from "lucide-react";
 
 interface ChatItem {
   id: number;
@@ -105,7 +106,7 @@ export default function ChatsPage() {
             <div className={`flex items-center shrink-0 ${isMobile ? "gap-2" : "gap-6"}`}>
               <div className="text-right">
                 <div className="flex items-center justify-end gap-1.5 text-on-surface-variant font-label-md mb-1">
-                  <span className="material-symbols-outlined text-[18px]">group</span>
+                  <LucideMessageSquare className="w-4 h-4" />
                   <span>{chat.members} Members</span>
                 </div>
                 
@@ -119,9 +120,7 @@ export default function ChatsPage() {
                 )}
               </div>
               
-              <span className="material-symbols-outlined text-outline shrink-0">
-                chevron_right
-              </span>
+              <ArrowRightIcon className="w-4 h-4 text-outline shrink-0" />
             </div>
           </div>
         );
