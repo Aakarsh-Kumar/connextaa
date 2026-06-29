@@ -25,6 +25,7 @@ import {
   ChevronUp,
   Star,
 } from "lucide-react";
+import Link from "next/link";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -464,9 +465,9 @@ export default function ChatRoomPage({ params }: PageProps) {
               )}
               <span className="text-xs text-[var(--on-surface-variant)]">
                 Created by{" "}
-                <span className="font-semibold text-[var(--on-surface)]">
+                <Link href={`/dashboard/profile/${collab.creator.username}`} className="font-semibold underline text-[var(--on-surface)]">
                   {collab.creator.name}
-                </span>
+                </Link>
               </span>
             </div>
           )}
@@ -521,7 +522,7 @@ export default function ChatRoomPage({ params }: PageProps) {
           <div className="space-y-2 overflow-y-auto max-h-44 pr-1">
             {/* Creator */}
             {collab?.creator && (
-              <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-white transition-colors">
+              <Link href={`/dashboard/profile/${collab.creator.username}`} className="flex items-center gap-3 p-2 rounded-xl hover:bg-white transition-colors">
                 {collab.creator.avatarUrl ? (
                   <Image
                     src={collab.creator.avatarUrl}
@@ -540,13 +541,13 @@ export default function ChatRoomPage({ params }: PageProps) {
                   <p className="text-xs text-[var(--outline)]">@{collab.creator.username} · Creator</p>
                 </div>
                 <Star className="w-3.5 h-3.5 text-yellow-500 shrink-0" />
-              </div>
+              </Link>
             )}
             {/* Other members */}
             {members
               .filter((m) => m.id !== collab?.creator?.id)
               .map((m) => (
-                <div key={m.id} className="flex items-center gap-3 p-2 rounded-xl hover:bg-white transition-colors">
+                <Link href={`/dashboard/profile/${m.username}`} key={m.id} className="flex items-center gap-3 p-2 rounded-xl hover:bg-white transition-colors">
                   {m.avatarUrl ? (
                     <Image
                       src={m.avatarUrl}
@@ -564,7 +565,7 @@ export default function ChatRoomPage({ params }: PageProps) {
                     <p className="text-sm font-semibold text-[var(--on-surface)] truncate">{m.name}</p>
                     <p className="text-xs text-[var(--outline)]">@{m.username}</p>
                   </div>
-                </div>
+                </Link>
               ))}
             {/* Placeholder members when no API data yet */}
             {!collab && (
@@ -666,7 +667,7 @@ export default function ChatRoomPage({ params }: PageProps) {
               )}
 
               <div
-                className={`px-4 py-3 rounded-2xl text-sm leading-relaxed break-words [overflow-wrap:anywhere] shadow-xs ${
+                className={`px-4 py-3 rounded-2xl text-sm leading-relaxed break-words [word-break:break-word] whitespace-pre-wrap shadow-xs ${
                   isMe
                     ? "bg-[var(--primary)] text-[var(--primary-foreground)] rounded-tr-sm"
                     : "bg-white dark:bg-[var(--card)] text-[var(--on-surface)] border border-[var(--border)] rounded-tl-sm"
@@ -712,6 +713,7 @@ export default function ChatRoomPage({ params }: PageProps) {
           type="text"
           value={input}
           onChange={handleInputChange}
+          maxLength={300}
         />
         <button
           type="submit"

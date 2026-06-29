@@ -199,6 +199,10 @@ const sendMessageController = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Message content is required' });
     }
 
+    if (message.length > 300) {
+      return res.status(400).json({ success: false, message: 'Message length cannot exceed 300 characters' });
+    }
+
     // Guard: check ChatMember (room membership) as the source of truth.
     // Backfill ChatMember if they are an approved collaboration member or creator.
     let chatMember = await prisma.chatMember.findUnique({
