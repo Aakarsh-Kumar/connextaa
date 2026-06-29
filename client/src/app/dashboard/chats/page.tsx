@@ -8,8 +8,10 @@ import toast from "react-hot-toast";
 import type { Category } from "@/types";
 import { LucideMessageSquare, ArrowRightIcon, LucideUser, Search } from "lucide-react";
 import { chatApi } from "@/features/chats/chatApi";
+import { useRouter } from "next/navigation";
 
 export default function ChatsPage() {
+  const router = useRouter();
   const isMobile = useIsMobile();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -22,8 +24,8 @@ export default function ChatsPage() {
     queryFn: chatApi.getChatRooms,
   });
 
-  const handleChatClick = (title: string) => {
-    toast.success(`Opening chat: ${title}`);
+  const handleChatClick = (roomId: string) => {
+    router.push(`/dashboard/chats/chat/${roomId}`);
   };
 
   if (isLoading) {
@@ -102,7 +104,7 @@ export default function ChatsPage() {
             return (
               <div
                 key={room.roomId}
-                onClick={() => handleChatClick(room.collaboration.title)}
+                onClick={() => handleChatClick(room.collaboration.id)}
                 className={`bg-card rounded-lg card-elevation flex items-center border border-transparent hover:border-primary/20 cursor-pointer ${
                   isMobile ? "p-4 gap-3" : "p-5 gap-6"
                 }`}
