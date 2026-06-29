@@ -81,6 +81,7 @@ export default function ChatRoomPage({ params }: PageProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [typingName, setTypingName] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
@@ -319,8 +320,9 @@ export default function ChatRoomPage({ params }: PageProps) {
 
   // ── Leave ────────────────────────────────────────────────────────────────────
 
-  const handleLeave = () => {
-    toast("Leave functionality coming soon!");
+  const handleLeave = async() => {
+    await collaborationApi.leaveCollaboration(collabId as string);
+    router.push("/dashboard/chats");
   };
 
   // ── Derived ──────────────────────────────────────────────────────────────────
@@ -366,32 +368,52 @@ export default function ChatRoomPage({ params }: PageProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-1 shrink-0">
-          {/* Members */}
-          <button
-            onClick={() => { setMembersOpen((v) => !v); setInfoOpen(false); }}
-            title="Members"
-            className="p-2 rounded-full hover:bg-[var(--surface-container-low)] transition-colors text-[var(--outline)] hover:text-[var(--primary)]"
-          >
-            <Users className="w-5 h-5" />
-          </button>
-          {/* Info */}
-          <button
-            onClick={() => { setInfoOpen((v) => !v); setMembersOpen(false); }}
-            title="Collaboration info"
-            className={`p-2 rounded-full hover:bg-[var(--surface-container-low)] transition-colors hover:text-[var(--primary)] ${
-              infoOpen ? "text-[var(--primary)]" : "text-[var(--outline)]"
-            }`}
-          >
-            <Info className="w-5 h-5" />
-          </button>
-          {/* Leave */}
-          <button
-            onClick={handleLeave}
-            title="Leave room"
-            className="p-2 rounded-full hover:bg-rose-50 transition-colors text-[var(--outline)] hover:text-rose-600"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
+          {showLeaveConfirm ? (
+            <div className="flex items-center gap-1.5 bg-rose-50 dark:bg-rose-950/20 px-2 py-1 rounded-full border border-rose-200/50">
+              <span className="text-[11px] font-bold text-rose-700 dark:text-rose-400 pl-1">Leave?</span>
+              <button
+                onClick={handleLeave}
+                className="px-2 py-0.5 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-[10px] font-bold transition-colors active:scale-95 cursor-pointer"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setShowLeaveConfirm(false)}
+                className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-[var(--on-surface)] dark:text-white rounded-full text-[10px] font-bold transition-colors cursor-pointer"
+              >
+                No
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Members */}
+              <button
+                onClick={() => { setMembersOpen((v) => !v); setInfoOpen(false); }}
+                title="Members"
+                className="p-2 rounded-full hover:bg-[var(--surface-container-low)] transition-colors text-[var(--outline)] hover:text-[var(--primary)]"
+              >
+                <Users className="w-5 h-5" />
+              </button>
+              {/* Info */}
+              <button
+                onClick={() => { setInfoOpen((v) => !v); setMembersOpen(false); }}
+                title="Collaboration info"
+                className={`p-2 rounded-full hover:bg-[var(--surface-container-low)] transition-colors hover:text-[var(--primary)] ${
+                  infoOpen ? "text-[var(--primary)]" : "text-[var(--outline)]"
+                }`}
+              >
+                <Info className="w-5 h-5" />
+              </button>
+              {/* Leave */}
+              <button
+                onClick={() => setShowLeaveConfirm(true)}
+                title="Leave room"
+                className="p-2 rounded-full hover:bg-rose-50 transition-colors text-[var(--outline)] hover:text-rose-600"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+            </>
+          )}
         </div>
       </header>
 
