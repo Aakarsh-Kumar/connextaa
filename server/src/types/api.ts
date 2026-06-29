@@ -1207,16 +1207,16 @@ export interface components {
         ChatRoom: {
             roomId: string;
             collaboration: {
-                id?: string;
-                title?: string;
-                category?: components["schemas"]["Category"];
+                id: string;
+                title: string;
+                category: components["schemas"]["Category"];
                 /** Format: date-time */
-                scheduledAt?: string;
+                scheduledAt: string;
             };
             unreadCount: number;
-            lastMessage?: string;
+            lastMessage: string;
             memberCount: number;
-            lastMessageSenderName?: string;
+            lastMessageSenderName: string;
         };
         Message: {
             id?: string;

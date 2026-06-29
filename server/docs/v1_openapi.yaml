@@ -530,6 +530,8 @@ components:
         - collaboration
         - unreadCount
         - memberCount
+        - lastMessageSenderName
+        - lastMessage
 
       properties:
         roomId:
@@ -537,6 +539,13 @@ components:
 
         collaboration:
           type: object
+
+          required:
+            - title
+            - category
+            - scheduledAt
+            - id
+
           properties:
             id:
               type: string

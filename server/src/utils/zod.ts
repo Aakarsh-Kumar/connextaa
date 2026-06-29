@@ -234,12 +234,11 @@ const ChatRoom = z
         category: Category,
         scheduledAt: z.string().datetime({ offset: true }),
       })
-      .partial()
       .passthrough(),
     unreadCount: z.number().int(),
-    lastMessage: z.string().optional(),
+    lastMessage: z.string(),
     memberCount: z.number().int(),
-    lastMessageSenderName: z.string().optional(),
+    lastMessageSenderName: z.string(),
   })
   .passthrough();
 const ChatRoomsResponse = z
