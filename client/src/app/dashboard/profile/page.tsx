@@ -330,12 +330,12 @@ export default function ProfilePage() {
               onClick: openEditDialog,
               variant: "default" as const,
             },
-            {
-              icon: <Sparkles className="w-5 h-5 text-[var(--on-surface-variant)]" />,
-              label: "Manage Interests",
-              onClick: openEditDialog,
-              variant: "default" as const,
-            },
+            // {
+            //   icon: <Sparkles className="w-5 h-5 text-[var(--on-surface-variant)]" />,
+            //   label: "Manage Interests",
+            //   onClick: openEditDialog,
+            //   variant: "default" as const,
+            // },
             {
               icon: <Bell className="w-5 h-5 text-[var(--on-surface-variant)]" />,
               label: "Notification Preferences",
