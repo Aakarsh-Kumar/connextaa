@@ -13,6 +13,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     if (user && !user.onboardingCompleted) {
       router.push("/onboarding");
     }
+    if(!user){
+      router.push("/")
+    }
   }, [user, router]);
 
   if (user && !user.onboardingCompleted) {

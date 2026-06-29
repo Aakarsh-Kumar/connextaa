@@ -6,7 +6,7 @@ import { Home, PlusCircle, MessageSquare, Bell, User } from "lucide-react";
 
 const navItems = [
   { label: "Home", href: "/dashboard", icon: Home },
-  { label: "Chats", href: "/dashboard/chat", icon: MessageSquare },
+  { label: "Chats", href: "/dashboard/chats", icon: MessageSquare },
   { label: "Create", href: "/dashboard/collaborations/create", icon: PlusCircle, highlight: true },
   { label: "Alerts", href: "/dashboard/notifications", icon: Bell },
   { label: "Profile", href: "/dashboard/profile", icon: User },

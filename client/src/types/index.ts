@@ -14,3 +14,11 @@ export type CollaborationFeedItem = components["schemas"]["CollaborationFeedItem
 export type CollaborationFeedResponse = components["schemas"]["CollaborationFeedResponse"];
 export type CollaborationStatus = components["schemas"]["CollaborationStatus"];
 export type JoinStatus = components["schemas"]["JoinStatus"];
+export type PendingJoinRequestsResponse = components["schemas"]["PendingJoinRequestsResponse"];
+
+export type ChatRoom = components["schemas"]["ChatRoom"];
+export type ChatRoomsResponse = components["schemas"]["ChatRoomsResponse"];
+export type Message = components["schemas"]["Message"];
+export type SendMessageRequest = components["schemas"]["SendMessageRequest"];
+export type MessagesResponse = components["schemas"]["MessagesResponse"];
+

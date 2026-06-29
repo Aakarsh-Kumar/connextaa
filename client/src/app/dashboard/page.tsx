@@ -128,7 +128,7 @@ export default function DashboardPage() {
         setFeed([{
       "id": "<string>",
       "category": "STUDY",
-      "title": "murli",
+      "title": "qwertyuiopqwertyuiopqwertyuiopqwertyuiop",
       "description": "adhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgk",
       "scheduledAt": "<dateTime>",
       "status": "COMPLETED",
@@ -159,7 +159,7 @@ export default function DashboardPage() {
     {
       "id": "<string>1",
       "category": "PROFESSIONAL",
-      "title": "adhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhas",
+      "title": "qwertyuiopqwertyuiopqwertyuiopqwertyuiop",
       "description": "adhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgk",
       "scheduledAt": "<dateTime>",
       "status": "CANCELLED",

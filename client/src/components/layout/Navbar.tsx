@@ -21,7 +21,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 const NAV_LINKS = [
   { label: "Feed", href: "/dashboard", icon: Home },
   { label: "Create", href: "/dashboard/collaborations/create", icon: PlusCircle },
-  { label: "Chats", href: "/dashboard/chat", icon: MessageSquare },
+  { label: "Chats", href: "/dashboard/chats", icon: MessageSquare },
   { label: "Alerts", href: "/dashboard/notifications", icon: Bell },
 ];
 

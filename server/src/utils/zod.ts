@@ -84,11 +84,7 @@ const UpdateProfileRequest = z
 const CollaborationStatus = z.enum(['OPEN', 'FULL', 'COMPLETED', 'CANCELLED']);
 const Location = z
   .object({
-    name: z
-      .string()
-      .min(3)
-      .max(100)
-      .regex(/^[a-zA-Z0-9 ]*$/),
+    name: z.string().min(3).max(100),
     lat: z.number().gte(-90).lte(90),
     lng: z.number().gte(-180).lte(180),
   })
@@ -195,6 +191,39 @@ const JoinRequest = z
   .object({ message: z.string().max(300) })
   .partial()
   .passthrough();
+const PendingJoinRequestsResponse = z
+  .object({
+    success: z.boolean(),
+    data: z.array(
+      z
+        .object({
+          requestId: z.string(),
+          collaboration: z
+            .object({
+              collaborationId: z.string(),
+              title: z.string(),
+              category: Category,
+            })
+            .partial()
+            .passthrough(),
+          joinMessage: z.string().nullable(),
+          requestedAt: z.string().datetime({ offset: true }),
+          status: JoinStatus,
+          user: z
+            .object({
+              id: z.string(),
+              name: z.string(),
+              username: z.string(),
+              avatarUrl: z.string().nullable(),
+            })
+            .partial()
+            .passthrough(),
+        })
+        .partial()
+        .passthrough(),
+    ),
+  })
+  .passthrough();
 const ChatRoom = z
   .object({
     roomId: z.string(),
@@ -273,6 +302,7 @@ export const schemas = {
   CollaborationResponse,
   UpdateCollaborationRequest,
   JoinRequest,
+  PendingJoinRequestsResponse,
   ChatRoom,
   ChatRoomsResponse,
   Message,
@@ -589,16 +619,18 @@ const endpoints = makeApi([
       .passthrough(),
   },
   {
+    method: 'get',
+    path: '/collaborations/requests',
+    alias: 'getCollaborationsrequests',
+    requestFormat: 'json',
+    response: PendingJoinRequestsResponse,
+  },
+  {
     method: 'post',
-    path: '/collaborations/:id/requests/:requestId/approve',
-    alias: 'postCollaborationsIdrequestsRequestIdapprove',
+    path: '/collaborations/requests/:requestId/approve',
+    alias: 'postCollaborationsrequestsRequestIdapprove',
     requestFormat: 'json',
     parameters: [
-      {
-        name: 'id',
-        type: 'Path',
-        schema: z.string(),
-      },
       {
         name: 'requestId',
         type: 'Path',
@@ -609,15 +641,10 @@ const endpoints = makeApi([
   },
   {
     method: 'post',
-    path: '/collaborations/:id/requests/:requestId/reject',
-    alias: 'postCollaborationsIdrequestsRequestIdreject',
+    path: '/collaborations/requests/:requestId/reject',
+    alias: 'postCollaborationsrequestsRequestIdreject',
     requestFormat: 'json',
     parameters: [
-      {
-        name: 'id',
-        type: 'Path',
-        schema: z.string(),
-      },
       {
         name: 'requestId',
         type: 'Path',
