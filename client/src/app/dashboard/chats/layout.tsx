@@ -38,7 +38,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 : "text-on-surface-variant hover:text-on-surface"
             }`}
           >
-            Requests (3)
+            Requests
           </Link>
           <Link
             id="tab-chats"

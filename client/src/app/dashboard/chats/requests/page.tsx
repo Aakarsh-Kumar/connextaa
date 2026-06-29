@@ -1,13 +1,13 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient, } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { requestsApi } from "@/features/chats/requestsApi";
 import toast from "react-hot-toast";
-import { LucideInbox } from "lucide-react";
+import { LucideInbox, Clock, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock } from "lucide-react";
 import {
   CATEGORIES,
   getCategoryStyles,
@@ -16,6 +16,7 @@ import {
 
 export default function RequestsPage() {
   const isMobile = useIsMobile();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const {
     data: response,

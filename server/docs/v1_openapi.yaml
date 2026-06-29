@@ -525,20 +525,48 @@ components:
     ChatRoom:
       type: object
 
+      required:
+        - roomId
+        - collaboration
+        - unreadCount
+        - memberCount
+        - lastMessageSenderName
+        - lastMessage
+
       properties:
         roomId:
           type: string
 
-        collaborationId:
-          type: string
+        collaboration:
+          type: object
 
-        title:
-          type: string
+          required:
+            - title
+            - category
+            - scheduledAt
+            - id
+
+          properties:
+            id:
+              type: string
+            title:
+              type: string
+            category:
+              $ref: "#/components/schemas/Category"
+            scheduledAt:
+              type: string
+              format: date-time
 
         unreadCount:
           type: integer
 
         lastMessage:
+          type: string
+        
+        memberCount:
+          type: integer   
+
+        lastMessageSenderName:
           type: string
 
     Message:

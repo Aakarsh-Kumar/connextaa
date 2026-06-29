@@ -227,12 +227,19 @@ const PendingJoinRequestsResponse = z
 const ChatRoom = z
   .object({
     roomId: z.string(),
-    collaborationId: z.string(),
-    title: z.string(),
+    collaboration: z
+      .object({
+        id: z.string(),
+        title: z.string(),
+        category: Category,
+        scheduledAt: z.string().datetime({ offset: true }),
+      })
+      .passthrough(),
     unreadCount: z.number().int(),
     lastMessage: z.string(),
+    memberCount: z.number().int(),
+    lastMessageSenderName: z.string(),
   })
-  .partial()
   .passthrough();
 const ChatRoomsResponse = z
   .object({ success: z.boolean(), data: z.array(ChatRoom) })

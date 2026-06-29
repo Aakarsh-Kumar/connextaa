@@ -236,6 +236,11 @@ const approveJoinRequestController = async (
             maxMembers: true,
             status: true,
             deletedAt: true,
+            chatRoom: {
+              select: {
+                id: true,
+              },
+            },
           },
         },
       },
@@ -298,6 +303,15 @@ const approveJoinRequestController = async (
           joinStatus: JoinStatus.APPROVED,
         },
       });
+
+      if (collaboration.chatRoom) {
+        await tx.chatMember.create({
+          data: {
+            roomId: collaboration.chatRoom.id,
+            userId: joinRequest.userId,
+          },
+        });
+      }
 
       const updatedApprovedCount =
         approvedMembersCount + 1;

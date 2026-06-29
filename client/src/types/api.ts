@@ -1205,11 +1205,18 @@ export interface components {
             toLocation: components["schemas"]["Location"];
         };
         ChatRoom: {
-            roomId?: string;
-            collaborationId?: string;
-            title?: string;
-            unreadCount?: number;
-            lastMessage?: string;
+            roomId: string;
+            collaboration: {
+                id: string;
+                title: string;
+                category: components["schemas"]["Category"];
+                /** Format: date-time */
+                scheduledAt: string;
+            };
+            unreadCount: number;
+            lastMessage: string;
+            memberCount: number;
+            lastMessageSenderName: string;
         };
         Message: {
             id?: string;
