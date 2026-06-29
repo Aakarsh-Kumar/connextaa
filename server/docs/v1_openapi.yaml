@@ -626,7 +626,7 @@ components:
       properties:
         idToken:
           type: string
-        maxLength: 2048
+          maxLength: 2048
 
     OnboardingRequest:
       type: object

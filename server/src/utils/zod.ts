@@ -1,7 +1,9 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
-const GoogleAuthRequest = z.object({ idToken: z.string() }).passthrough();
+const GoogleAuthRequest = z
+  .object({ idToken: z.string().max(2048) })
+  .passthrough();
 const User = z
   .object({
     id: z.string().uuid(),
@@ -126,12 +128,12 @@ const CollaborationFeedResponse = z
 const CreateCollaborationRequest = z
   .object({
     category: Category,
-    title: z.string(),
-    description: z.string(),
+    title: z.string().min(3).max(40),
+    description: z.string().min(10).max(250),
     fromLocation: Location,
     toLocation: Location,
     scheduledAt: z.string().datetime({ offset: true }),
-    maxMembers: z.number().int().gte(2),
+    maxMembers: z.number().int().gte(2).lte(30),
   })
   .passthrough();
 const CreateCollaborationResponse = z
@@ -258,7 +260,9 @@ const MessagesResponse = z
   .object({ success: z.boolean(), data: z.array(Message) })
   .partial()
   .passthrough();
-const SendMessageRequest = z.object({ message: z.string() }).passthrough();
+const SendMessageRequest = z
+  .object({ message: z.string().min(1).max(300) })
+  .passthrough();
 const SubmitRatingRequest = z
   .object({
     collaborationId: z.string(),
@@ -330,7 +334,7 @@ const endpoints = makeApi([
       {
         name: 'body',
         type: 'Body',
-        schema: z.object({ idToken: z.string() }).passthrough(),
+        schema: z.object({ idToken: z.string().max(2048) }).passthrough(),
       },
     ],
     response: AuthResponse,
@@ -417,7 +421,7 @@ const endpoints = makeApi([
       {
         name: 'body',
         type: 'Body',
-        schema: z.object({ message: z.string() }).passthrough(),
+        schema: z.object({ message: z.string().min(1).max(300) }).passthrough(),
       },
       {
         name: 'roomId',
