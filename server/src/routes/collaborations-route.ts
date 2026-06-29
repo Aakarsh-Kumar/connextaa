@@ -6,6 +6,7 @@ import { schemas } from '../utils/zod';
 import isOnboarded from '../middlewares/onboardedCheck';
 import validateTime from '../middlewares/validateTime';
 import { getRequestsController, createJoinRequestController, approveJoinRequestController, rejectJoinRequestController } from '../controllers/requests';
+import { getCollaborationDetailsController } from '../controllers/collaboration-detail';
 
 const router = Router();
 
@@ -25,6 +26,15 @@ router.get(
     isOnboarded,
     validateResponse(schemas.PendingJoinRequestsResponse),
     getRequestsController,
+)
+
+
+router.get(
+    '/:id',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.CollaborationResponse),
+    getCollaborationDetailsController
 )
 
 router.post(
@@ -50,6 +60,13 @@ router.post(
     isOnboarded,
     validateResponse(schemas.SuccessResponse),
     rejectJoinRequestController,
+)
+
+router.get('/:id',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.CollaborationResponse),
+    getCollaborationDetailsController,
 )
 
 export default router;

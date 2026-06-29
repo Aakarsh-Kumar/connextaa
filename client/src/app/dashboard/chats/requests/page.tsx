@@ -86,130 +86,164 @@ const rejectMutation = useMutation({
     );
   }
 
+  const filteredRequests = requests.filter((req) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    return (
+      req.user?.name?.toLowerCase().includes(query) ||
+      req.user?.username?.toLowerCase().includes(query) ||
+      req.collaboration?.title?.toLowerCase().includes(query) ||
+      req.joinMessage?.toLowerCase().includes(query)
+    );
+  });
+
   return (
-    <div
-      className={`grid ${
-        isMobile ? "grid-cols-1" : "grid-cols-2 lg:grid-cols-3"
-      } gap-gutter`}
-      id="content-requests"
-    >
-      {requests.map((req) => {
-        const CategoryIcon = getCategoryIcon(
-          req.collaboration?.category
-        );
+    <div className="flex flex-col gap-6">
+      {/* Search Bar */}
+      <div className="relative group max-w-md">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--outline)] group-focus-within:text-[var(--primary)] transition-colors" />
+        <input
+          className="w-full pl-12 pr-4 py-3 bg-[var(--surface-container-low)] border-none rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all text-body-md text-[var(--foreground)] placeholder:text-[var(--outline)]"
+          placeholder="Search requests by user, title, or message..."
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
 
-        const categoryName =
-          CATEGORIES.find(
-            (c) => c.id === req.collaboration?.category
-          )?.name ?? "Other";
+      {filteredRequests.length > 0 ? (
+        <div
+          className={`grid ${
+            isMobile ? "grid-cols-1" : "grid-cols-2 lg:grid-cols-3"
+          } gap-gutter`}
+          id="content-requests"
+        >
+          {filteredRequests.map((req) => {
+            const CategoryIcon = getCategoryIcon(
+              req.collaboration?.category
+            );
 
-        return (
-          <div
-            key={req.requestId}
-            className="bg-card p-6 rounded-lg card-elevation border border-outline-variant/30 flex flex-col justify-between"
-          >
-            <div>
-              {/* User */}
-              <div className="flex items-start gap-4 mb-4">
-                <Image
-                  className="w-12 h-12 rounded-full object-cover"
-                  src={
-                    req.user?.avatarUrl ||
-                    "/default-avatar.png"
-                  }
-                  alt={req.user?.name || "User"}
-                  width={48}
-                  height={48}
-                />
+            const categoryName =
+              CATEGORIES.find(
+                (c) => c.id === req.collaboration?.category
+              )?.name ?? "Other";
 
-                <Link
-                  className="min-w-0 flex-1 cursor-pointer"
-                  href={`/dashboard/profile/${req.user?.username}`}
-                >
-                  <h3 className="font-bold text-on-surface truncate">
-                    {req.user?.name}
-                  </h3>
+            return (
+              <div
+                key={req.requestId}
+                className="bg-card p-6 rounded-lg card-elevation border border-outline-variant/30 flex flex-col justify-between"
+              >
+                <div>
+                  {/* User */}
+                  <div className="flex items-start gap-4 mb-4">
+                    <Image
+                      className="w-12 h-12 rounded-full object-cover"
+                      src={
+                        req.user?.avatarUrl ||
+                        "/default-avatar.png"
+                      }
+                      alt={req.user?.name || "User"}
+                      width={48}
+                      height={48}
+                    />
 
-                  <p className="text-xs text-on-surface-variant">
-                    @{req.user?.username}
-                  </p>
-                </Link>
-              </div>
+                    <Link
+                      className="min-w-0 flex-1 cursor-pointer"
+                      href={`/dashboard/profile/${req.user?.username}`}
+                    >
+                      <h3 className="font-bold text-on-surface truncate">
+                        {req.user?.name}
+                      </h3>
 
-              {/* Collaboration */}
-              <div className="mb-4">
-                <p className="text-xs text-on-surface-variant mb-1">
-                  Requested to join
-                </p>
-
-                <h4 className="font-semibold text-on-surface">
-                  {req.collaboration?.title}
-                </h4>
-              </div>
-
-              {/* Meta */}
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <div
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-medium ${getCategoryStyles(
-                    req.collaboration?.category
-                  )}`}
-                >
-                  <CategoryIcon className="w-3 h-3" />
-                  {categoryName}
-                </div>
-
-                {req.requestedAt && (
-                  <div className="inline-flex items-center gap-1 text-xs text-on-surface-variant">
-                    <Clock className="w-3 h-3" />
-                    {new Date(
-                      req.requestedAt
-                    ).toLocaleString("en-IN", {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    })}
+                      <p className="text-xs text-on-surface-variant">
+                        @{req.user?.username}
+                      </p>
+                    </Link>
                   </div>
-                )}
-              </div>
 
-              {/* Message */}
-              {req.joinMessage && (
-                <div className="bg-surface-container-low p-4 rounded-xl mb-6">
-                  <p className="text-on-surface-variant italic text-sm">
-                    &ldquo;{req.joinMessage}&rdquo;
-                  </p>
+                  {/* Collaboration */}
+                  <div className="mb-4">
+                    <p className="text-xs text-on-surface-variant mb-1">
+                      Requested to join
+                    </p>
+
+                    <h4 className="font-semibold text-on-surface">
+                      {req.collaboration?.title}
+                    </h4>
+                  </div>
+
+                  {/* Meta */}
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <div
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-medium ${getCategoryStyles(
+                        req.collaboration?.category
+                      )}`}
+                    >
+                      <CategoryIcon className="w-3 h-3" />
+                      {categoryName}
+                    </div>
+
+                    {req.requestedAt && (
+                      <div className="inline-flex items-center gap-1 text-xs text-on-surface-variant">
+                        <Clock className="w-3 h-3" />
+                        {new Date(
+                          req.requestedAt
+                        ).toLocaleString("en-IN", {
+                          dateStyle: "short",
+                          timeStyle: "short",
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Message */}
+                  {req.joinMessage && (
+                    <div className="bg-surface-container-low p-4 rounded-xl mb-6">
+                      <p className="text-on-surface-variant italic text-sm">
+                        &ldquo;{req.joinMessage}&rdquo;
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            {/* Actions */}
-            <div className="flex gap-3">
-              <button
-                onClick={() =>
-                  handleReject(
-                    req.requestId!,
-                    req.user?.name ?? "User"
-                  )
-                }
-                className="flex-1 py-3 border border-outline-variant text-on-surface-variant rounded-xl hover:bg-surface-container-low transition-colors cursor-pointer text-sm"
-              >
-                Reject
-              </button>
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() =>
+                      handleReject(
+                        req.requestId!,
+                        req.user?.name ?? "User"
+                      )
+                    }
+                    className="flex-1 py-3 border border-outline-variant text-on-surface-variant rounded-xl hover:bg-surface-container-low transition-colors cursor-pointer text-sm"
+                  >
+                    Reject
+                  </button>
 
-              <button
-                onClick={() =>
-                  handleApprove(
-                    req.requestId!,
-                    req.user?.name ?? "User"
-                  )
-                }
-                className="flex-1 py-3 bg-primary text-white rounded-xl hover:bg-on-primary-fixed-variant transition-transform active:scale-95 duration-200 cursor-pointer text-sm"
-              >
-                Approve
-              </button>
-            </div>
-          </div>
-        );
-      })}
+                  <button
+                    onClick={() =>
+                      handleApprove(
+                        req.requestId!,
+                        req.user?.name ?? "User"
+                      )
+                    }
+                    className="flex-1 py-3 bg-primary text-white rounded-xl hover:bg-on-primary-fixed-variant transition-transform active:scale-95 duration-200 cursor-pointer text-sm"
+                  >
+                    Approve
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <LucideInbox className="text-[50px] text-outline-variant mb-4" />
+          <p className="text-on-surface-variant font-body-lg">
+            No matching requests found.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

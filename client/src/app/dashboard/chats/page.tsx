@@ -104,7 +104,7 @@ export default function ChatsPage() {
             return (
               <div
                 key={room.roomId}
-                onClick={() => handleChatClick(room.collaboration.id)}
+                onClick={() => handleChatClick(room.roomId)}
                 className={`bg-card rounded-lg card-elevation flex items-center border border-transparent hover:border-primary/20 cursor-pointer ${
                   isMobile ? "p-4 gap-3" : "p-5 gap-6"
                 }`}

@@ -5,6 +5,7 @@ import {
   CollaborationFeedResponse,
   Category,
   SuccessResponse,
+  CollaborationResponse
 } from "@/types";
 
 export const collaborationApi = {
@@ -38,6 +39,11 @@ export const collaborationApi = {
       `/collaborations/${id}/join`,
       joinData
     );
+    return response.data;
+  },
+
+  getCollaborationDetails: async (id: string): Promise<CollaborationResponse> => {
+    const response = await api.get<CollaborationResponse>(`/collaborations/${id}`);
     return response.data;
   },
 };
