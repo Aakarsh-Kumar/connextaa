@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import prisma from '../models';
 import logger from '../utils/logger';
 import { CollaborationStatus, JoinStatus } from '@prisma/client';
+import { getIO } from '../sockets/socket';
 
 const getRoomsController = async (req: Request, res: Response) => {
   try {
@@ -184,4 +185,97 @@ const getMessagesController = async (req: Request, res: Response) => {
   }
 };
 
-export { getRoomsController, getMessagesController };
+const sendMessageController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const roomId = req.params.id as string;
+    const { message } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    if (!message || typeof message !== 'string' || !message.trim()) {
+      return res.status(400).json({ success: false, message: 'Message content is required' });
+    }
+
+    // Guard: check ChatMember (room membership) as the source of truth.
+    // Backfill ChatMember if they are an approved collaboration member or creator.
+    let chatMember = await prisma.chatMember.findUnique({
+      where: { roomId_userId: { roomId, userId } },
+      select: { id: true },
+    });
+
+    if (!chatMember) {
+      const chatRoom = await prisma.chatRoom.findUnique({
+        where: { id: roomId },
+        select: { collaborationId: true, collaboration: { select: { creatorId: true } } },
+      });
+
+      if (!chatRoom) {
+        return res.status(404).json({ success: false, message: 'Chat room not found' });
+      }
+
+      const isCreator = chatRoom.collaboration.creatorId === userId;
+
+      const collabMember = isCreator
+        ? { joinStatus: JoinStatus.APPROVED }
+        : await prisma.collaborationMember.findUnique({
+            where: { collaborationId_userId: { collaborationId: chatRoom.collaborationId, userId } },
+            select: { joinStatus: true },
+          });
+
+      if (!collabMember || collabMember.joinStatus !== JoinStatus.APPROVED) {
+        return res.status(403).json({ success: false, message: 'You are not a member of this chat room' });
+      }
+
+      // Backfill the missing ChatMember row
+      await prisma.chatMember.create({
+        data: { roomId, userId },
+      });
+    }
+
+    // Save to database
+    const savedMessage = await prisma.message.create({
+      data: {
+        roomId,
+        senderId: userId,
+        message: message.trim(),
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            onboardingCompleted: true,
+            username: true,
+            avatarUrl: true,
+            bio: true,
+          },
+        },
+      },
+    });
+
+    const messageData = {
+      id: savedMessage.id,
+      message: savedMessage.message,
+      createdAt: savedMessage.createdAt.toISOString(),
+      sender: savedMessage.sender,
+    };
+
+    // Broadcast to the socket room
+    try {
+      getIO().to(roomId).emit('new_message', messageData);
+    } catch (socketErr) {
+      logger.error('Error broadcasting message via Socket.IO', socketErr);
+    }
+
+    return res.status(201).json(messageData);
+  } catch (error) {
+    logger.error('Error sending message', { error });
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export { getRoomsController, getMessagesController, sendMessageController };

@@ -10,6 +10,7 @@ import { collaborationApi } from "@/features/collaboration/api/collaborationApi"
 import { CATEGORIES, getCategoryStyles } from "@/constants";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { socket } from "@/services/socket";
 import {
   ArrowLeft,
   Info,
@@ -21,7 +22,6 @@ import {
   LogOut,
   User,
   Compass,
-  ChevronDown,
   ChevronUp,
   Star,
 } from "lucide-react";
@@ -85,6 +85,81 @@ export default function ChatRoomPage({ params }: PageProps) {
   const messagesAreaRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isCurrentlyTypingRef = useRef(false);
+
+  // ── Scroll to bottom when initial messages load or optimistic messages added ──
+
+  const scrollToBottom = () =>
+    setTimeout(() => {
+      const el = messagesAreaRef.current;
+      if (el) el.scrollTop = el.scrollHeight;
+    }, 60);
+
+  // ── Socket Connection & Handlers ────────────────────────────────────────────
+
+  useEffect(() => {
+    // Ensure we are connected
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    // Join room
+    socket.emit("join_room", { roomId });
+
+    // Handle incoming message
+    const handleNewMessage = (msg: LocalMessage) => {
+      queryClient.setQueryData(["messages", roomId], (oldData: any) => {
+        if (!oldData) return oldData;
+        const pages = [...oldData.pages];
+        if (pages.length === 0) return oldData;
+
+        // Since server query lists are ordered DESC, the first page (index 0)
+        // contains the newest messages. Prepend new message to this first page.
+        const updatedFirstPage = {
+          ...pages[0],
+          data: [msg, ...(pages[0].data || [])],
+        };
+
+        return {
+          ...oldData,
+          pages: [updatedFirstPage, ...pages.slice(1)],
+        };
+      });
+
+      scrollToBottom();
+    };
+
+    // Handle typing events
+    const handleTyping = (data: { userId: string; name: string }) => {
+      if (data.userId !== user?.id) {
+        setTypingName(data.name);
+        setIsTyping(true);
+        scrollToBottom();
+      }
+    };
+
+    const handleStopTyping = () => {
+      setIsTyping(false);
+    };
+
+    socket.on("new_message", handleNewMessage);
+    socket.on("typing", handleTyping);
+    socket.on("stop_typing", handleStopTyping);
+
+    return () => {
+      // Leave room and clean up listeners
+      socket.emit("leave_room", { roomId });
+      socket.off("new_message", handleNewMessage);
+      socket.off("typing", handleTyping);
+      socket.off("stop_typing", handleStopTyping);
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [roomId, queryClient, user?.id]);
+
   // ── Data ────────────────────────────────────────────────────────────────────
 
   const { data: roomsData } = useQuery({
@@ -143,13 +218,7 @@ export default function ChatRoomPage({ params }: PageProps) {
     wrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, []);
 
-  // ── Scroll to bottom when initial messages load or optimistic messages added ──
 
-  const scrollToBottom = () =>
-    setTimeout(() => {
-      const el = messagesAreaRef.current;
-      if (el) el.scrollTop = el.scrollHeight;
-    }, 60);
 
   // Scroll to bottom once on first load
   const initialLoadDone = useRef(false);
@@ -184,6 +253,26 @@ export default function ChatRoomPage({ params }: PageProps) {
     }
   }, [serverMessages.length]);
 
+  // ── Typing Indicator ────────────────────────────────────────────────────────
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+
+    if (!isCurrentlyTypingRef.current) {
+      isCurrentlyTypingRef.current = true;
+      socket.emit("typing_start", { roomId, name: user?.name });
+    }
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      isCurrentlyTypingRef.current = false;
+      socket.emit("typing_stop", { roomId, name: user?.name });
+    }, 1500);
+  };
+
   // ── Send ─────────────────────────────────────────────────────────────────────
 
   const handleSend = async (e: React.FormEvent) => {
@@ -191,6 +280,13 @@ export default function ChatRoomPage({ params }: PageProps) {
     const text = input.trim();
     if (!text || !user) return;
     setInput("");
+
+    // Reset typing state
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    isCurrentlyTypingRef.current = false;
+    socket.emit("typing_stop", { roomId });
 
     // Optimistically append the message locally
     const optimisticId = `optimistic-${Date.now()}`;
@@ -615,7 +711,7 @@ export default function ChatRoomPage({ params }: PageProps) {
           placeholder="Type a message..."
           type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={handleInputChange}
         />
         <button
           type="submit"
