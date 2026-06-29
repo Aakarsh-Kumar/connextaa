@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
@@ -28,62 +28,25 @@ import {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface MockMessage {
+interface LocalMessage {
   id: string;
-  text: string;
-  senderId: string;
-  senderName: string;
-  senderAvatar?: string | null;
-  timestamp: Date;
-  isSystem?: boolean;
+  message: string;
+  createdAt: string;
+  sender: {
+    id: string;
+    name: string;
+    username: string;
+    avatarUrl?: string | null;
+    email?: string;
+    onboardingCompleted?: boolean;
+    bio?: string;
+  };
+  _optimistic?: boolean; // locally appended before server confirms
 }
 
 interface PageProps {
   params: Promise<{ roomId: string }>;
 }
-
-// ─── Sample data ──────────────────────────────────────────────────────────────
-
-const ME_ID = "me";
-
-const SAMPLE_MESSAGES: MockMessage[] = [
-  {
-    id: "1",
-    senderId: "aakarsh",
-    senderName: "Aakarsh",
-    text: "Hey guys, I've prepared some notes on Graph algorithms. Should we start with Dijkstra first tomorrow?",
-    timestamp: new Date(Date.now() - 1000 * 60 * 40),
-  },
-  {
-    id: "2",
-    senderId: ME_ID,
-    senderName: "Me",
-    text: "That sounds great! I have some problems from LeetCode that we can solve together after the theory.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 35),
-  },
-  {
-    id: "3",
-    senderId: "sneha",
-    senderName: "Sneha",
-    text: "I'll bring some snacks too! 🥨",
-    timestamp: new Date(Date.now() - 1000 * 60 * 20),
-  },
-  {
-    id: "4",
-    senderId: "sneha",
-    senderName: "Sneha",
-    text: "Also, does anyone have a spare charger? My laptop is dying.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 19),
-  },
-  {
-    id: "sys-1",
-    senderId: "system",
-    senderName: "system",
-    text: "Rahul joined the group",
-    timestamp: new Date(Date.now() - 1000 * 60 * 10),
-    isSystem: true,
-  },
-];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -110,7 +73,7 @@ export default function ChatRoomPage({ params }: PageProps) {
   const { user } = useAuthStore();
 
   // UI state
-  const [messages, setMessages] = useState<MockMessage[]>(SAMPLE_MESSAGES);
+  const [optimisticMessages, setOptimisticMessages] = useState<LocalMessage[]>([]);
   const [input, setInput] = useState("");
   const [infoOpen, setInfoOpen] = useState(false);
   const [membersOpen, setMembersOpen] = useState(false);
@@ -120,6 +83,7 @@ export default function ChatRoomPage({ params }: PageProps) {
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
 
   // ── Data ────────────────────────────────────────────────────────────────────
 
@@ -138,8 +102,40 @@ export default function ChatRoomPage({ params }: PageProps) {
   });
 
   const collab = collabData?.collaboration;
-  const members = collabData?.members ?? [];
+  const members: any[] = collabData?.members ?? [];
   const memberCount = collabData?.currentMembers ?? room?.memberCount ?? 1;
+
+  // ── Fetch messages (cursor-based, load older on scroll-up) ──────────────────
+
+  const {
+    data: messagesPages,
+    isLoading: isMessagesLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["messages", roomId],
+    queryFn: ({ pageParam }) =>
+      chatApi.getRoomMessages(roomId, { cursor: pageParam as string | undefined, limit: 30 }),
+    initialPageParam: undefined as string | undefined,
+    // Server returns newest-first (DESC). nextCursor = oldest message id in this page.
+    // Passing that as cursor fetches messages even older than the current set.
+    getNextPageParam: (lastPage: any) => lastPage.nextCursor ?? undefined,
+  });
+
+  // Pages arrive newest-first. To display chronologically (oldest at top):
+  //   • Reverse the pages array so older pages come first
+  //   • Reverse each page's data array (server returned DESC, we want ASC)
+  const serverMessages: LocalMessage[] = [...(messagesPages?.pages ?? [])]
+    .reverse()
+    .flatMap((page: any) => [...(page.data ?? [])].reverse());
+
+  // Merge server messages with optimistic ones (dedup by id)
+  const serverIds = new Set(serverMessages.map((m) => m.id));
+  const messages: LocalMessage[] = [
+    ...serverMessages,
+    ...optimisticMessages.filter((m) => !serverIds.has(m.id)),
+  ];
 
   // ── Scroll chat widget into view on mount ────────────────────────────────────
 
@@ -147,7 +143,7 @@ export default function ChatRoomPage({ params }: PageProps) {
     wrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, []);
 
-  // ── Scroll messages area to bottom (internally) ──────────────────────────────
+  // ── Scroll to bottom when initial messages load or optimistic messages added ──
 
   const scrollToBottom = () =>
     setTimeout(() => {
@@ -155,59 +151,73 @@ export default function ChatRoomPage({ params }: PageProps) {
       if (el) el.scrollTop = el.scrollHeight;
     }, 60);
 
+  // Scroll to bottom once on first load
+  const initialLoadDone = useRef(false);
   useEffect(() => {
-    scrollToBottom();
-  }, [messages.length]);
+    if (!isMessagesLoading && !initialLoadDone.current) {
+      initialLoadDone.current = true;
+      scrollToBottom();
+    }
+  }, [isMessagesLoading]);
+
+  // ── Load older messages on scroll-up ─────────────────────────────────────────
+
+  const prevScrollHeight = useRef(0);
+
+  const handleMessagesScroll = () => {
+    const el = messagesAreaRef.current;
+    if (!el) return;
+    // When user scrolls near the top and there are older pages available
+    if (el.scrollTop < 80 && hasNextPage && !isFetchingNextPage) {
+      // Save scroll height before fetch so we can restore position after prepend
+      prevScrollHeight.current = el.scrollHeight;
+      fetchNextPage();
+    }
+  };
+
+  // After older messages prepend, restore scroll position so view doesn't jump
+  useEffect(() => {
+    const el = messagesAreaRef.current;
+    if (el && prevScrollHeight.current > 0) {
+      el.scrollTop = el.scrollHeight - prevScrollHeight.current;
+      prevScrollHeight.current = 0;
+    }
+  }, [serverMessages.length]);
 
   // ── Send ─────────────────────────────────────────────────────────────────────
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     const text = input.trim();
-    if (!text) return;
+    if (!text || !user) return;
     setInput("");
 
-    const newMsg: MockMessage = {
-      id: `msg-${Date.now()}`,
-      senderId: ME_ID,
-      senderName: user?.name ?? "Me",
-      text,
-      timestamp: new Date(),
+    // Optimistically append the message locally
+    const optimisticId = `optimistic-${Date.now()}`;
+    const optimisticMsg: LocalMessage = {
+      id: optimisticId,
+      message: text,
+      createdAt: new Date().toISOString(),
+      sender: {
+        id: user.id,
+        name: user.name ?? "Me",
+        username: user.username ?? "me",
+        avatarUrl: user.avatarUrl,
+      },
+      _optimistic: true,
     };
-    setMessages((prev) => [...prev, newMsg]);
+    setOptimisticMessages((prev) => [...prev, optimisticMsg]);
+    scrollToBottom();
 
-    // Simulate a reply after 2s
-    const bots = [
-      { id: "aakarsh", name: "Aakarsh" },
-      { id: "sneha", name: "Sneha" },
-    ];
-    const bot = bots[Math.floor(Math.random() * bots.length)];
-    const replies = [
-      "Sounds good! 👍",
-      "I'll be there on time.",
-      "Perfect, thanks for the heads up!",
-      "Got it. See you then.",
-      "Let's do it! Can't wait.",
-    ];
-
-    setTimeout(() => {
-      setTypingName(bot.name);
-      setIsTyping(true);
-      scrollToBottom();
-      setTimeout(() => {
-        setIsTyping(false);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `bot-${Date.now()}`,
-            senderId: bot.id,
-            senderName: bot.name,
-            text: replies[Math.floor(Math.random() * replies.length)],
-            timestamp: new Date(),
-          },
-        ]);
-      }, 1800);
-    }, 1200);
+    try {
+      await chatApi.sendMessage(roomId, { message: text });
+      // Invalidate to pull the confirmed message from server (removes optimistic)
+      queryClient.invalidateQueries({ queryKey: ["messages", roomId] });
+      setOptimisticMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+    } catch {
+      toast.error("Failed to send message");
+      setOptimisticMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+    }
   };
 
   // ── Leave ────────────────────────────────────────────────────────────────────
@@ -500,34 +510,62 @@ export default function ChatRoomPage({ params }: PageProps) {
       )}
 
       {/* ── Messages Area ────────────────────────────────────────────────── */}
-      <div ref={messagesAreaRef} className="flex-1 overflow-y-auto px-4 py-5 space-y-3 bg-[var(--background)]">
-        {messages.map((msg, idx) => {
-          if (msg.isSystem) {
-            return (
-              <div key={msg.id} className="flex justify-center my-1">
-                <span className="text-[10px] font-bold tracking-widest uppercase text-[var(--outline)] bg-[var(--surface-container)] px-3 py-1 rounded-full border border-[var(--border)]/40">
-                  {msg.text}
-                </span>
-              </div>
-            );
-          }
+      <div
+        ref={messagesAreaRef}
+        onScroll={handleMessagesScroll}
+        className="flex-1 overflow-y-auto px-4 py-5 space-y-3 bg-[var(--background)]"
+      >
+        {/* "Loading older messages" indicator at top */}
+        {isFetchingNextPage && (
+          <div className="flex justify-center pb-2">
+            <span className="text-[11px] text-[var(--outline)] font-semibold flex items-center gap-1.5">
+              <span className="w-1 h-1 rounded-full bg-[var(--primary)] animate-bounce" style={{ animationDelay: "0ms" }} />
+              <span className="w-1 h-1 rounded-full bg-[var(--primary)] animate-bounce" style={{ animationDelay: "150ms" }} />
+              <span className="w-1 h-1 rounded-full bg-[var(--primary)] animate-bounce" style={{ animationDelay: "300ms" }} />
+              Loading older messages
+            </span>
+          </div>
+        )}
 
-          const isMe = msg.senderId === ME_ID;
+        {/* Initial load indicator */}
+        {isMessagesLoading && (
+          <div className="flex justify-center py-8">
+            <div className="flex gap-1.5 items-center text-[var(--outline)] text-xs font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)] animate-bounce" style={{ animationDelay: "0ms" }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)] animate-bounce" style={{ animationDelay: "150ms" }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)] animate-bounce" style={{ animationDelay: "300ms" }} />
+            </div>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!isMessagesLoading && messages.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full py-20 text-center">
+            <div className="w-14 h-14 rounded-full bg-[var(--surface-container-low)] border border-[var(--border)] flex items-center justify-center mb-4">
+              <Compass className="w-7 h-7 text-[var(--primary)]" />
+            </div>
+            <p className="font-bold text-[var(--on-surface)]">No messages yet</p>
+            <p className="text-xs text-[var(--on-surface-variant)] mt-1">Be the first to say something!</p>
+          </div>
+        )}
+
+        {messages.map((msg, idx) => {
+          const isMe = msg.sender.id === user?.id;
           const prevMsg = messages[idx - 1];
           const showSender =
             !isMe &&
-            (!prevMsg || prevMsg.isSystem || prevMsg.senderId !== msg.senderId);
+            (!prevMsg || prevMsg.sender.id !== msg.sender.id);
 
           return (
             <div
               key={msg.id}
               className={`flex flex-col ${isMe ? "items-end" : "items-start"} max-w-[80%] ${
                 isMe ? "ml-auto" : "mr-auto"
-              }`}
+              } ${msg._optimistic ? "opacity-70" : ""}`}
             >
               {showSender && (
                 <span className="text-[11px] font-semibold text-[var(--outline)] mb-1 ml-3">
-                  {msg.senderName}
+                  {msg.sender.name}
                 </span>
               )}
 
@@ -538,7 +576,7 @@ export default function ChatRoomPage({ params }: PageProps) {
                     : "bg-white dark:bg-[var(--card)] text-[var(--on-surface)] border border-[var(--border)] rounded-tl-sm"
                 }`}
               >
-                {msg.text}
+                {msg.message}
               </div>
 
               <span
@@ -546,7 +584,9 @@ export default function ChatRoomPage({ params }: PageProps) {
                   isMe ? "mr-2" : "ml-2"
                 }`}
               >
-                {isMe ? `Sent · ${formatTime(msg.timestamp)}` : formatTime(msg.timestamp)}
+                {isMe
+                  ? `${msg._optimistic ? "Sending…" : "Sent"} · ${formatTime(new Date(msg.createdAt))}`
+                  : formatTime(new Date(msg.createdAt))}
               </span>
             </div>
           );

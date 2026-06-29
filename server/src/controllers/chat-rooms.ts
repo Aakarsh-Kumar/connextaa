@@ -86,4 +86,102 @@ const getRoomsController = async (req: Request, res: Response) => {
   }
 };
 
-export { getRoomsController };
+const getMessagesController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const roomId = req.params.id as string;
+    const cursor = req.query.cursor as string | undefined;
+    const limit = Math.min(Number(req.query.limit ?? 30), 100);
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    // Guard: check ChatMember (room membership) as the source of truth.
+    // If a row is missing but the user IS an approved CollaborationMember / creator,
+    // backfill the ChatMember row automatically (handles members approved before this
+    // logic existed) and allow access. Non-members still receive 403.
+    let chatMember = await prisma.chatMember.findUnique({
+      where: { roomId_userId: { roomId, userId } },
+      select: { id: true },
+    });
+
+    if (!chatMember) {
+      // Resolve the collaboration for this room so we can check CollaborationMember
+      const chatRoom = await prisma.chatRoom.findUnique({
+        where: { id: roomId },
+        select: { collaborationId: true, collaboration: { select: { creatorId: true } } },
+      });
+
+      if (!chatRoom) {
+        return res.status(404).json({ success: false, message: 'Chat room not found' });
+      }
+
+      const isCreator = chatRoom.collaboration.creatorId === userId;
+
+      const collabMember = isCreator
+        ? { joinStatus: JoinStatus.APPROVED }
+        : await prisma.collaborationMember.findUnique({
+            where: { collaborationId_userId: { collaborationId: chatRoom.collaborationId, userId } },
+            select: { joinStatus: true },
+          });
+
+      if (!collabMember || collabMember.joinStatus !== JoinStatus.APPROVED) {
+        return res.status(403).json({ success: false, message: 'You are not a member of this chat room' });
+      }
+
+      // Backfill the missing ChatMember row
+      chatMember = await prisma.chatMember.create({
+        data: { roomId, userId },
+        select: { id: true },
+      });
+    }
+
+    // Fetch newest messages first (DESC). Client reverses pages for display.
+    // Cursor = oldest message id seen so far, so next page goes further back.
+    const messages = await prisma.message.findMany({
+      where: { roomId },
+      ...(cursor
+        ? {
+            skip: 1,          // skip the cursor item itself
+            cursor: { id: cursor },
+          }
+        : {}),
+      take: limit,
+      orderBy: { createdAt: 'desc' },  // newest first
+      include: {
+        sender: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            onboardingCompleted: true,
+            username: true,
+            avatarUrl: true,
+            bio: true,
+          },
+        },
+      },
+    });
+
+    // nextCursor = the oldest message in this page (last item, since DESC order)
+    // Client passes this as cursor to load messages even older than these.
+    const nextCursor = messages.length === limit
+      ? messages[messages.length - 1].id
+      : null;
+
+    const data = messages.map((m) => ({
+      id: m.id,
+      message: m.message,
+      createdAt: m.createdAt.toISOString(),
+      sender: m.sender,
+    }));
+
+    return res.status(200).json({ success: true, data, nextCursor });
+  } catch (error) {
+    logger.error('Error fetching messages', { error });
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export { getRoomsController, getMessagesController };
