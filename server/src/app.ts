@@ -10,9 +10,9 @@ import { extractClientIP, isPrivateOrLocalIP } from './utils/ipUtils';
 import HealthRoutes from './routes/health';
 import SampleRoutes from './routes/sample-route';
 import AuthRoutes from './routes/auth-route';
-import OnboardingRoutes from './routes/onboarding-route'
-import UserRoutes from './routes/user-route'
-import CollaborationRoutes from './routes/collaborations-route'
+import OnboardingRoutes from './routes/onboarding-route';
+import UserRoutes from './routes/user-route';
+import CollaborationRoutes from './routes/collaborations-route';
 import './types';
 import ChatRoutes from './routes/chat-route';
 
@@ -37,6 +37,7 @@ app.use(
         'http://127.0.0.1:3000',
         'http://127.0.0.1:8080',
         'null', // Allow null origin for local file testing
+        'https://connectify.aakarsh.xyz',
       ];
 
       // Check if origin is in allowed list or starts with localhost
@@ -47,7 +48,7 @@ app.use(
       return callback(null, true); // Allow all origins for development
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','PATCH'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: [
       'Content-Type',
       'Authorization',
@@ -126,7 +127,7 @@ app.use('/api/sample', SampleRoutes);
 app.use(`/api/${config.apiVersion}/auth`, AuthRoutes);
 app.use(`/api/${config.apiVersion}/onboarding`, OnboardingRoutes);
 
-app.use(`/api/${config.apiVersion}/users`, UserRoutes)
+app.use(`/api/${config.apiVersion}/users`, UserRoutes);
 app.use(`/api/${config.apiVersion}/collaborations`, CollaborationRoutes);
 
 app.use(`/api/${config.apiVersion}/chat`, ChatRoutes);
