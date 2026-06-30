@@ -779,6 +779,27 @@ const endpoints = makeApi([
   },
   {
     method: 'get',
+    path: '/users/:username/collaborations',
+    alias: 'getUsersUsernamecollaborations',
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'username',
+        type: 'Path',
+        schema: z.string(),
+      },
+    ],
+    response: CollaborationFeedResponse,
+    errors: [
+      {
+        status: 404,
+        description: `User Not Found`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: 'get',
     path: '/users/me',
     alias: 'getUsersme',
     requestFormat: 'json',

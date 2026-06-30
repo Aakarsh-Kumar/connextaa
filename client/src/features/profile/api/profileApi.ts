@@ -1,5 +1,5 @@
 import { api } from "@/services/api";
-import { ProfileResponse, UpdateProfileRequest } from "@/types";
+import { ProfileResponse, UpdateProfileRequest, CollaborationFeedResponse } from "@/types";
 
 export const profileApi = {
   getMeProfile: async (): Promise<ProfileResponse> => {
@@ -14,6 +14,16 @@ export const profileApi = {
 
   getPublicProfile: async (userId: string): Promise<ProfileResponse> => {
     const response = await api.get<ProfileResponse>(`/users/${userId}`);
+    return response.data;
+  },
+
+  getUserCollaborations: async (
+    username: string,
+    cursor?: string
+  ): Promise<CollaborationFeedResponse & { nextCursor?: string | null }> => {
+    const response = await api.get(`/users/${username}/collaborations`, {
+      params: cursor ? { cursor } : {},
+    });
     return response.data;
   },
 };

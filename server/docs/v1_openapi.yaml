@@ -1165,6 +1165,40 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /users/{username}/collaborations:
+    get:
+      tags:
+        - Users
+
+      summary: User Collaborations
+
+      parameters:
+        - name: username
+
+          in: path
+
+          required: true
+
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: User Collaborations
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationFeedResponse"
+
+        "404":
+          description: User Not Found
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+                
   #################################################
   # COLLABORATIONS
   #################################################

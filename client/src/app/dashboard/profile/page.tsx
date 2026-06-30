@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { profileApi } from "@/features/profile/api/profileApi";
 import { authApi } from "@/features/auth/api/authApi";
 import { CATEGORIES, getCategoryStyles } from "@/constants";
-import { type Category, type ProfileResponse } from "@/types";
+import { type Category, type ProfileResponse, type CollaborationFeedItem } from "@/types";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ActivityCard, SkeletonCard } from "@/components/dashboard/ActivityCard";
 import {
   Dialog,
   DialogContent,
@@ -27,10 +28,10 @@ import {
   AtSign,
   ChevronRight,
   LogOut,
-  Sparkles,
   Loader2,
   Lock,
   Bell,
+  Compass,
 } from "lucide-react";
 
 const DEFAULT_AVATAR =
@@ -43,6 +44,12 @@ export default function ProfilePage() {
 
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Collaborations
+  const [collabs, setCollabs] = useState<CollaborationFeedItem[]>([]);
+  const [collabsLoading, setCollabsLoading] = useState(true);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   // Edit Dialog States
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -62,6 +69,36 @@ export default function ProfilePage() {
     };
     fetchProfile();
   }, []);
+
+  const fetchCollabs = useCallback(async (cursor?: string) => {
+    if (!profile?.user.username) return;
+    try {
+      const data = await profileApi.getUserCollaborations(profile.user.username, cursor);
+      if (cursor) {
+        setCollabs((prev) => [...prev, ...(data.data ?? [])]);
+      } else {
+        setCollabs(data.data ?? []);
+      }
+      setNextCursor((data as any).nextCursor ?? null);
+    } catch {
+      // silently fail
+    } finally {
+      setCollabsLoading(false);
+      setLoadingMore(false);
+    }
+  }, [profile?.user.username]);
+
+  useEffect(() => {
+    if (!profile?.user.username) return;
+    fetchCollabs();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.user.username]);
+
+  const handleLoadMore = () => {
+    if (!nextCursor || loadingMore) return;
+    setLoadingMore(true);
+    fetchCollabs(nextCursor);
+  };
 
   const handleLogout = async () => {
     try {
@@ -314,6 +351,61 @@ export default function ProfilePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* ── My Collaborations ── */}
+      <section className="space-y-4">
+        <h3 className="font-headline-md text-headline-md text-[var(--foreground)] px-1 tracking-tight">
+          My Collaborations
+        </h3>
+
+        {collabsLoading ? (
+          <div className="space-y-4">
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+        ) : collabs.length === 0 ? (
+          <div className="bg-[var(--card)] border border-[var(--surface-container-high)] rounded-2xl p-10 text-center space-y-3 flex flex-col items-center">
+            <div className="w-12 h-12 rounded-full bg-[var(--surface-container-low)] flex items-center justify-center">
+              <Compass className="w-6 h-6 text-[var(--outline)]" />
+            </div>
+            <p className="font-semibold text-[var(--on-surface)]">No collaborations yet</p>
+            <p className="text-xs text-[var(--on-surface-variant)]">
+              You haven&apos;t posted any collaborations yet.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {collabs.map((activity) => (
+              // On own profile: always isJoined=true (creator), so button is disabled
+              <ActivityCard
+                key={activity.id}
+                activity={activity}
+                pendingRequests={[]}
+                onOpenJoin={() => {}}
+                isJoined={true}
+              />
+            ))}
+
+            {/* Load more */}
+            {nextCursor && (
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="w-full py-3 rounded-xl border border-[var(--border)] text-sm font-semibold text-[var(--on-surface-variant)] hover:bg-[var(--surface-container-low)] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  "Load more"
+                )}
+              </button>
+            )}
+          </div>
+        )}
       </section>
 
       {/* ── Account Settings ── */}
