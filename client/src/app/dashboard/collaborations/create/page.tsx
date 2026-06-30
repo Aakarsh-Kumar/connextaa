@@ -218,28 +218,33 @@ export default function CreateCollaborationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-40 md:pb-8">
+    <div className="max-w-5xl mx-auto pb-40 md:pb-8 space-y-6">
 
-      {/* ── Top App Bar ── */}
-      <div className="sticky top-16 z-30 bg-background/80 backdrop-blur-md border-b border-outline-variant/30 px-4 h-14 flex items-center gap-3">
-        <Link
-          href="/dashboard"
-          className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container active:scale-90 transition-all"
-        >
-          <ArrowLeft className="w-5 h-5 text-on-surface" />
-        </Link>
-        <div>
-          <h1 className="font-headline-md text-headline-md text-on-surface">Create Activity</h1>
-          {!isMobile && (
-            <p className="font-body-md text-body-md text-on-surface-variant">
+      {/* ── Page Header ── */}
+      <header className="mb-stack-lg">
+        <div className="flex items-center gap-3">
+          {/* <Link
+            href="/dashboard"
+            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container active:scale-90 transition-all shrink-0"
+          >
+            <ArrowLeft className="w-5 h-5 text-on-surface" />
+          </Link> */}
+          <div>
+            <h1 className={isMobile
+              ? "font-headline-lg-mobile text-headline-lg-mobile text-on-surface"
+              : "font-headline-lg text-headline-lg text-on-surface"
+            }>
+              Create Activity
+            </h1>
+            <p className="text-on-surface-variant font-body-md mt-0.5">
               Post an opportunity and find people to work with.
             </p>
-          )}
+          </div>
         </div>
-      </div>
+      </header>
 
-      {/* ── Single-column layout ── */}
-      <div className="max-w-2xl md:max-w-5xl mx-auto px-4 md:px-6 py-4 md:py-6 space-y-4">
+      {/* ── Form sections ── */}
+      <div className="space-y-4">
 
         {/* Section 1: What are you planning? */}
         <section className="bg-card border border-outline-variant/30 rounded-2xl p-6 card-shadow space-y-4">

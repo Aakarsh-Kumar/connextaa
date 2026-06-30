@@ -11,7 +11,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isRequestsActive = pathname.includes("/requests");
 
   return (
-    <div className="w-full flex flex-col">
+    <div className="w-full max-w-5xl mx-auto flex flex-col">
       
       {/* Header Section */}
       <header className="mb-stack-lg">

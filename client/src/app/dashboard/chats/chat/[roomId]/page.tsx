@@ -339,7 +339,7 @@ export default function ChatRoomPage({ params }: PageProps) {
   return (
     <div
       ref={wrapperRef}
-      className="flex flex-col w-full max-w-3xl mx-auto bg-[var(--card)] rounded-2xl shadow-sm border border-[var(--surface-container-high)] overflow-hidden"
+      className="flex flex-col w-full max-w-5xl mx-auto bg-[var(--card)] rounded-2xl shadow-sm border border-[var(--surface-container-high)] overflow-hidden"
       style={{ height: isMobile ? "calc(100dvh - 120px)" : "calc(100dvh - 140px)" }}
     >
       {/* ── Header ──────────────────────────────────────────────────────────── */}

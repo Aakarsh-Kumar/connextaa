@@ -233,16 +233,19 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-16">
+    <div className="max-w-5xl mx-auto space-y-8 pb-16">
       {/* Welcome Header */}
-      <section className="animate-fade-in space-y-1">
-        <h1 className="font-headline-lg text-headline-lg text-[var(--on-surface)] tracking-tight">
+      <header className="mb-stack-lg">
+        <h1 className={isMobile
+          ? "font-headline-lg-mobile text-headline-lg-mobile text-on-surface"
+          : "font-headline-lg text-headline-lg text-on-surface"
+        }>
           {greeting}, {user?.name.split(" ")[0] || "Collaborator"}
         </h1>
-        <p className="font-body-lg text-body-lg text-[var(--on-surface-variant)]">
+        <p className="text-on-surface-variant font-body-md mt-1">
           Find something interesting nearby today.
         </p>
-      </section>
+      </header>
 
       {/* Search & Filters Container */}
       <section className="bg-[var(--card)] p-6 rounded-2xl shadow-[0px_4px_20px_rgba(31,41,55,0.05)] border border-[var(--surface-container-high)] space-y-6">
