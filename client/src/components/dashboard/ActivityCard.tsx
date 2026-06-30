@@ -11,6 +11,7 @@ interface ActivityCardProps {
   activity: CollaborationFeedItem;
   pendingRequests: string[];
   onOpenJoin?: (act: CollaborationFeedItem) => void;
+  isJoined?: boolean;
 }
 
 const formatDate = (dateString?: string) => {
@@ -26,7 +27,7 @@ return date.toLocaleDateString("en-US", {
 };
 
 const formatDistance = (meters?: number | null) => {
-if (meters === undefined || meters === null) return "1.2 km away";
+if (meters === undefined || meters === null) return "0.0 km";
 const km = meters / 1000;
 return `${km.toFixed(1)} km away`;
 };
@@ -34,14 +35,17 @@ return `${km.toFixed(1)} km away`;
 export function ActivityCard({
   activity,
   pendingRequests,
-  onOpenJoin
+  onOpenJoin,
+  isJoined = false,
 }: ActivityCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const isPending = activity.id ? pendingRequests.includes(activity.id) : false;
   const isCarpool = activity.category === "CARPOOLING";
   const CategoryIcon = CATEGORIES.find((c) => c.id === activity.category)?.icon ?? Compass;
-  const ctaText = isPending
-    ? "⏳ Request Pending"
+  const ctaText = isJoined
+    ? "Joined"
+    : isPending
+    ? "Request Pending"
     : isCarpool
     ? "Request Seat"
     : "Join Activity";
@@ -162,10 +166,12 @@ export function ActivityCard({
 
       {/* CTA Trigger — pinned to bottom */}
       <button
-        disabled={isPending || activity.id === "preview"}
+        disabled={isJoined || isPending || activity.id === "preview"}
         onClick={() => onOpenJoin?.(activity)}
         className={`mt-auto w-full py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] shadow-sm text-sm cursor-pointer disabled:opacity-50 ${
-          isPending
+          isJoined
+            ? "bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-300 border border-green-200 dark:border-green-900 cursor-not-allowed font-semibold"
+            : isPending
             ? "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500 cursor-not-allowed border border-[var(--border)]"
             : "bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90"
         }`}

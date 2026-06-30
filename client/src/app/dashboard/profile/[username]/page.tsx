@@ -3,15 +3,30 @@
 import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { profileApi } from "@/features/profile/api/profileApi";
+import { collaborationApi } from "@/features/collaboration/api/collaborationApi";
 import { CATEGORIES, getCategoryStyles } from "@/constants";
-import { type ProfileResponse } from "@/types";
+import { type ProfileResponse, type CollaborationFeedItem } from "@/types";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ActivityCard, SkeletonCard } from "@/components/dashboard/ActivityCard";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import {
   Star,
+  Loader2,
+  Compass,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import Link from "next/link";
 
 const DEFAULT_AVATAR =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBdjOVVpPF_CyFFwM0PKq5gTHLZoabu_iQdSTAzkNY_nO2fQ3rSoj41BnCu-QDkvsVKGYrd3kGXkUaOPB5NUlV3hiufvfd9X_3vZv7mIZTjfpNxNjVROiEL_YRmXIRYE1VE-kCJ7kNqzSC2Z6gjKDW43MCXJv1ije7ub3Ckpt-w8E4obDbQ6wL7buu2VtMaDkTHEGxhTRT_l-QRgPS_J3VP3ynNS1SOM17PZq67q04cMlIVR0wc45HnV0esb17f9mBpuanGFrrLMjet";
@@ -24,8 +39,38 @@ export default function PublicProfilePage() {
     const [loading, setLoading] = useState(true);
     const params = useParams<{ username: string }>();
     const username = params.username;
-    
-    
+
+    // Collaborations state
+    const [collabs, setCollabs] = useState<CollaborationFeedItem[]>([]);
+    const [collabsLoading, setCollabsLoading] = useState(true);
+    const [nextCursor, setNextCursor] = useState<string | null>(null);
+    const [loadingMore, setLoadingMore] = useState(false);
+
+    // Geolocation coordinates
+    const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+
+    // Join modal state
+    const [isJoinSheetOpen, setIsJoinSheetOpen] = useState(false);
+    const [selectedActivity, setSelectedActivity] = useState<CollaborationFeedItem | null>(null);
+    const [joinMessage, setJoinMessage] = useState("");
+    const [joining, setJoining] = useState(false);
+    const [pendingRequests, setPendingRequests] = useState<string[]>([]);
+
+    useEffect(() => {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setCoords({
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    });
+                },
+                () => {
+                    // Fallback silently
+                }
+            );
+        }
+    }, []);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -41,6 +86,99 @@ export default function PublicProfilePage() {
         if(!username) return;
         fetchProfile();
     }, [username,router]);
+
+    // const fetchCollabs = useCallback(async (cursor?: string) => {
+    //     if (!username) return;
+    //     try {
+    //         const data = await profileApi.getUserCollaborations(
+    //             username,
+    //             cursor,
+    //             coords?.lat,
+    //             coords?.lng
+    //         );
+    //         if (cursor) {
+    //             setCollabs((prev) => [...prev, ...(data.data ?? [])]);
+    //         } else {
+    //             setCollabs(data.data ?? []);
+    //         }
+    //         setNextCursor((data as any).nextCursor ?? null);
+    //     } catch {
+    //         // silently fail — collabs are not critical
+    //     } finally {
+    //         setCollabsLoading(false);
+    //         setLoadingMore(false);
+    //     }
+    // }, [username, coords]);
+
+    useEffect(() => {
+        if (!username) return;
+
+        const loadCollabs = async () => {
+            try {
+                const data = await profileApi.getUserCollaborations(
+                    username,
+                    undefined,
+                    coords?.lat,
+                    coords?.lng
+                );
+
+                setCollabs(data.data ?? []);
+                setNextCursor((data as any).nextCursor ?? null);
+            } catch {
+                // silently fail
+            } finally {
+                setCollabsLoading(false);
+            }
+        };
+
+        loadCollabs();
+    }, [username, coords]);
+
+    const handleOpenJoin = (activity: CollaborationFeedItem) => {
+        setSelectedActivity(activity);
+        setJoinMessage("");
+        setIsJoinSheetOpen(true);
+    };
+
+    const handleJoinSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedActivity?.id) return;
+        setJoining(true);
+        try {
+            await collaborationApi.joinCollaboration(selectedActivity.id, {
+                message: joinMessage.trim() || undefined,
+            });
+            setPendingRequests((prev) => [...prev, selectedActivity.id!]);
+            toast.success("Join request submitted!");
+            setIsJoinSheetOpen(false);
+        } catch (err: any) {
+            toast.error(err.response?.data?.message || "Failed to submit request.");
+        } finally {
+            setJoining(false);
+        }
+    };
+
+    const handleLoadMore = async () => {
+        if (!nextCursor || loadingMore || !username) return;
+
+        setLoadingMore(true);
+
+        try {
+            const data = await profileApi.getUserCollaborations(
+                username,
+                nextCursor,
+                coords?.lat,
+                coords?.lng
+            );
+
+            setCollabs((prev) => [...prev, ...(data.data ?? [])]);
+            setNextCursor((data as any).nextCursor ?? null);
+        } catch {
+            // silently fail
+        } finally {
+            setLoadingMore(false);
+        }
+    };
 
     /* ─── Loading skeleton ──────────────────────────────────────── */
     if (loading || !profile) {
@@ -199,6 +337,7 @@ export default function PublicProfilePage() {
             )}
         </section>
 
+        
         {/* ── Community Feedback ── */}
         <section className="space-y-4">
             <h3 className="font-headline-md text-headline-md text-[var(--foreground)] px-1 tracking-tight">
@@ -225,6 +364,136 @@ export default function PublicProfilePage() {
             ))}
             </div>
         </section>
+
+        {/* ── Collaborations ── */}
+        <section className="space-y-4">
+            <h3 className="font-headline-md text-headline-md text-[var(--foreground)] px-1 tracking-tight">
+            Collaborations
+            </h3>
+
+            {collabsLoading ? (
+            <div className="space-y-4">
+                <SkeletonCard />
+                <SkeletonCard />
+            </div>
+            ) : collabs.length === 0 ? (
+            <div className="bg-[var(--card)] border border-[var(--surface-container-high)] rounded-2xl p-10 text-center space-y-3 flex flex-col items-center">
+                <div className="w-12 h-12 rounded-full bg-[var(--surface-container-low)] flex items-center justify-center">
+                <Compass className="w-6 h-6 text-[var(--outline)]" />
+                </div>
+                <p className="font-semibold text-[var(--on-surface)]">No collaborations yet</p>
+                <p className="text-xs text-[var(--on-surface-variant)]">
+                {profile.user.name} hasn&apos;t posted any collaborations.
+                </p>
+            </div>
+            ) : (
+            <div className="space-y-4">
+                {collabs.map((activity) => (
+                <ActivityCard
+                    key={activity.id}
+                    activity={activity}
+                    pendingRequests={pendingRequests}
+                    onOpenJoin={handleOpenJoin}
+                    isJoined={(activity as any).isJoined}
+                />
+                ))}
+
+                {/* Load more */}
+                {nextCursor && (
+                <button
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    className="w-full py-3 rounded-xl border border-[var(--border)] text-sm font-semibold text-[var(--on-surface-variant)] hover:bg-[var(--surface-container-low)] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                    {loadingMore ? (
+                    <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Loading...
+                    </>
+                    ) : (
+                    "Load more"
+                    )}
+                </button>
+                )}
+            </div>
+            )}
+        </section>
+
+        {/* ── Join Request Bottom Sheet ── */}
+        <Sheet open={isJoinSheetOpen} onOpenChange={setIsJoinSheetOpen}>
+            <SheetContent side="bottom" className="p-6 pb-8 rounded-t-3xl border-t border-[var(--border)] max-w-lg mx-auto bg-[var(--card)]">
+            <SheetHeader className="space-y-1">
+                <SheetTitle className="text-xl font-bold font-headline-md text-[var(--foreground)]">
+                Join Activity
+                </SheetTitle>
+                <SheetDescription className="text-sm text-[var(--muted-foreground)]">
+                Submit a request to participate in this collaboration.
+                </SheetDescription>
+            </SheetHeader>
+
+            {selectedActivity && (
+                <div className="mt-4 p-4 bg-[var(--surface-container-low)] rounded-2xl border border-[var(--surface-container-high)] space-y-1.5">
+                <h4 className="font-bold text-base text-[var(--foreground)] break-words">
+                    {selectedActivity.title}
+                </h4>
+                <p className="text-xs text-[var(--outline)] font-medium">
+                    Hosted by{" "}
+                    <Link href={`/dashboard/profile/${selectedActivity.creator?.username}`}>
+                    <span className="font-bold text-[var(--on-surface)] underline">
+                        {selectedActivity.creator?.name || "Neighbor"}
+                    </span>
+                    </Link>
+                </p>
+                </div>
+            )}
+
+            <form onSubmit={handleJoinSubmit} className="space-y-4 mt-4">
+                <div className="space-y-2">
+                <label htmlFor="join-message" className="text-sm font-semibold text-[var(--foreground)]">
+                    Message to creator{" "}
+                    <span className="text-xs text-[var(--muted-foreground)]">
+                    ({joinMessage.length}/120 characters)
+                    </span>
+                </label>
+                <textarea
+                    id="join-message"
+                    value={joinMessage}
+                    onChange={(e) => setJoinMessage(e.target.value)}
+                    className="w-full px-3 py-2 border border-[var(--border)] rounded-xl focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--ring)] focus:outline-none transition-all bg-transparent text-sm h-24 resize-none text-[var(--foreground)]"
+                    placeholder="Tell the creator why you'd like to join."
+                    required
+                    maxLength={120}
+                />
+                </div>
+
+                <SheetFooter className="flex gap-2 pt-4 border-t border-[var(--border)]">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsJoinSheetOpen(false)}
+                    disabled={joining}
+                    className="h-10 rounded-xl"
+                >
+                    Cancel
+                </Button>
+                <Button
+                    type="submit"
+                    disabled={joining}
+                    className="h-10 rounded-xl bg-[var(--primary)] text-[var(--primary-foreground)] font-semibold hover:opacity-90 flex items-center justify-center min-w-[120px]"
+                >
+                    {joining ? (
+                    <>
+                        <Loader2 className="w-4 h-4 animate-spin shrink-0 mr-1" />
+                        <span>Sending...</span>
+                    </>
+                    ) : (
+                    "Send Request"
+                    )}
+                </Button>
+                </SheetFooter>
+            </form>
+            </SheetContent>
+        </Sheet>
 
         </div>
     );

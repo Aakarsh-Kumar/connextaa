@@ -34,4 +34,29 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     });
   }
 };
-export { isAuthenticated };
+
+// Decodes the JWT if present but does NOT block unauthenticated requests.
+// Use on public routes where knowing who the viewer is enriches the response.
+const optionalAuth = (req: Request, _res: Response, next: NextFunction) => {
+  let token: string | undefined;
+
+  if (req.cookies?.token) {
+    token = req.cookies.token;
+  }
+
+  if (!token && req.headers.authorization?.startsWith('Bearer ')) {
+    token = req.headers.authorization.replace('Bearer ', '').trim();
+  }
+
+  if (token) {
+    try {
+      (req as any).user = verifyToken(token);
+    } catch {
+      // Invalid token — treat as unauthenticated, don't block
+    }
+  }
+
+  next();
+};
+
+export { isAuthenticated, optionalAuth };

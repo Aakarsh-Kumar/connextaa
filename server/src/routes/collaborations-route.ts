@@ -5,7 +5,9 @@ import { validate, validateResponse } from '../middlewares/validate';
 import { schemas } from '../utils/zod';
 import isOnboarded from '../middlewares/onboardedCheck';
 import validateTime from '../middlewares/validateTime';
-import { getRequestsController, createJoinRequestController, approveJoinRequestController, rejectJoinRequestController } from '../controllers/requests';
+import { getRequestsController, createJoinRequestController, approveJoinRequestController, rejectJoinRequestController, leaveRequestController } from '../controllers/requests';
+import { getCollaborationDetailsController } from '../controllers/collaboration-detail';
+import { updateCollaborationController, deleteCollaborationController } from '../controllers/update-collaboration';
 
 const router = Router();
 
@@ -25,6 +27,15 @@ router.get(
     isOnboarded,
     validateResponse(schemas.PendingJoinRequestsResponse),
     getRequestsController,
+)
+
+
+router.get(
+    '/:id',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.CollaborationResponse),
+    getCollaborationDetailsController
 )
 
 router.post(
@@ -51,5 +62,34 @@ router.post(
     validateResponse(schemas.SuccessResponse),
     rejectJoinRequestController,
 )
+
+router.post('/:id/leave',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.SuccessResponse),
+    leaveRequestController,
+)
+
+router.get('/:id',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.CollaborationResponse),
+    getCollaborationDetailsController,
+)
+
+router.patch('/:id',
+    isAuthenticated,
+    isOnboarded,
+    validate(schemas.UpdateCollaborationRequest),
+    validateResponse(schemas.CollaborationResponse),
+    updateCollaborationController,
+);
+
+router.delete('/:id',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.SuccessResponse),
+    deleteCollaborationController,
+);
 
 export default router;

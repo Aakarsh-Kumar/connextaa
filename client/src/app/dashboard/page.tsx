@@ -213,9 +213,6 @@ export default function DashboardPage() {
       setPendingRequests((prev) => [...prev, selectedActivity.id!]);
       toast.success("Join request submitted successfully!");
       setIsJoinSheetOpen(false);
-    } catch (err: any) {
-      console.error("Join request error:", err);
-      toast.error(err.response?.data?.message || "Failed to submit request.");
     } finally {
       setJoining(false);
     }

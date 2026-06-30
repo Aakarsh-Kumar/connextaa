@@ -1,4 +1,4 @@
-import { getRoomsController } from '../controllers/chat-rooms';
+import { getRoomsController, getMessagesController, sendMessageController } from '../controllers/chat-rooms';
 import { Router } from 'express';
 import { isAuthenticated } from '../middlewares/auth';
 import { validate, validateResponse } from '../middlewares/validate';
@@ -13,6 +13,21 @@ router.get(
     isOnboarded,
     validateResponse(schemas.ChatRoomsResponse),
     getRoomsController
+)
+
+router.get('/rooms/:id/messages',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.MessagesResponse),
+    getMessagesController
+)
+
+router.post('/rooms/:id/messages',
+    isAuthenticated,
+    isOnboarded,
+    validate(schemas.SendMessageRequest),
+    validateResponse(schemas.Message),
+    sendMessageController
 )
 
 export default router;

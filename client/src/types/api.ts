@@ -335,6 +335,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/{username}/collaborations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** User Collaborations */
+        get: {
+            parameters: {
+                query?: {
+                    lat?: number;
+                    lng?: number;
+                };
+                header?: never;
+                path: {
+                    username: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description User Collaborations */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CollaborationFeedResponse"];
+                    };
+                };
+                /** @description User Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/collaborations": {
         parameters: {
             query?: never;
@@ -1297,16 +1347,16 @@ export interface components {
         };
         CollaborationResponse: {
             success?: boolean;
-            collaboration?: components["schemas"]["Collaboration"];
+            collaboration: components["schemas"]["Collaboration"];
             members?: {
                 id?: string;
                 name?: string;
                 username?: string;
                 avatarUrl?: string | null;
             }[];
-            currentMembers?: number;
-            isCreator?: boolean;
-            myJoinStatus?: components["schemas"]["JoinStatus"];
+            currentMembers: number;
+            isCreator: boolean;
+            myJoinStatus: components["schemas"]["JoinStatus"];
         };
         CollaborationFeedResponse: {
             success?: boolean;

@@ -440,4 +440,115 @@ const rejectJoinRequestController = async (
   }
 };
 
-export { getRequestsController, createJoinRequestController, approveJoinRequestController, rejectJoinRequestController };
+const leaveRequestController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const collaborationId = req.params.id as string;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    // Find the collaboration and verify creator vs member status
+    const collaboration = await prisma.collaboration.findUnique({
+      where: { id: collaborationId, deletedAt: null },
+      select: {
+        id: true,
+        creatorId: true,
+        maxMembers: true,
+        status: true,
+        chatRoom: {
+          select: { id: true },
+        },
+      },
+    });
+
+    if (!collaboration) {
+      return res.status(404).json({
+        success: false,
+        message: "Collaboration not found",
+      });
+    }
+
+    if (collaboration.creatorId === userId) {
+      return res.status(400).json({
+        success: false,
+        message: "Creator cannot leave the collaboration. Delete it instead.",
+      });
+    }
+
+    // Check if user is currently an approved member
+    const memberRecord = await prisma.collaborationMember.findUnique({
+      where: {
+        collaborationId_userId: {
+          collaborationId,
+          userId,
+        },
+      },
+      select: {
+        id: true,
+        joinStatus: true,
+      },
+    });
+
+    if (!memberRecord || memberRecord.joinStatus !== JoinStatus.APPROVED) {
+      return res.status(400).json({
+        success: false,
+        message: "You are not an approved member of this collaboration",
+      });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // 1. Update collaboration member status to LEFT
+      await tx.collaborationMember.update({
+        where: { id: memberRecord.id },
+        data: { joinStatus: JoinStatus.LEFT },
+      });
+
+      // 2. Remove from ChatMember if chat room exists
+      if (collaboration.chatRoom) {
+        await tx.chatMember.deleteMany({
+          where: {
+            roomId: collaboration.chatRoom.id,
+            userId,
+          },
+        });
+      }
+
+      // 3. Update collaboration status back to OPEN if it was FULL
+      const approvedCount = await tx.collaborationMember.count({
+        where: {
+          collaborationId,
+          joinStatus: JoinStatus.APPROVED,
+        },
+      });
+
+      if (approvedCount < collaboration.maxMembers && collaboration.status === CollaborationStatus.FULL) {
+        await tx.collaboration.update({
+          where: { id: collaborationId },
+          data: { status: CollaborationStatus.OPEN },
+        });
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Left collaboration successfully",
+    });
+  } catch (error) {
+    logger.error("leaveRequestController error", {
+      error,
+      userId: req.user?.id,
+      collaborationId: req.params.id,
+    });
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export { getRequestsController, createJoinRequestController, approveJoinRequestController, rejectJoinRequestController, leaveRequestController };

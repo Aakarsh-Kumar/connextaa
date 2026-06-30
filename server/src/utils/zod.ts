@@ -1,7 +1,9 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
-const GoogleAuthRequest = z.object({ idToken: z.string() }).passthrough();
+const GoogleAuthRequest = z
+  .object({ idToken: z.string().max(2048) })
+  .passthrough();
 const User = z
   .object({
     id: z.string().uuid(),
@@ -84,7 +86,7 @@ const UpdateProfileRequest = z
 const CollaborationStatus = z.enum(['OPEN', 'FULL', 'COMPLETED', 'CANCELLED']);
 const Location = z
   .object({
-    name: z.string().min(3).max(100),
+    name: z.string().min(3).max(200),
     lat: z.number().gte(-90).lte(90),
     lng: z.number().gte(-180).lte(180),
   })
@@ -126,12 +128,12 @@ const CollaborationFeedResponse = z
 const CreateCollaborationRequest = z
   .object({
     category: Category,
-    title: z.string(),
-    description: z.string(),
+    title: z.string().min(3).max(40),
+    description: z.string().min(10).max(250),
     fromLocation: Location,
     toLocation: Location,
     scheduledAt: z.string().datetime({ offset: true }),
-    maxMembers: z.number().int().gte(2),
+    maxMembers: z.number().int().gte(2).lte(30),
   })
   .passthrough();
 const CreateCollaborationResponse = z
@@ -159,24 +161,25 @@ const Collaboration = z
 const JoinStatus = z.enum(['PENDING', 'APPROVED', 'REJECTED', 'LEFT']);
 const CollaborationResponse = z
   .object({
-    success: z.boolean(),
+    success: z.boolean().optional(),
     collaboration: Collaboration,
-    members: z.array(
-      z
-        .object({
-          id: z.string(),
-          name: z.string(),
-          username: z.string(),
-          avatarUrl: z.string().nullable(),
-        })
-        .partial()
-        .passthrough(),
-    ),
+    members: z
+      .array(
+        z
+          .object({
+            id: z.string(),
+            name: z.string(),
+            username: z.string(),
+            avatarUrl: z.string().nullable(),
+          })
+          .partial()
+          .passthrough(),
+      )
+      .optional(),
     currentMembers: z.number().int(),
     isCreator: z.boolean(),
     myJoinStatus: JoinStatus,
   })
-  .partial()
   .passthrough();
 const UpdateCollaborationRequest = z
   .object({
@@ -258,7 +261,9 @@ const MessagesResponse = z
   .object({ success: z.boolean(), data: z.array(Message) })
   .partial()
   .passthrough();
-const SendMessageRequest = z.object({ message: z.string() }).passthrough();
+const SendMessageRequest = z
+  .object({ message: z.string().min(1).max(300) })
+  .passthrough();
 const SubmitRatingRequest = z
   .object({
     collaborationId: z.string(),
@@ -330,7 +335,7 @@ const endpoints = makeApi([
       {
         name: 'body',
         type: 'Body',
-        schema: z.object({ idToken: z.string() }).passthrough(),
+        schema: z.object({ idToken: z.string().max(2048) }).passthrough(),
       },
     ],
     response: AuthResponse,
@@ -417,7 +422,7 @@ const endpoints = makeApi([
       {
         name: 'body',
         type: 'Body',
-        schema: z.object({ message: z.string() }).passthrough(),
+        schema: z.object({ message: z.string().min(1).max(300) }).passthrough(),
       },
       {
         name: 'roomId',
@@ -765,6 +770,37 @@ const endpoints = makeApi([
       },
     ],
     response: ProfileResponse,
+    errors: [
+      {
+        status: 404,
+        description: `User Not Found`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: 'get',
+    path: '/users/:username/collaborations',
+    alias: 'getUsersUsernamecollaborations',
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'username',
+        type: 'Path',
+        schema: z.string(),
+      },
+      {
+        name: 'lat',
+        type: 'Query',
+        schema: z.number().optional(),
+      },
+      {
+        name: 'lng',
+        type: 'Query',
+        schema: z.number().optional(),
+      },
+    ],
+    response: CollaborationFeedResponse,
     errors: [
       {
         status: 404,

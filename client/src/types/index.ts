@@ -22,3 +22,5 @@ export type Message = components["schemas"]["Message"];
 export type SendMessageRequest = components["schemas"]["SendMessageRequest"];
 export type MessagesResponse = components["schemas"]["MessagesResponse"];
 
+export type CollaborationResponse = components["schemas"]["CollaborationResponse"]
+

@@ -14,7 +14,7 @@ export const chatApi = {
 
   getRoomMessages: async (
     roomId: string,
-    params?: { page?: number; limit?: number }
+    params?: { cursor?: string; limit?: number }
   ): Promise<MessagesResponse> => {
     const response = await api.get<MessagesResponse>(
       `/chat/rooms/${roomId}/messages`,

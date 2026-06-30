@@ -14,7 +14,7 @@ api.interceptors.response.use(
     // 1. Handle Response Errors (Server responded with status outside 2xx)
     if (error.response) {
       const { status, data } = error.response;
-      const errorMessage = data?.message || "Something went wrong";
+      const errorMessage = data?.errors?.[0]?.message||data?.message || "Something went wrong";
 
       switch (status) {
         case 401: {
