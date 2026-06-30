@@ -86,7 +86,7 @@ const UpdateProfileRequest = z
 const CollaborationStatus = z.enum(['OPEN', 'FULL', 'COMPLETED', 'CANCELLED']);
 const Location = z
   .object({
-    name: z.string().min(3).max(100),
+    name: z.string().min(3).max(200),
     lat: z.number().gte(-90).lte(90),
     lng: z.number().gte(-180).lte(180),
   })

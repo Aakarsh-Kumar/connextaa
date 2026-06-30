@@ -212,7 +212,7 @@ export default function CreateCollaborationPage() {
       
       const res = await collaborationApi.createCollaboration(payload);
       toast.success("Collaboration created successfully!");
-      router.push(`/chats/chat/${res.chatRoomId}`);
+      router.push(`/dashboard/chats/chat/${res.chatRoomId}`);
     } finally {
       setSubmitting(false);
     }

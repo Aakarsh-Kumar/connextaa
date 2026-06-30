@@ -157,7 +157,6 @@ export default function ProfilePage() {
   };
 
   const handleMarkCompleted = async (id: string) => {
-    try {
       const response = await collaborationApi.updateCollaboration(id, {
         status: "COMPLETED",
       });
@@ -174,9 +173,6 @@ export default function ProfilePage() {
       );
 
       toast.success("Collaboration marked as completed!");
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to complete collaboration");
-    }
   };
 
   const handleConfirmDeleteCollab = (id: string) => {
@@ -197,8 +193,9 @@ export default function ProfilePage() {
     }
   };
 
-  const fetchCollabs = useCallback(async (cursor?: string) => {
+  const fetchCollabs = async (cursor?: string) => {
     if (!profile?.user.username) return;
+
     try {
       const data = await profileApi.getUserCollaborations(
         profile.user.username,
@@ -206,29 +203,78 @@ export default function ProfilePage() {
         coords?.lat,
         coords?.lng
       );
+
       if (cursor) {
         setCollabs((prev) => [...prev, ...(data.data ?? [])]);
       } else {
         setCollabs(data.data ?? []);
       }
-      setNextCursor((data as any).nextCursor ?? null);
+
+      setNextCursor(data.nextCursor ?? null);
     } catch {
       // silently fail
     } finally {
       setCollabsLoading(false);
       setLoadingMore(false);
     }
-  }, [profile?.user.username, coords]);
+  };
 
   useEffect(() => {
     if (!profile?.user.username) return;
-    fetchCollabs();
-  }, [fetchCollabs, profile?.user.username]);
 
-  const handleLoadMore = () => {
-    if (!nextCursor || loadingMore) return;
+    let cancelled = false;
+
+    const loadCollabs = async () => {
+      try {
+        const data = await profileApi.getUserCollaborations(
+          profile.user.username,
+          undefined,
+          coords?.lat,
+          coords?.lng
+        );
+
+        if (cancelled) return;
+
+        setCollabs(data.data ?? []);
+        setNextCursor(
+          (data as { nextCursor?: string | null }).nextCursor ?? null
+        );
+      } catch {
+        // silently fail
+      } finally {
+        if (!cancelled) {
+          setCollabsLoading(false);
+        }
+      }
+    };
+
+    void loadCollabs();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profile?.user.username, coords]);
+
+  const handleLoadMore = async () => {
+    if (!nextCursor || loadingMore || !profile?.user.username) return;
+
     setLoadingMore(true);
-    fetchCollabs(nextCursor);
+
+    try {
+      const data = await profileApi.getUserCollaborations(
+        profile.user.username,
+        nextCursor,
+        coords?.lat,
+        coords?.lng
+      );
+
+      setCollabs((prev) => [...prev, ...(data.data ?? [])]);
+      setNextCursor(
+        (data as { nextCursor?: string | null }).nextCursor ?? null
+      );
+    } finally {
+      setLoadingMore(false);
+    }
   };
 
   const handleLogout = async () => {
@@ -486,6 +532,73 @@ export default function ProfilePage() {
         </div>
       </section>
 
+      
+
+      {/* ── Account Settings ── */}
+      <section className="space-y-4">
+        <h3 className="font-headline-md text-headline-md text-[var(--foreground)] px-1 tracking-tight">
+          Account Settings
+        </h3>
+        <div className="space-y-2">
+
+          {[
+            {
+              icon: <User className="w-5 h-5 text-[var(--on-surface-variant)]" />,
+              label: "Edit Profile",
+              onClick: openEditDialog,
+              variant: "default" as const,
+            },
+            // {
+            //   icon: <Sparkles className="w-5 h-5 text-[var(--on-surface-variant)]" />,
+            //   label: "Manage Interests",
+            //   onClick: openEditDialog,
+            //   variant: "default" as const,
+            // },
+            {
+              icon: <Bell className="w-5 h-5 text-[var(--on-surface-variant)]" />,
+              label: "Notification Preferences",
+              onClick: () => toast("Notification settings coming soon!"),
+              variant: "default" as const,
+            },
+            {
+              icon: <Lock className="w-5 h-5 text-[var(--on-surface-variant)]" />,
+              label: "Privacy",
+              onClick: () => toast("Privacy configurations coming soon!"),
+              variant: "default" as const,
+            },
+          ].map((item) => (
+            <button
+              key={item.label}
+              onClick={item.onClick}
+              className="w-full bg-[var(--card)] px-6 py-4 rounded-2xl flex justify-between items-center border border-[var(--surface-container-high)] hover:bg-[var(--surface-container-low)] transition-colors shadow-sm group"
+            >
+              <div className="flex items-center gap-3">
+                {item.icon}
+                <span className="font-body-md text-body-md text-[var(--on-surface)]">
+                  {item.label}
+                </span>
+              </div>
+              <ChevronRight className="text-[var(--outline)] group-hover:translate-x-1 transition-transform w-5 h-5" />
+            </button>
+          ))}
+
+          {/* Logout — destructive */}
+          <button
+            onClick={handleLogout}
+            className="w-full bg-[var(--card)] px-6 py-4 rounded-2xl flex justify-between items-center border border-[var(--surface-container-high)] hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors shadow-sm group"
+          >
+            <div className="flex items-center gap-3">
+              <LogOut className="w-5 h-5 text-[var(--destructive)]" />
+              <span className="font-body-md text-body-md text-[var(--destructive)]">
+                Logout
+              </span>
+            </div>
+            <ChevronRight className="text-[var(--destructive)] opacity-50 group-hover:translate-x-1 transition-transform w-5 h-5" />
+          </button>
+
+        </div>
+      </section>
+
       {/* ── My Collaborations ── */}
       <section className="space-y-4">
         <h3 className="font-headline-md text-headline-md text-[var(--foreground)] px-1 tracking-tight">
@@ -565,71 +678,6 @@ export default function ProfilePage() {
             )}
           </div>
         )}
-      </section>
-
-      {/* ── Account Settings ── */}
-      <section className="space-y-4">
-        <h3 className="font-headline-md text-headline-md text-[var(--foreground)] px-1 tracking-tight">
-          Account Settings
-        </h3>
-        <div className="space-y-2">
-
-          {[
-            {
-              icon: <User className="w-5 h-5 text-[var(--on-surface-variant)]" />,
-              label: "Edit Profile",
-              onClick: openEditDialog,
-              variant: "default" as const,
-            },
-            // {
-            //   icon: <Sparkles className="w-5 h-5 text-[var(--on-surface-variant)]" />,
-            //   label: "Manage Interests",
-            //   onClick: openEditDialog,
-            //   variant: "default" as const,
-            // },
-            {
-              icon: <Bell className="w-5 h-5 text-[var(--on-surface-variant)]" />,
-              label: "Notification Preferences",
-              onClick: () => toast("Notification settings coming soon!"),
-              variant: "default" as const,
-            },
-            {
-              icon: <Lock className="w-5 h-5 text-[var(--on-surface-variant)]" />,
-              label: "Privacy",
-              onClick: () => toast("Privacy configurations coming soon!"),
-              variant: "default" as const,
-            },
-          ].map((item) => (
-            <button
-              key={item.label}
-              onClick={item.onClick}
-              className="w-full bg-[var(--card)] px-6 py-4 rounded-2xl flex justify-between items-center border border-[var(--surface-container-high)] hover:bg-[var(--surface-container-low)] transition-colors shadow-sm group"
-            >
-              <div className="flex items-center gap-3">
-                {item.icon}
-                <span className="font-body-md text-body-md text-[var(--on-surface)]">
-                  {item.label}
-                </span>
-              </div>
-              <ChevronRight className="text-[var(--outline)] group-hover:translate-x-1 transition-transform w-5 h-5" />
-            </button>
-          ))}
-
-          {/* Logout — destructive */}
-          <button
-            onClick={handleLogout}
-            className="w-full bg-[var(--card)] px-6 py-4 rounded-2xl flex justify-between items-center border border-[var(--surface-container-high)] hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors shadow-sm group"
-          >
-            <div className="flex items-center gap-3">
-              <LogOut className="w-5 h-5 text-[var(--destructive)]" />
-              <span className="font-body-md text-body-md text-[var(--destructive)]">
-                Logout
-              </span>
-            </div>
-            <ChevronRight className="text-[var(--destructive)] opacity-50 group-hover:translate-x-1 transition-transform w-5 h-5" />
-          </button>
-
-        </div>
       </section>
 
       {/* ── Edit Profile Dialog ── */}

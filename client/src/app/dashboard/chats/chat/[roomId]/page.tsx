@@ -193,7 +193,7 @@ export default function ChatRoomPage({ params }: PageProps) {
   } = useInfiniteQuery({
     queryKey: ["messages", roomId],
     queryFn: ({ pageParam }) =>
-      chatApi.getRoomMessages(roomId, { cursor: pageParam as string | undefined, limit: 30 }),
+      chatApi.getRoomMessages(roomId, { cursor: pageParam as string | undefined, limit: 20 }),
     initialPageParam: undefined as string | undefined,
     // Server returns newest-first (DESC). nextCursor = oldest message id in this page.
     // Passing that as cursor fetches messages even older than the current set.

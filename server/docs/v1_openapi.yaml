@@ -389,7 +389,7 @@ components:
       properties:
         name:
           type: string
-          maxLength: 100
+          maxLength: 200
           minLength: 3
 
         lat:
