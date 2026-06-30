@@ -1,13 +1,18 @@
 import app from './app';
 import logger from './utils/logger';
+import { createServer } from 'http';
+import { initSocket } from './sockets/socket';
 
 const PORT = process.env.PORT || 3000;
 
 // Initialize database connection and start server
 async function startServer() {
   try {
-    // Start the Express server
-    const server = app.listen(PORT, () => {
+    const server = createServer(app);
+    initSocket(server);
+
+    // Start the server
+    server.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
       console.log(`Server running on port ${PORT}`);
     });

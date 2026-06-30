@@ -1,19 +1,21 @@
 import { Request, Response } from 'express';
 import logger from '../utils/logger';
 import prisma from '../models';
+import { JoinStatus } from '@prisma/client';
+import { getCollaborationsWithDistance, mapToFeedItem } from '../utils/collaborationQuery';
 
 const publicProfileController = async (req: Request, res: Response) => {
     try {
-        if (!req.params.userId) {
+        if (!req.params.username) {
             res.status(401).json({ success: false, message: 'Unauthorized' });
             return;
         }
 
-    const userId = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId;
+        const username = Array.isArray(req.params.username) ? req.params.username[0] : req.params.username;
 
         // Fetch user profile with categories in a single query
         const user = await prisma.user.findUnique({
-            where: { id: userId },
+            where: { username: username },
             select: {
                 id: true,
                 name: true,
@@ -33,25 +35,25 @@ const publicProfileController = async (req: Request, res: Response) => {
 
         // Fetch stats in parallel for performance
         const [createdCount, joinedCount, completedCount, ratingAgg] = await Promise.all([
-            prisma.collaboration.count({ where: { creatorId: userId } }),
+            prisma.collaboration.count({ where: { creatorId: user.id } }),
             prisma.collaborationMember.count({
-                where: { userId, joinStatus: 'APPROVED' },
+                where: { userId: user.id, joinStatus: 'APPROVED' },
             }),
             prisma.collaboration.count({
                 where: {
                     status: 'COMPLETED',
                     OR: [
-                        { creatorId: userId },
+                        { creatorId: user.id },
                         {
                             members: {
-                                some: { userId, joinStatus: 'APPROVED' },
+                                some: { userId: user.id, joinStatus: 'APPROVED' },
                             },
                         },
                     ],
                 },
             }),
             prisma.rating.aggregate({
-                where: { reviewedUserId: userId },
+                where: { reviewedUserId: user.id },
                 _avg: {
                     showUpRating: true,
                     friendlyRating: true,
@@ -104,4 +106,75 @@ const publicProfileController = async (req: Request, res: Response) => {
     }
 };
 
-export { publicProfileController };
+const userCollaborationsController = async (req: Request, res: Response) => {
+    try {
+        const username = Array.isArray(req.params.username) ? req.params.username[0] : req.params.username;
+        const cursor = req.query.cursor as string | undefined;
+        const limit = Math.min(Number(req.query.limit ?? 2), 30);
+        
+        // Parse user coordinates if available
+        const userLat = req.query.lat ? Number(req.query.lat) : undefined;
+        const userLng = req.query.lng ? Number(req.query.lng) : undefined;
+
+        // Optional: requesting user (may not be authenticated — public endpoint)
+        const viewerId = req.user?.id;
+
+        // Resolve the profile user by username
+        const profileUser = await prisma.user.findUnique({
+            where: { username },
+            select: { id: true },
+        });
+
+        if (!profileUser) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Fetch collaborations using PostGIS spatial logic
+        const collaborations = await getCollaborationsWithDistance({
+            creatorId: profileUser.id,
+            cursor,
+            limit,
+            userLat,
+            userLng,
+        });
+
+        // If viewer is authenticated, bulk-fetch their membership statuses for all returned collaborations
+        const viewerMemberships: Map<string, JoinStatus> = new Map();
+        if (viewerId && collaborations.length > 0) {
+            const collabIds = collaborations.map((c) => c.id);
+            const memberships = await prisma.collaborationMember.findMany({
+                where: {
+                    collaborationId: { in: collabIds },
+                    userId: viewerId,
+                },
+                select: { collaborationId: true, joinStatus: true },
+            });
+            memberships.forEach((m) => viewerMemberships.set(m.collaborationId, m.joinStatus));
+        }
+
+        const data = collaborations.map((c) => 
+            mapToFeedItem(c, {
+                viewerId,
+                viewerMemberships,
+            })
+        );
+
+        const nextCursor = collaborations.length === limit
+            ? collaborations[collaborations.length - 1].id
+            : null;
+
+        return res.status(200).json({
+            success: true,
+            data,
+            nextCursor,
+            pagination: {
+                hasMore: nextCursor !== null,
+            },
+        });
+    } catch (error) {
+        logger.error('userCollaborationsController error', { error });
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+export { publicProfileController, userCollaborationsController };

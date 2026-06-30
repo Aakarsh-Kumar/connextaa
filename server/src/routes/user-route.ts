@@ -1,18 +1,12 @@
 import { meProfileController } from '../controllers/me-profile';
 import { Router } from 'express';
-import { isAuthenticated } from '../middlewares/auth';
-import { publicProfileController } from '../controllers/public-profile';
+import { isAuthenticated, optionalAuth } from '../middlewares/auth';
+import { publicProfileController, userCollaborationsController } from '../controllers/public-profile';
 import { updateMeProfileController } from '../controllers/update-me-profile';
 import { validate, validateResponse } from '../middlewares/validate';
 import { schemas } from '../utils/zod';
 const router = Router();
 
-/**
- * GET /users/me
- * 1. isAuthenticated        — verifies JWT
- * 2. validateResponse()     — dev-only: asserts response matches AuthMeResponse schema
- * 3. meProfileController    — returns current user profile
- */
 router.get(
   '/me',
   isAuthenticated,
@@ -20,13 +14,6 @@ router.get(
   meProfileController,
 );
 
-/**
- * PATCH /users/me
- * 1. isAuthenticated           — verifies JWT
- * 2. validate(body)            — Zod: { name?, username?, bio?, avatarUrl? } (all optional)
- * 3. validateResponse()        — dev-only: asserts response matches AuthMeResponse schema
- * 4. updateMeProfileController — applies profile updates
- */
 router.patch(
   '/me',
   isAuthenticated,
@@ -34,8 +21,16 @@ router.patch(
   validateResponse(schemas.ProfileResponse),
   updateMeProfileController,
 );
+
 router.get(
-  '/:userId',
+  '/:username/collaborations',
+  optionalAuth,
+  validateResponse(schemas.CollaborationFeedResponse),
+  userCollaborationsController,
+)
+
+router.get(
+  '/:username',
   validateResponse(schemas.ProfileResponse),
   publicProfileController,
 );

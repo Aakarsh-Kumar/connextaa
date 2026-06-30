@@ -4,6 +4,9 @@ import * as React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Clock } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { useAuthStore } from "@/store/authStore";
+import { GoogleLoginButton } from "@/features/auth/components/GoogleLoginButton";
 
 export default function HeroSection() {
   const isMobile = useIsMobile();
@@ -19,10 +22,19 @@ export default function HeroSection() {
           <p className="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-xl mx-auto lg:mx-0">
             Need a ride, a study buddy, a travel companion, or someone attending the same event? Connect with people nearby instantly.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <button className={`bg-popover text-primary-foreground ${isMobile ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"} rounded-[9999px] font-bold card-shadow active:scale-95 hover:bg-primary/95 transition-all cursor-pointer`}>
-              Continue with Google
-            </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
+            {useAuthStore((state) => state.isAuthenticated) ? (
+              <Link
+                href="/dashboard"
+                className={`bg-popover text-primary-foreground ${
+                  isMobile ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"
+                } rounded-[9999px] font-bold card-shadow active:scale-95 hover:bg-primary/95 transition-all cursor-pointer text-center`}
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <GoogleLoginButton />
+            )}
             <a
               href="#features"
               className={`bg-transparent border border-outline-variant text-on-surface-variant ${isMobile ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"} rounded-[9999px] font-bold hover:bg-muted transition-all cursor-pointer flex items-center justify-center`}

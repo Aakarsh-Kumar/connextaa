@@ -42,12 +42,28 @@
   --color-outline-variant: var(--outline-variant);
   --color-surface-container: var(--surface-container);
   --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
   --color-primary-container: var(--primary-container);
   --color-on-primary-container: var(--on-primary-container);
   --color-secondary-container: var(--secondary-container);
   --color-on-secondary-container: var(--on-secondary-container);
   --color-on-secondary-fixed-variant: var(--on-secondary-fixed-variant);
   --color-on-background: var(--on-background);
+  --color-surface: var(--surface);
+  --color-surface-variant: var(--surface-variant);
+  --color-outline: var(--outline);
+  --color-tertiary: var(--tertiary);
+  --color-on-primary-fixed-variant: var(--on-primary-fixed-variant);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --spacing-stack-sm: 8px;
+  --spacing-stack-lg: 32px;
+  --spacing-margin-desktop: 40px;
+  --spacing-container-max: 1280px;
+  --spacing-stack-md: 16px;
+  --spacing-unit: 8px;
+  --spacing-gutter: 24px;
+  --spacing-margin-mobile: 20px;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -73,6 +89,12 @@
   --outline-variant: #bbcac6;
   --surface-container: #e6eeff;
   --surface-container-low: #eff4ff;
+  --surface-container-high: #dee9fc;
+  --surface-container-highest: #d9e3f6;
+  --surface: #f8f9ff;
+  --surface-variant: #d9e3f6;
+  --outline: #6c7a77;
+  --tertiary: #5d5f5e;
 
   --popover: #006B5F;
   --popover-foreground: #1F2937;
@@ -123,6 +145,9 @@
 
   --sidebar-border: #E5E7EB;
   --sidebar-ring: #14B8A6;
+  
+  --on-primary-fixed-variant: #005048;
+  --surface-container-lowest: #ffffff;
 }
 .dark {
   --background: oklch(0.141 0.005 285.823);
@@ -255,4 +280,21 @@
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-15px); }
+}
+
+@utility ios-tab-active {
+  background-color: #ffffff;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+@utility card-elevation {
+  box-shadow: 0px 4px 20px rgba(31, 41, 55, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 8px 30px rgba(31, 41, 55, 0.08);
+  }
+  &:active {
+    transform: scale(0.98) translateY(0px);
+  }
 }

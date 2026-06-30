@@ -98,35 +98,17 @@ components:
     AuthMeResponse:
       type: object
 
+      required:
+        - success
+        - user
+
       properties:
         success:
           type: boolean
 
         user:
-          type: object
-
-          properties:
-            id:
-              type: string
-              format: uuid
-
-            email:
-              type: string
-
-            name:
-              type: string
-
-            username:
-              type: string
-              nullable: true
-
-            avatarUrl:
-              type: string
-              nullable: true
-
-            onboardingCompleted:
-              type: boolean
-
+          $ref: "#/components/schemas/User"
+          
     ProfileResponse:
       type: object
 
@@ -249,6 +231,9 @@ components:
 
     PendingJoinRequestsResponse:
       type: object
+      required:
+        - success
+        - data
 
       properties:
         success:
@@ -264,8 +249,26 @@ components:
               requestId:
                 type: string
 
+              collaboration:
+                type: object
+
+                properties:
+                  collaborationId:
+                    type: string
+
+                  title:
+                    type: string
+
+                  category:
+                    $ref: "#/components/schemas/Category"
+
               joinMessage:
                 type: string
+                nullable: true
+
+              requestedAt:
+                type: string
+                format: date-time
 
               status:
                 $ref: "#/components/schemas/JoinStatus"
@@ -326,7 +329,12 @@ components:
     #################################################
 
     User:
-      type: object
+      required:
+        - id
+        - email
+        - name
+        - onboardingCompleted
+        - username
 
       properties:
         id:
@@ -338,6 +346,9 @@ components:
 
         email:
           type: string
+          
+        onboardingCompleted:
+          type: boolean
 
         username:
           type: string
@@ -378,12 +389,18 @@ components:
       properties:
         name:
           type: string
+          maxLength: 200
+          minLength: 3
 
         lat:
           type: number
+          minimum: -90
+          maximum: 90
 
         lng:
           type: number
+          minimum: -180
+          maximum: 180
 
     #################################################
     # COLLABORATION
@@ -391,7 +408,17 @@ components:
 
     Collaboration:
       type: object
-
+      required:
+        - id
+        - title
+        - description
+        - fromLocation
+        - toLocation
+        - scheduledAt
+        - maxMembers
+        - status
+        - creator
+        - category
       properties:
         id:
           type: string
@@ -401,9 +428,13 @@ components:
 
         title:
           type: string
+          minLength: 3
+          maxLength: 40
 
         description:
           type: string
+          minLength: 10
+          maxLength: 250
 
         fromLocation:
           $ref: "#/components/schemas/Location"
@@ -417,15 +448,32 @@ components:
 
         maxMembers:
           type: integer
+          minLength: 2
+          maxLength: 30
 
         status:
           $ref: "#/components/schemas/CollaborationStatus"
 
         creator:
-          $ref: "#/components/schemas/User"
+          $ref: "#/components/schemas/User"          
 
     CollaborationFeedItem:
       type: object
+      
+      required:
+        - id
+        - category
+        - title
+        - description
+        - scheduledAt
+        - status
+        - currentMembers
+        - maxMembers
+        - creator
+        - rating
+        - distanceMeters
+        - fromLocation
+        - toLocation
 
       properties:
         id:
@@ -456,6 +504,10 @@ components:
         distanceMeters:
           type: number
           nullable: true
+        
+        rating: 
+          type: integer
+          nullable: true
 
         creator:
           $ref: "#/components/schemas/User"
@@ -473,20 +525,48 @@ components:
     ChatRoom:
       type: object
 
+      required:
+        - roomId
+        - collaboration
+        - unreadCount
+        - memberCount
+        - lastMessageSenderName
+        - lastMessage
+
       properties:
         roomId:
           type: string
 
-        collaborationId:
-          type: string
+        collaboration:
+          type: object
 
-        title:
-          type: string
+          required:
+            - title
+            - category
+            - scheduledAt
+            - id
+
+          properties:
+            id:
+              type: string
+            title:
+              type: string
+            category:
+              $ref: "#/components/schemas/Category"
+            scheduledAt:
+              type: string
+              format: date-time
 
         unreadCount:
           type: integer
 
         lastMessage:
+          type: string
+        
+        memberCount:
+          type: integer   
+
+        lastMessageSenderName:
           type: string
 
     Message:
@@ -546,6 +626,7 @@ components:
       properties:
         idToken:
           type: string
+          maxLength: 2048
 
     OnboardingRequest:
       type: object
@@ -607,9 +688,13 @@ components:
 
         title:
           type: string
+          minLength: 3
+          maxLength: 40
 
         description:
           type: string
+          minLength: 10
+          maxLength: 250
 
         fromLocation:
           $ref: "#/components/schemas/Location"
@@ -624,6 +709,7 @@ components:
         maxMembers:
           type: integer
           minimum: 2
+          maximum: 30
 
     UpdateCollaborationRequest:
       type: object
@@ -660,6 +746,8 @@ components:
       properties:
         message:
           type: string
+          minLength: 1
+          maxLength: 300
 
     SubmitRatingRequest:
       type: object
@@ -709,14 +797,12 @@ components:
     AuthResponse:
       type: object
 
+      required:
+        - success
+        - user
+
       properties:
         success:
-          type: boolean
-
-        token:
-          type: string
-
-        onboardingCompleted:
           type: boolean
 
         user:
@@ -724,6 +810,11 @@ components:
 
     UserProfileResponse:
       type: object
+
+      required:
+        - success
+        - user
+        - stats
 
       properties:
         success:
@@ -751,6 +842,12 @@ components:
 
     CollaborationResponse:
       type: object
+
+      required:
+        - collaboration
+        - currentMembers
+        - isCreator
+        - myJoinStatus
 
       properties:
         success:
@@ -906,6 +1003,29 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+
+      summary: Logout User
+
+      responses:
+        "200":
+          description: Logout Success
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+        "401":
+          description: Unauthorized
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   #################################################
   # ONBOARDING
   #################################################
@@ -1017,7 +1137,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /users/{userId}:
+  /users/{username}:
     get:
       tags:
         - Users
@@ -1025,7 +1145,7 @@ paths:
       summary: Public User Profile
 
       parameters:
-        - name: userId
+        - name: username
 
           in: path
 
@@ -1033,7 +1153,6 @@ paths:
 
           schema:
             type: string
-            format: uuid
 
       responses:
         "200":
@@ -1052,6 +1171,50 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /users/{username}/collaborations:
+    get:
+      tags:
+        - Users
+
+      summary: User Collaborations
+
+      parameters:
+        - name: username
+
+          in: path
+
+          required: true
+
+          schema:
+            type: string
+        
+        - name: lat
+          in: query
+          schema:
+            type: number
+
+        - name: lng
+          in: query
+          schema:
+            type: number
+
+      responses:
+        "200":
+          description: User Collaborations
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationFeedResponse"
+
+        "404":
+          description: User Not Found
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+                
   #################################################
   # COLLABORATIONS
   #################################################
@@ -1314,7 +1477,23 @@ paths:
                         user:
                           $ref: "#/components/schemas/User"
 
-  /collaborations/{id}/requests/{requestId}/approve:
+  /collaborations/requests:
+    get:
+      tags:
+        - Memberships
+
+      summary: Get Pending Join Requests for current user
+
+      responses:
+        "200":
+          description: Pending Requests
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PendingJoinRequestsResponse"
+
+  /collaborations/requests/{requestId}/approve:
     post:
       tags:
         - Memberships
@@ -1322,12 +1501,6 @@ paths:
       summary: Approve Join Request
 
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-
         - name: requestId
           in: path
           required: true
@@ -1343,7 +1516,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/SuccessResponse"
 
-  /collaborations/{id}/requests/{requestId}/reject:
+  /collaborations/requests/{requestId}/reject:
     post:
       tags:
         - Memberships
@@ -1351,12 +1524,6 @@ paths:
       summary: Reject Join Request
 
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-
         - name: requestId
           in: path
           required: true

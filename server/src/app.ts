@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import { config } from './config/config';
 import { errorHandler } from './middlewares/errorHandler';
 import logger from './utils/logger';
@@ -11,7 +12,9 @@ import SampleRoutes from './routes/sample-route';
 import AuthRoutes from './routes/auth-route';
 import OnboardingRoutes from './routes/onboarding-route'
 import UserRoutes from './routes/user-route'
+import CollaborationRoutes from './routes/collaborations-route'
 import './types';
+import ChatRoutes from './routes/chat-route';
 
 const app = express();
 
@@ -44,7 +47,7 @@ app.use(
       return callback(null, true); // Allow all origins for development
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','PATCH'],
     allowedHeaders: [
       'Content-Type',
       'Authorization',
@@ -57,12 +60,13 @@ app.use(
 );
 
 // Security middleware
+app.use(cookieParser());
 app.use(helmet());
 
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 1000, // limit each IP to 100 requests per windowMs
   message: {
     status: 'error',
     message: 'Too many requests from this IP, please try again later.',
@@ -119,10 +123,13 @@ app.use('/api/health', HealthRoutes);
 // Sample route
 app.use('/api/sample', SampleRoutes);
 
-app.use(`/api/${config.apiVersion}/auth`, AuthRoutes)
-app.use(`/api/${config.apiVersion}/onboarding`, OnboardingRoutes)
+app.use(`/api/${config.apiVersion}/auth`, AuthRoutes);
+app.use(`/api/${config.apiVersion}/onboarding`, OnboardingRoutes);
 
 app.use(`/api/${config.apiVersion}/users`, UserRoutes)
+app.use(`/api/${config.apiVersion}/collaborations`, CollaborationRoutes);
+
+app.use(`/api/${config.apiVersion}/chat`, ChatRoutes);
 
 // 404 handler
 app.use((req, res) => {

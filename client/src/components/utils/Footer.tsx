@@ -4,7 +4,7 @@ import * as React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Globe, AtSign } from "lucide-react";
 import Image from "next/image";
-import Logo from "@/../public/logo-icon.png";
+import Logo from "@/../public/logo.png";
 
 const footerLinks = {
   Product: [
@@ -37,13 +37,13 @@ export default function Footer() {
               <Image
                 alt="Connectify Logo"
                 src={Logo}
-                className="h-8 w-8 object-contain"
-                width={32}
+                className=" object-contain"
+                width={140}
                 height={32}
               />
-              <span className="font-headline-md text-headline-md font-bold text-popover">
+              {/* <span className="font-headline-md text-headline-md font-bold text-popover">
                 Connectify
-              </span>
+              </span> */}
             </div>
             <p className="text-on-surface-variant font-body-md text-body-md max-w-xs">
               Building bridges between neighbors for a more collaborative world.
