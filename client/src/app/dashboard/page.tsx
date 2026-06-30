@@ -66,7 +66,7 @@ export default function DashboardPage() {
   // Greeting dynamic based on time
   const [greeting, setGreeting] = useState("Good Evening");
 
-  useEffect(() => {
+  
     const hours = new Date().getHours();
     if (hours >= 5 && hours < 12) {
       setGreeting("Good Morning");
@@ -75,7 +75,6 @@ export default function DashboardPage() {
     } else {
       setGreeting("Good Evening");
     }
-  }, []);
 
   // Request browser geolocation on mount
   useEffect(() => {
@@ -87,7 +86,7 @@ export default function DashboardPage() {
             lng: position.coords.longitude,
           });
         },
-        (error) => {
+        () => {
           console.warn("Geolocation permission denied/unavailable. Using fallback SRM location.");
         }
       );
@@ -114,79 +113,79 @@ export default function DashboardPage() {
     const fetchFeed = async () => {
       setLoading(true);
       try {
-        // const data = await collaborationApi.getCollaborations({
-        //   page: 1,
-        //   limit: 20,
-        //   category: selectedCategory !== "ALL" ? (selectedCategory as Category) : undefined,
-        //   lat: coords.lat,
-        //   lng: coords.lng,
-        //   radius: radius === 9999 ? undefined : radius,
-        // });
-        // if (data.success && data.data) {
-        //   setFeed(data.data);
-        // }
-        setFeed([{
-      "id": "<string>",
-      "category": "STUDY",
-      "title": "qwertyuiopqwertyuiopqwertyuiopqwertyuiop",
-      "description": "adhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgk",
-      "scheduledAt": "<dateTime>",
-      "status": "COMPLETED",
-      "currentMembers": 1,
-      "maxMembers": 30,
-      "distanceMeters": 100,
-      "creator": {
-        "id": "<uuid>",
-        "email": "<string>",
-        "name": "<string>",
-        "onboardingCompleted": true,
-        "username": "<string>",
-        "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocIzGdK_6Z-rx_2aXKAn70Pf6iaRP0HTZPrkCsgDG9uJzLYSkg=s96-c",
-        "bio": "<string>"
-      },
-      "fromLocation": {
-        "name": "SRM Institute of Science and Technology, Potheri, Chengalpattu, Tamil Nadu, India",
-        "lat": 12.8230,
-        "lng": 80.0444
-      },
-      "toLocation": {
-        "name": "SRM Institute of Science and Technology, Potheri, Chengalpattu, Tamil Nadu, India",
-        "lat": 12.9230,
-        "lng": 80.0444
-      },
-      rating: 4.0,
-    },
-    {
-      "id": "<string>1",
-      "category": "PROFESSIONAL",
-      "title": "qwertyuiopqwertyuiopqwertyuiopqwertyuiop",
-      "description": "adhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgk",
-      "scheduledAt": "<dateTime>",
-      "status": "CANCELLED",
-      "currentMembers": 10,
-      "maxMembers": 30,
-      "distanceMeters": 100,
-      "creator": {
-        "id": "<uuid>",
-        "email": "<string>",
-        "name": "<string>",
-        "onboardingCompleted": true,
-        "username": "<string>",
-        "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocIzGdK_6Z-rx_2aXKAn70Pf6iaRP0HTZPrkCsgDG9uJzLYSkg=s96-c",
-        "bio": "<string>"
-      },
-      "fromLocation": {
-        "name": "<string>",
-        "lat": 12.8230,
-        "lng": 80.0444
-      },
-      "toLocation": {
-        "name": "<string>",
-        "lat": 12.9230,
-        "lng": 80.0444
-      },
-      "rating": 4.1,
-    }])
+        const data = await collaborationApi.getCollaborations({
+          page: 1,
+          limit: 20,
+          category: selectedCategory !== "ALL" ? (selectedCategory as Category) : undefined,
+          lat: coords.lat,
+          lng: coords.lng,
+          radius: radius === 9999 ? undefined : radius,
+        });
+        if (data.success && data.data) {
+          setFeed(data.data);
+        }
+    //     setFeed([{
+    //   "id": "<string>",
+    //   "category": "STUDY",
+    //   "title": "qwertyuiopqwertyuiopqwertyuiopqwertyuiop",
+    //   "description": "adhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgk",
+    //   "scheduledAt": "<dateTime>",
+    //   "status": "COMPLETED",
+    //   "currentMembers": 1,
+    //   "maxMembers": 30,
+    //   "distanceMeters": 100,
+    //   "creator": {
+    //     "id": "<uuid>",
+    //     "email": "<string>",
+    //     "name": "<string>",
+    //     "onboardingCompleted": true,
+    //     "username": "<string>",
+    //     "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocIzGdK_6Z-rx_2aXKAn70Pf6iaRP0HTZPrkCsgDG9uJzLYSkg=s96-c",
+    //     "bio": "<string>"
+    //   },
+    //   "fromLocation": {
+    //     "name": "SRM Institute of Science and Technology, Potheri, Chengalpattu, Tamil Nadu, India",
+    //     "lat": 12.8230,
+    //     "lng": 80.0444
+    //   },
+    //   "toLocation": {
+    //     "name": "SRM Institute of Science and Technology, Potheri, Chengalpattu, Tamil Nadu, India",
+    //     "lat": 12.9230,
+    //     "lng": 80.0444
+    //   },
+    //   rating: 4.0,
+    // },
+    // {
+    //   "id": "<string>1",
+    //   "category": "PROFESSIONAL",
+    //   "title": "qwertyuiopqwertyuiopqwertyuiopqwertyuiop",
+    //   "description": "adhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgk",
+    //   "scheduledAt": "<dateTime>",
+    //   "status": "CANCELLED",
+    //   "currentMembers": 10,
+    //   "maxMembers": 30,
+    //   "distanceMeters": 100,
+    //   "creator": {
+    //     "id": "<uuid>",
+    //     "email": "<string>",
+    //     "name": "<string>",
+    //     "onboardingCompleted": true,
+    //     "username": "<string>",
+    //     "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocIzGdK_6Z-rx_2aXKAn70Pf6iaRP0HTZPrkCsgDG9uJzLYSkg=s96-c",
+    //     "bio": "<string>"
+    //   },
+    //   "fromLocation": {
+    //     "name": "<string>",
+    //     "lat": 12.8230,
+    //     "lng": 80.0444
+    //   },
+    //   "toLocation": {
+    //     "name": "<string>",
+    //     "lat": 12.9230,
+    //     "lng": 80.0444
+    //   },
+    //   "rating": 4.1,
+    // }])
       } finally {
         setLoading(false);
       }

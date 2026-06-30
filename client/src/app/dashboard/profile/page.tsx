@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { profileApi } from "@/features/profile/api/profileApi";
@@ -166,7 +166,7 @@ export default function ProfilePage() {
           c.id === id
             ? {
                 ...c,
-                status: response.collaboration.status as any,
+                status: response.collaboration.status,
               }
             : c
         )

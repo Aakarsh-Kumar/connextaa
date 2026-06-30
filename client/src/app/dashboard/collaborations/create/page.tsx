@@ -100,7 +100,6 @@ function LocationInput({ id, label, placeholder, value, onChange }: LocationInpu
   };
 
   const handleSelect = (result: NominatimResult) => {
-    const shortName = result.display_name.split(",")[0].trim();
     setQuery(result.display_name);
     onChange({
       name: result.display_name,
