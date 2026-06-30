@@ -17,6 +17,14 @@ export interface CollaborationDistanceFilter {
   /** If provided, distances are computed relative to this point */
   userLat?: number;
   userLng?: number;
+  /** Filter collaborations by category */
+  category?: string;
+  /** Filter collaborations within this radius (in km) */
+  radius?: number;
+  /** Exclude collaborations where this user is already an approved member */
+  excludeUserId?: string;
+  /** Whether to order by distance instead of created_at */
+  orderByDistance?: boolean;
 }
 
 export interface CollaborationWithDistance {
@@ -88,98 +96,136 @@ export async function getCollaborationsWithDistance(
     limit = 10,
     userLat,
     userLng,
+    category,
+    radius,
+    excludeUserId,
+    orderByDistance,
   } = filters;
 
   const safeLimitValue = Math.min(limit, 30);
   const hasLocation = userLat != null && userLng != null && !isNaN(userLat) && !isNaN(userLng);
 
-  // ── Build raw SQL ────────────────────────────────────────────────────────
-  // We use $queryRaw because Prisma's findMany cannot compute ST_Distance.
-  // Cursor pagination: ORDER BY created_at DESC, then skip rows with
-  // created_at < cursor_created_at (or equal created_at but id < cursor_id)
-  // to maintain stable order.
-
   let rawRows: any[];
 
   if (hasLocation) {
-    // Full PostGIS distance path
-    const userPoint = `ST_SetSRID(ST_MakePoint(${userLng!}, ${userLat!}), 4326)::geography`;
+    const latNum = Number(userLat);
+    const lngNum = Number(userLng);
+    const radiusMeters = radius ? Number(radius) * 1000 : null;
 
+    // ── Build raw SQL conditions ───────────────────────────────────────────
+    const whereConditions: Prisma.Sql[] = [];
+
+    if (excludeDeleted) {
+      whereConditions.push(Prisma.sql`c.deleted_at IS NULL`);
+    }
     if (creatorId) {
-      // Filter by creator id
-      if (cursor) {
+      whereConditions.push(Prisma.sql`c.creator_id = ${creatorId}`);
+    }
+    if (category) {
+      whereConditions.push(Prisma.sql`c.category = ${category}::"Category"`);
+    }
+    if (excludeUserId) {
+      whereConditions.push(Prisma.sql`NOT EXISTS (
+        SELECT 1 FROM collaboration_members cm
+        WHERE cm.collaboration_id = c.id
+          AND cm.user_id = ${excludeUserId}
+          AND cm.join_status = 'APPROVED'
+      )`);
+    }
+    if (radiusMeters) {
+      whereConditions.push(Prisma.sql`(
+        ST_DWithin(c.from_point, ST_SetSRID(ST_MakePoint(${lngNum}, ${latNum}), 4326)::geography, ${radiusMeters})
+        OR
+        ST_DWithin(c.to_point, ST_SetSRID(ST_MakePoint(${lngNum}, ${latNum}), 4326)::geography, ${radiusMeters})
+      )`);
+    }
+
+    const whereClause = whereConditions.length > 0
+      ? Prisma.sql`WHERE ${Prisma.join(whereConditions, ' AND ')}`
+      : Prisma.empty;
+
+    if (cursor) {
+      if (orderByDistance) {
         rawRows = await prisma.$queryRaw<any[]>`
           WITH cursor_row AS (
-            SELECT created_at, id FROM collaborations WHERE id = ${cursor}
+            SELECT
+              id,
+              LEAST(
+                ST_Distance(from_point, ST_SetSRID(ST_MakePoint(${lngNum}, ${latNum}), 4326)::geography),
+                ST_Distance(to_point,   ST_SetSRID(ST_MakePoint(${lngNum}, ${latNum}), 4326)::geography)
+              ) AS distance_meters
+            FROM collaborations
+            WHERE id = ${cursor}
           ),
           cd AS (
             SELECT
               c.*,
               LEAST(
-                ST_Distance(c.from_point, ST_SetSRID(ST_MakePoint(${userLng!}, ${userLat!}), 4326)::geography),
-                ST_Distance(c.to_point,   ST_SetSRID(ST_MakePoint(${userLng!}, ${userLat!}), 4326)::geography)
+                ST_Distance(c.from_point, ST_SetSRID(ST_MakePoint(${lngNum}, ${latNum}), 4326)::geography),
+                ST_Distance(c.to_point,   ST_SetSRID(ST_MakePoint(${lngNum}, ${latNum}), 4326)::geography)
               ) AS distance_meters
             FROM collaborations c
-            WHERE
-              c.creator_id = ${creatorId}
-              ${excludeDeleted ? Prisma.sql`AND c.deleted_at IS NULL` : Prisma.empty}
+            ${whereClause}
           )
           SELECT cd.* FROM cd, cursor_row
-          WHERE (cd.created_at < cursor_row.created_at)
-             OR (cd.created_at = cursor_row.created_at AND cd.id != cursor_row.id)
-          ORDER BY cd.created_at DESC
+          WHERE (cd.distance_meters > cursor_row.distance_meters)
+             OR (cd.distance_meters = cursor_row.distance_meters AND cd.id > cursor_row.id)
+          ORDER BY cd.distance_meters ASC, cd.id ASC
           LIMIT ${safeLimitValue}
         `;
       } else {
         rawRows = await prisma.$queryRaw<any[]>`
-          SELECT
-            c.*,
-            LEAST(
-              ST_Distance(c.from_point, ST_SetSRID(ST_MakePoint(${userLng!}, ${userLat!}), 4326)::geography),
-              ST_Distance(c.to_point,   ST_SetSRID(ST_MakePoint(${userLng!}, ${userLat!}), 4326)::geography)
-            ) AS distance_meters
-          FROM collaborations c
-          WHERE
-            c.creator_id = ${creatorId}
-            AND c.deleted_at IS NULL
-          ORDER BY c.created_at DESC
+          WITH cursor_row AS (
+            SELECT id, created_at FROM collaborations WHERE id = ${cursor}
+          ),
+          cd AS (
+            SELECT
+              c.*,
+              LEAST(
+                ST_Distance(c.from_point, ST_SetSRID(ST_MakePoint(${lngNum}, ${latNum}), 4326)::geography),
+                ST_Distance(c.to_point,   ST_SetSRID(ST_MakePoint(${lngNum}, ${latNum}), 4326)::geography)
+              ) AS distance_meters
+            FROM collaborations c
+            ${whereClause}
+          )
+          SELECT cd.* FROM cd, cursor_row
+          WHERE (cd.created_at < cursor_row.created_at)
+             OR (cd.created_at = cursor_row.created_at AND cd.id != cursor_row.id)
+          ORDER BY cd.created_at DESC, cd.id DESC
           LIMIT ${safeLimitValue}
         `;
       }
     } else {
-      // No creator filter — full feed
-      if (cursor) {
+      if (orderByDistance) {
         rawRows = await prisma.$queryRaw<any[]>`
-          WITH cursor_row AS (
-            SELECT created_at, id FROM collaborations WHERE id = ${cursor}
-          ),
-          cd AS (
+          WITH cd AS (
             SELECT
               c.*,
               LEAST(
-                ST_Distance(c.from_point, ST_SetSRID(ST_MakePoint(${userLng!}, ${userLat!}), 4326)::geography),
-                ST_Distance(c.to_point,   ST_SetSRID(ST_MakePoint(${userLng!}, ${userLat!}), 4326)::geography)
+                ST_Distance(c.from_point, ST_SetSRID(ST_MakePoint(${lngNum}, ${latNum}), 4326)::geography),
+                ST_Distance(c.to_point,   ST_SetSRID(ST_MakePoint(${lngNum}, ${latNum}), 4326)::geography)
               ) AS distance_meters
             FROM collaborations c
-            WHERE c.deleted_at IS NULL
+            ${whereClause}
           )
-          SELECT cd.* FROM cd, cursor_row
-          WHERE (cd.created_at < cursor_row.created_at)
-             OR (cd.created_at = cursor_row.created_at AND cd.id != cursor_row.id)
-          ORDER BY cd.created_at DESC
+          SELECT cd.* FROM cd
+          ORDER BY cd.distance_meters ASC, cd.id ASC
           LIMIT ${safeLimitValue}
         `;
       } else {
         rawRows = await prisma.$queryRaw<any[]>`
-          SELECT
-            c.*,
-            LEAST(
-              ST_Distance(c.from_point, ST_SetSRID(ST_MakePoint(${userLng!}, ${userLat!}), 4326)::geography),
-              ST_Distance(c.to_point,   ST_SetSRID(ST_MakePoint(${userLng!}, ${userLat!}), 4326)::geography)
-            ) AS distance_meters
-          FROM collaborations c
-          WHERE c.deleted_at IS NULL
-          ORDER BY c.created_at DESC
+          WITH cd AS (
+            SELECT
+              c.*,
+              LEAST(
+                ST_Distance(c.from_point, ST_SetSRID(ST_MakePoint(${lngNum}, ${latNum}), 4326)::geography),
+                ST_Distance(c.to_point,   ST_SetSRID(ST_MakePoint(${lngNum}, ${latNum}), 4326)::geography)
+              ) AS distance_meters
+            FROM collaborations c
+            ${whereClause}
+          )
+          SELECT cd.* FROM cd
+          ORDER BY cd.created_at DESC, cd.id DESC
           LIMIT ${safeLimitValue}
         `;
       }
@@ -190,6 +236,15 @@ export async function getCollaborationsWithDistance(
       where: {
         ...(creatorId ? { creatorId } : {}),
         ...(excludeDeleted ? { deletedAt: null } : {}),
+        ...(category ? { category: category as any } : {}),
+        ...(excludeUserId ? {
+          members: {
+            none: {
+              userId: excludeUserId,
+              joinStatus: 'APPROVED',
+            },
+          },
+        } : {}),
       },
       ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
       take: safeLimitValue,

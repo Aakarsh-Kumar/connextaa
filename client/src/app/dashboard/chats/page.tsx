@@ -4,8 +4,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getCategoryIcon, getCategoryStyles } from "@/constants";
-import toast from "react-hot-toast";
-import type { Category } from "@/types";
 import { LucideMessageSquare, ArrowRightIcon, LucideUser, Search } from "lucide-react";
 import { chatApi } from "@/features/chats/chatApi";
 import { useRouter } from "next/navigation";

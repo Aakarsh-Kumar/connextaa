@@ -64,18 +64,16 @@ export default function DashboardPage() {
   const [pendingRequests, setPendingRequests] = useState<string[]>([]);
 
   // Greeting dynamic based on time
-  const [greeting, setGreeting] = useState("Good Evening");
-
-  useEffect(() => {
+  const greeting = (() => {
     const hours = new Date().getHours();
     if (hours >= 5 && hours < 12) {
-      setGreeting("Good Morning");
+      return "Good Morning";
     } else if (hours >= 12 && hours < 17) {
-      setGreeting("Good Afternoon");
+      return "Good Afternoon";
     } else {
-      setGreeting("Good Evening");
+      return "Good Evening";
     }
-  }, []);
+  })();
 
   // Request browser geolocation on mount
   useEffect(() => {
@@ -87,7 +85,7 @@ export default function DashboardPage() {
             lng: position.coords.longitude,
           });
         },
-        (error) => {
+        () => {
           console.warn("Geolocation permission denied/unavailable. Using fallback SRM location.");
         }
       );
@@ -114,79 +112,79 @@ export default function DashboardPage() {
     const fetchFeed = async () => {
       setLoading(true);
       try {
-        // const data = await collaborationApi.getCollaborations({
-        //   page: 1,
-        //   limit: 20,
-        //   category: selectedCategory !== "ALL" ? (selectedCategory as Category) : undefined,
-        //   lat: coords.lat,
-        //   lng: coords.lng,
-        //   radius: radius === 9999 ? undefined : radius,
-        // });
-        // if (data.success && data.data) {
-        //   setFeed(data.data);
-        // }
-        setFeed([{
-      "id": "<string>",
-      "category": "STUDY",
-      "title": "qwertyuiopqwertyuiopqwertyuiopqwertyuiop",
-      "description": "adhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgk",
-      "scheduledAt": "<dateTime>",
-      "status": "COMPLETED",
-      "currentMembers": 1,
-      "maxMembers": 30,
-      "distanceMeters": 100,
-      "creator": {
-        "id": "<uuid>",
-        "email": "<string>",
-        "name": "<string>",
-        "onboardingCompleted": true,
-        "username": "<string>",
-        "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocIzGdK_6Z-rx_2aXKAn70Pf6iaRP0HTZPrkCsgDG9uJzLYSkg=s96-c",
-        "bio": "<string>"
-      },
-      "fromLocation": {
-        "name": "SRM Institute of Science and Technology, Potheri, Chengalpattu, Tamil Nadu, India",
-        "lat": 12.8230,
-        "lng": 80.0444
-      },
-      "toLocation": {
-        "name": "SRM Institute of Science and Technology, Potheri, Chengalpattu, Tamil Nadu, India",
-        "lat": 12.9230,
-        "lng": 80.0444
-      },
-      rating: 4.0,
-    },
-    {
-      "id": "<string>1",
-      "category": "PROFESSIONAL",
-      "title": "qwertyuiopqwertyuiopqwertyuiopqwertyuiop",
-      "description": "adhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgk",
-      "scheduledAt": "<dateTime>",
-      "status": "CANCELLED",
-      "currentMembers": 10,
-      "maxMembers": 30,
-      "distanceMeters": 100,
-      "creator": {
-        "id": "<uuid>",
-        "email": "<string>",
-        "name": "<string>",
-        "onboardingCompleted": true,
-        "username": "<string>",
-        "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocIzGdK_6Z-rx_2aXKAn70Pf6iaRP0HTZPrkCsgDG9uJzLYSkg=s96-c",
-        "bio": "<string>"
-      },
-      "fromLocation": {
-        "name": "<string>",
-        "lat": 12.8230,
-        "lng": 80.0444
-      },
-      "toLocation": {
-        "name": "<string>",
-        "lat": 12.9230,
-        "lng": 80.0444
-      },
-      "rating": 4.1,
-    }])
+        const data = await collaborationApi.getCollaborations({
+          page: 1,
+          limit: 20,
+          category: selectedCategory !== "ALL" ? (selectedCategory as Category) : undefined,
+          lat: coords.lat,
+          lng: coords.lng,
+          radius: radius === 9999 ? undefined : radius,
+        });
+        if (data.success && data.data) {
+          setFeed(data.data);
+        }
+    //     setFeed([{
+    //   "id": "<string>",
+    //   "category": "STUDY",
+    //   "title": "qwertyuiopqwertyuiopqwertyuiopqwertyuiop",
+    //   "description": "adhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgk",
+    //   "scheduledAt": "<dateTime>",
+    //   "status": "COMPLETED",
+    //   "currentMembers": 1,
+    //   "maxMembers": 30,
+    //   "distanceMeters": 100,
+    //   "creator": {
+    //     "id": "<uuid>",
+    //     "email": "<string>",
+    //     "name": "<string>",
+    //     "onboardingCompleted": true,
+    //     "username": "<string>",
+    //     "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocIzGdK_6Z-rx_2aXKAn70Pf6iaRP0HTZPrkCsgDG9uJzLYSkg=s96-c",
+    //     "bio": "<string>"
+    //   },
+    //   "fromLocation": {
+    //     "name": "SRM Institute of Science and Technology, Potheri, Chengalpattu, Tamil Nadu, India",
+    //     "lat": 12.8230,
+    //     "lng": 80.0444
+    //   },
+    //   "toLocation": {
+    //     "name": "SRM Institute of Science and Technology, Potheri, Chengalpattu, Tamil Nadu, India",
+    //     "lat": 12.9230,
+    //     "lng": 80.0444
+    //   },
+    //   rating: 4.0,
+    // },
+    // {
+    //   "id": "<string>1",
+    //   "category": "PROFESSIONAL",
+    //   "title": "qwertyuiopqwertyuiopqwertyuiopqwertyuiop",
+    //   "description": "adhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgk",
+    //   "scheduledAt": "<dateTime>",
+    //   "status": "CANCELLED",
+    //   "currentMembers": 10,
+    //   "maxMembers": 30,
+    //   "distanceMeters": 100,
+    //   "creator": {
+    //     "id": "<uuid>",
+    //     "email": "<string>",
+    //     "name": "<string>",
+    //     "onboardingCompleted": true,
+    //     "username": "<string>",
+    //     "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocIzGdK_6Z-rx_2aXKAn70Pf6iaRP0HTZPrkCsgDG9uJzLYSkg=s96-c",
+    //     "bio": "<string>"
+    //   },
+    //   "fromLocation": {
+    //     "name": "<string>",
+    //     "lat": 12.8230,
+    //     "lng": 80.0444
+    //   },
+    //   "toLocation": {
+    //     "name": "<string>",
+    //     "lat": 12.9230,
+    //     "lng": 80.0444
+    //   },
+    //   "rating": 4.1,
+    // }])
       } finally {
         setLoading(false);
       }
@@ -235,16 +233,19 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-16">
+    <div className="max-w-5xl mx-auto space-y-8 pb-16">
       {/* Welcome Header */}
-      <section className="animate-fade-in space-y-1">
-        <h1 className="font-headline-lg text-headline-lg text-[var(--on-surface)] tracking-tight">
+      <header className="mb-stack-lg">
+        <h1 className={isMobile
+          ? "font-headline-lg-mobile text-headline-lg-mobile text-on-surface"
+          : "font-headline-lg text-headline-lg text-on-surface"
+        }>
           {greeting}, {user?.name.split(" ")[0] || "Collaborator"}
         </h1>
-        <p className="font-body-lg text-body-lg text-[var(--on-surface-variant)]">
+        <p className="text-on-surface-variant font-body-md mt-1">
           Find something interesting nearby today.
         </p>
-      </section>
+      </header>
 
       {/* Search & Filters Container */}
       <section className="bg-[var(--card)] p-6 rounded-2xl shadow-[0px_4px_20px_rgba(31,41,55,0.05)] border border-[var(--surface-container-high)] space-y-6">

@@ -183,11 +183,7 @@ export default function PublicProfilePage() {
     /* ─── Loading skeleton ──────────────────────────────────────── */
     if (loading || !profile) {
         return (
-        <div
-            className={`max-w-[800px] mx-auto py-8 space-y-6 ${
-            isMobile ? "px-4" : "px-0"
-            }`}
-        >
+        <div className="max-w-5xl mx-auto py-8 space-y-6">
             <div className="flex flex-col items-center text-center space-y-4">
             <Skeleton className="w-32 h-32 rounded-full" />
             <Skeleton className="h-8 w-48" />
@@ -221,11 +217,7 @@ export default function PublicProfilePage() {
 
     /* ─── Page ──────────────────────────────────────────────────── */
     return (
-        <div
-        className={`max-w-[800px] mx-auto py-8 space-y-6 ${
-            isMobile ? "px-4" : "px-0"
-        }`}
-        >
+        <div className="max-w-5xl mx-auto py-8 space-y-6">
 
         {/* ── Profile Header: centered, no banner ── */}
         <section className="flex flex-col items-center text-center pt-6 pb-8 space-y-4">
