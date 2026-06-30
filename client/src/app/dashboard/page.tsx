@@ -64,17 +64,16 @@ export default function DashboardPage() {
   const [pendingRequests, setPendingRequests] = useState<string[]>([]);
 
   // Greeting dynamic based on time
-  const [greeting, setGreeting] = useState("Good Evening");
-
-  
+  const greeting = (() => {
     const hours = new Date().getHours();
     if (hours >= 5 && hours < 12) {
-      setGreeting("Good Morning");
+      return "Good Morning";
     } else if (hours >= 12 && hours < 17) {
-      setGreeting("Good Afternoon");
+      return "Good Afternoon";
     } else {
-      setGreeting("Good Evening");
+      return "Good Evening";
     }
+  })();
 
   // Request browser geolocation on mount
   useEffect(() => {

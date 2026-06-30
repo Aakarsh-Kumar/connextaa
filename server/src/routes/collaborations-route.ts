@@ -8,6 +8,7 @@ import validateTime from '../middlewares/validateTime';
 import { getRequestsController, createJoinRequestController, approveJoinRequestController, rejectJoinRequestController, leaveRequestController } from '../controllers/requests';
 import { getCollaborationDetailsController } from '../controllers/collaboration-detail';
 import { updateCollaborationController, deleteCollaborationController } from '../controllers/update-collaboration';
+import { getAllCollaborationsController } from '../controllers/get-collaborations-feed'
 
 const router = Router();
 
@@ -19,6 +20,14 @@ router.post(
     validateTime,
     validateResponse(schemas.CreateCollaborationResponse),
     createCollaborationsController,
+)
+
+router.get(
+    '/',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.CollaborationFeedResponse),
+    getAllCollaborationsController,
 )
 
 router.get(
