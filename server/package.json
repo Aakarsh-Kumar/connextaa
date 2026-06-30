@@ -31,7 +31,6 @@
     "@types/ms": "^2.1.0",
     "@types/node": "^24.0.1",
     "@types/winston-loggly-bulk": "^3.0.6",
-    "dotenv": "^16.5.0",
     "eslint": "^9.29.0",
     "express": "^5.1.0",
     "install": "^0.13.0",
