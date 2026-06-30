@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { profileApi } from "@/features/profile/api/profileApi";
+import { collaborationApi } from "@/features/collaboration/api/collaborationApi";
 import { authApi } from "@/features/auth/api/authApi";
 import { CATEGORIES, getCategoryStyles } from "@/constants";
 import { type Category, type ProfileResponse, type CollaborationFeedItem } from "@/types";
@@ -33,6 +34,7 @@ import {
   Bell,
   Compass,
 } from "lucide-react";
+import Image from "next/image";
 
 const DEFAULT_AVATAR =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBdjOVVpPF_CyFFwM0PKq5gTHLZoabu_iQdSTAzkNY_nO2fQ3rSoj41BnCu-QDkvsVKGYrd3kGXkUaOPB5NUlV3hiufvfd9X_3vZv7mIZTjfpNxNjVROiEL_YRmXIRYE1VE-kCJ7kNqzSC2Z6gjKDW43MCXJv1ije7ub3Ckpt-w8E4obDbQ6wL7buu2VtMaDkTHEGxhTRT_l-QRgPS_J3VP3ynNS1SOM17PZq67q04cMlIVR0wc45HnV0esb17f9mBpuanGFrrLMjet";
@@ -53,6 +55,20 @@ export default function ProfilePage() {
 
   // Geolocation coordinates
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+
+  // Edit Collaboration States
+  const [isEditCollabOpen, setIsEditCollabOpen] = useState(false);
+  const [editingCollab, setEditingCollab] = useState<CollaborationFeedItem | null>(null);
+  const [editCollabTitle, setEditCollabTitle] = useState("");
+  const [editCollabDesc, setEditCollabDesc] = useState("");
+  const [editCollabMaxMembers, setEditCollabMaxMembers] = useState(2);
+  const [editCollabDate, setEditCollabDate] = useState("");
+  const [editCollabCurrentApproved, setEditCollabCurrentApproved] = useState(1);
+  const [updatingCollab, setUpdatingCollab] = useState(false);
+
+  // Delete/Cancel Dialog States
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deletingCollab, setDeletingCollab] = useState(false);
 
   // Edit Dialog States
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -88,6 +104,98 @@ export default function ProfilePage() {
     };
     fetchProfile();
   }, []);
+
+  const handleOpenEditCollab = (collab: CollaborationFeedItem) => {
+    setEditingCollab(collab);
+    setEditCollabTitle(collab.title);
+    setEditCollabDesc(collab.description);
+    setEditCollabMaxMembers(collab.maxMembers || 5);
+    setEditCollabDate(collab.scheduledAt ? new Date(collab.scheduledAt).toISOString().slice(0, 16) : "");
+    setEditCollabCurrentApproved(collab.currentMembers || 1);
+    setIsEditCollabOpen(true);
+  };
+  
+  const handleUpdateCollab = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCollab?.id) return;
+
+    if (editCollabMaxMembers < editCollabCurrentApproved) {
+      toast.error(`Maximum members cannot be less than current approved members (${editCollabCurrentApproved})`);
+      return;
+    }
+
+    setUpdatingCollab(true);
+    try {
+      const response = await collaborationApi.updateCollaboration(editingCollab.id, {
+        title: editCollabTitle.trim(),
+        description: editCollabDesc.trim(),
+        maxMembers: editCollabMaxMembers,
+        scheduledAt: new Date(editCollabDate).toISOString(),
+      });
+
+      // Update state local list
+      setCollabs((prev) =>
+        prev.map((c) =>
+          c.id === editingCollab.id
+            ? {
+                ...c,
+                title: response.collaboration.title,
+                description: response.collaboration.description,
+                maxMembers: response.collaboration.maxMembers,
+                scheduledAt: response.collaboration.scheduledAt,
+                currentMembers: response.currentMembers,
+              }
+            : c
+        )
+      );
+
+      toast.success("Collaboration updated successfully!");
+      setIsEditCollabOpen(false);
+    } finally {
+      setUpdatingCollab(false);
+    }
+  };
+
+  const handleMarkCompleted = async (id: string) => {
+    try {
+      const response = await collaborationApi.updateCollaboration(id, {
+        status: "COMPLETED",
+      });
+
+      setCollabs((prev) =>
+        prev.map((c) =>
+          c.id === id
+            ? {
+                ...c,
+                status: response.collaboration.status as any,
+              }
+            : c
+        )
+      );
+
+      toast.success("Collaboration marked as completed!");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to complete collaboration");
+    }
+  };
+
+  const handleConfirmDeleteCollab = (id: string) => {
+    setDeleteConfirmId(id);
+  };
+
+  const handleDeleteCollab = async () => {
+    if (!deleteConfirmId) return;
+    setDeletingCollab(true);
+    try {
+      await collaborationApi.deleteCollaboration(deleteConfirmId);
+      // Remove from list
+      setCollabs((prev) => prev.filter((c) => c.id !== deleteConfirmId));
+      toast.success("Collaboration deleted successfully");
+      setDeleteConfirmId(null);
+    } finally {
+      setDeletingCollab(false);
+    }
+  };
 
   const fetchCollabs = useCallback(async (cursor?: string) => {
     if (!profile?.user.username) return;
@@ -239,9 +347,11 @@ export default function ProfilePage() {
 
         {/* Avatar */}
         <div className="relative w-32 h-32">
-          <img
+          <Image
             alt="User Avatar"
             src={profile.user.avatarUrl || DEFAULT_AVATAR}
+            width={20}
+          height={20}
             className="w-full h-full rounded-full object-cover border-4 border-[var(--card)] shadow-md"
             onError={(e) => {
               (e.target as HTMLImageElement).src = DEFAULT_AVATAR;
@@ -400,14 +510,40 @@ export default function ProfilePage() {
         ) : (
           <div className="space-y-4">
             {collabs.map((activity) => (
-              // On own profile: always isJoined=true (creator), so button is disabled
-              <ActivityCard
-                key={activity.id}
-                activity={activity}
-                pendingRequests={[]}
-                onOpenJoin={() => {}}
-                isJoined={true}
-              />
+              <div key={activity.id} className="relative group bg-[var(--card)] rounded-2xl border border-[var(--surface-container-high)] shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col">
+                <ActivityCard
+                  activity={activity}
+                  pendingRequests={[]}
+                  onOpenJoin={() => {}}
+                  isJoined={true}
+                />
+                
+                {/* Owner Actions Footer */}
+                <div className="px-6 py-3 bg-[var(--surface-container-low)] border-t border-[var(--outline-variant)]/20 flex gap-2 justify-end items-center">
+                  {activity.status !== "COMPLETED" && (
+                    <>
+                      <button
+                        onClick={() => handleOpenEditCollab(activity)}
+                        className="px-4 py-2 text-xs font-bold text-[var(--primary)] hover:bg-[var(--primary)]/10 rounded-xl transition-all cursor-pointer"
+                      >
+                        Edit Details
+                      </button>
+                      <button
+                        onClick={() => handleMarkCompleted(activity.id)}
+                        className="px-4 py-2 text-xs font-bold text-green-700 hover:bg-green-50 dark:hover:bg-green-950/20 rounded-xl transition-all cursor-pointer"
+                      >
+                        Mark Completed
+                      </button>
+                    </>
+                  )}
+                  <button
+                    onClick={() => handleConfirmDeleteCollab(activity.id)}
+                    className="px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-all cursor-pointer"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
             ))}
 
             {/* Load more */}
@@ -613,6 +749,155 @@ export default function ProfilePage() {
             </DialogFooter>
 
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Edit Collaboration Dialog ── */}
+      <Dialog open={isEditCollabOpen} onOpenChange={setIsEditCollabOpen}>
+        <DialogContent className="max-w-md w-full bg-[var(--card)] border border-[var(--border)] p-6 rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-headline-md text-headline-md text-[var(--foreground)]">
+              Edit Collaboration
+            </DialogTitle>
+            <DialogDescription className="font-body-md text-body-md text-[var(--muted-foreground)]">
+              Update collaboration details.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleUpdateCollab} className="space-y-4 mt-2">
+            {/* Title */}
+            <div className="space-y-2">
+              <label htmlFor="edit-collab-title" className="text-sm font-semibold text-[var(--foreground)]">
+                Title
+              </label>
+              <Input
+                id="edit-collab-title"
+                type="text"
+                value={editCollabTitle}
+                onChange={(e) => setEditCollabTitle(e.target.value)}
+                className="h-10 border border-[var(--border)] rounded-xl"
+                required
+                maxLength={40}
+              />
+            </div>
+
+            {/* Description */}
+            <div className="space-y-1">
+              <label htmlFor="edit-collab-desc" className="text-sm font-semibold text-[var(--foreground)]">
+                Description
+              </label>
+              <textarea
+                id="edit-collab-desc"
+                value={editCollabDesc}
+                onChange={(e) => setEditCollabDesc(e.target.value)}
+                className="w-full px-3 py-2 border border-[var(--border)] rounded-xl focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--ring)] focus:outline-none transition-all bg-transparent text-sm h-24 resize-none text-[var(--foreground)]"
+                required
+                maxLength={250}
+              />
+            </div>
+
+            {/* Scheduled At */}
+            <div className="space-y-2">
+              <label htmlFor="edit-collab-date" className="text-sm font-semibold text-[var(--foreground)] block">
+                Scheduled Date & Time
+              </label>
+              <Input
+                id="edit-collab-date"
+                type="datetime-local"
+                value={editCollabDate}
+                onChange={(e) => setEditCollabDate(e.target.value)}
+                className="h-10 border border-[var(--border)] rounded-xl"
+                required
+              />
+            </div>
+
+            {/* Max Members */}
+            <div className="space-y-2">
+              <label htmlFor="edit-collab-max" className="text-sm font-semibold text-[var(--foreground)]">
+                Maximum Members
+              </label>
+              <Input
+                id="edit-collab-max"
+                type="number"
+                min={editCollabCurrentApproved}
+                max={30}
+                value={editCollabMaxMembers}
+                onChange={(e) => setEditCollabMaxMembers(parseInt(e.target.value) || 2)}
+                className="h-10 border border-[var(--border)] rounded-xl"
+                required
+              />
+              <p className="text-xs text-[var(--muted-foreground)]">
+                Cannot be less than the current approved members ({editCollabCurrentApproved}).
+              </p>
+            </div>
+
+            <DialogFooter className="flex justify-end gap-2 pt-4 border-t border-[var(--border)]">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditCollabOpen(false)}
+                disabled={updatingCollab}
+                className="h-10 rounded-xl"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={updatingCollab}
+                className="h-10 rounded-xl bg-[var(--primary)] text-[var(--primary-foreground)] font-semibold hover:opacity-90 flex items-center justify-center min-w-[110px]"
+              >
+                {updatingCollab ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin shrink-0 mr-1" />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Delete Confirmation Dialog ── */}
+      <Dialog open={deleteConfirmId !== null} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <DialogContent className="max-w-md w-full bg-[var(--card)] border border-[var(--border)] p-6 rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-headline-md text-headline-md text-[var(--foreground)]">
+              Delete Collaboration?
+            </DialogTitle>
+            <DialogDescription className="font-body-md text-body-md text-[var(--muted-foreground)]">
+              Are you sure you want to delete this collaboration? This action is permanent and will cancel the activity.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="flex justify-end gap-2 pt-4 border-t border-[var(--border)]">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteConfirmId(null)}
+              disabled={deletingCollab}
+              className="h-10 rounded-xl"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleDeleteCollab}
+              disabled={deletingCollab}
+              className="h-10 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold flex items-center justify-center min-w-[110px]"
+            >
+              {deletingCollab ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin shrink-0 mr-1" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                "Delete"
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

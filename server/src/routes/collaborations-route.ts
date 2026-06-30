@@ -7,6 +7,7 @@ import isOnboarded from '../middlewares/onboardedCheck';
 import validateTime from '../middlewares/validateTime';
 import { getRequestsController, createJoinRequestController, approveJoinRequestController, rejectJoinRequestController, leaveRequestController } from '../controllers/requests';
 import { getCollaborationDetailsController } from '../controllers/collaboration-detail';
+import { updateCollaborationController, deleteCollaborationController } from '../controllers/update-collaboration';
 
 const router = Router();
 
@@ -75,5 +76,20 @@ router.get('/:id',
     validateResponse(schemas.CollaborationResponse),
     getCollaborationDetailsController,
 )
+
+router.patch('/:id',
+    isAuthenticated,
+    isOnboarded,
+    validate(schemas.UpdateCollaborationRequest),
+    validateResponse(schemas.CollaborationResponse),
+    updateCollaborationController,
+);
+
+router.delete('/:id',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.SuccessResponse),
+    deleteCollaborationController,
+);
 
 export default router;

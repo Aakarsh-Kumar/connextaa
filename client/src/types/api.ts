@@ -345,7 +345,10 @@ export interface paths {
         /** User Collaborations */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    lat?: number;
+                    lng?: number;
+                };
                 header?: never;
                 path: {
                     username: string;
@@ -1344,16 +1347,16 @@ export interface components {
         };
         CollaborationResponse: {
             success?: boolean;
-            collaboration?: components["schemas"]["Collaboration"];
+            collaboration: components["schemas"]["Collaboration"];
             members?: {
                 id?: string;
                 name?: string;
                 username?: string;
                 avatarUrl?: string | null;
             }[];
-            currentMembers?: number;
-            isCreator?: boolean;
-            myJoinStatus?: components["schemas"]["JoinStatus"];
+            currentMembers: number;
+            isCreator: boolean;
+            myJoinStatus: components["schemas"]["JoinStatus"];
         };
         CollaborationFeedResponse: {
             success?: boolean;

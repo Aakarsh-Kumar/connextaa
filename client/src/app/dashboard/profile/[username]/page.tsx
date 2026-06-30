@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { profileApi } from "@/features/profile/api/profileApi";
 import { collaborationApi } from "@/features/collaboration/api/collaborationApi";
@@ -87,33 +87,52 @@ export default function PublicProfilePage() {
         fetchProfile();
     }, [username,router]);
 
-    const fetchCollabs = useCallback(async (cursor?: string) => {
-        if (!username) return;
-        try {
-            const data = await profileApi.getUserCollaborations(
-                username,
-                cursor,
-                coords?.lat,
-                coords?.lng
-            );
-            if (cursor) {
-                setCollabs((prev) => [...prev, ...(data.data ?? [])]);
-            } else {
-                setCollabs(data.data ?? []);
-            }
-            setNextCursor((data as any).nextCursor ?? null);
-        } catch {
-            // silently fail — collabs are not critical
-        } finally {
-            setCollabsLoading(false);
-            setLoadingMore(false);
-        }
-    }, [username, coords]);
+    // const fetchCollabs = useCallback(async (cursor?: string) => {
+    //     if (!username) return;
+    //     try {
+    //         const data = await profileApi.getUserCollaborations(
+    //             username,
+    //             cursor,
+    //             coords?.lat,
+    //             coords?.lng
+    //         );
+    //         if (cursor) {
+    //             setCollabs((prev) => [...prev, ...(data.data ?? [])]);
+    //         } else {
+    //             setCollabs(data.data ?? []);
+    //         }
+    //         setNextCursor((data as any).nextCursor ?? null);
+    //     } catch {
+    //         // silently fail — collabs are not critical
+    //     } finally {
+    //         setCollabsLoading(false);
+    //         setLoadingMore(false);
+    //     }
+    // }, [username, coords]);
 
     useEffect(() => {
         if (!username) return;
-        fetchCollabs();
-    }, [fetchCollabs, username]);
+
+        const loadCollabs = async () => {
+            try {
+                const data = await profileApi.getUserCollaborations(
+                    username,
+                    undefined,
+                    coords?.lat,
+                    coords?.lng
+                );
+
+                setCollabs(data.data ?? []);
+                setNextCursor((data as any).nextCursor ?? null);
+            } catch {
+                // silently fail
+            } finally {
+                setCollabsLoading(false);
+            }
+        };
+
+        loadCollabs();
+    }, [username, coords]);
 
     const handleOpenJoin = (activity: CollaborationFeedItem) => {
         setSelectedActivity(activity);
@@ -139,10 +158,26 @@ export default function PublicProfilePage() {
         }
     };
 
-    const handleLoadMore = () => {
-        if (!nextCursor || loadingMore) return;
+    const handleLoadMore = async () => {
+        if (!nextCursor || loadingMore || !username) return;
+
         setLoadingMore(true);
-        fetchCollabs(nextCursor);
+
+        try {
+            const data = await profileApi.getUserCollaborations(
+                username,
+                nextCursor,
+                coords?.lat,
+                coords?.lng
+            );
+
+            setCollabs((prev) => [...prev, ...(data.data ?? [])]);
+            setNextCursor((data as any).nextCursor ?? null);
+        } catch {
+            // silently fail
+        } finally {
+            setLoadingMore(false);
+        }
     };
 
     /* ─── Loading skeleton ──────────────────────────────────────── */

@@ -161,24 +161,25 @@ const Collaboration = z
 const JoinStatus = z.enum(['PENDING', 'APPROVED', 'REJECTED', 'LEFT']);
 const CollaborationResponse = z
   .object({
-    success: z.boolean(),
+    success: z.boolean().optional(),
     collaboration: Collaboration,
-    members: z.array(
-      z
-        .object({
-          id: z.string(),
-          name: z.string(),
-          username: z.string(),
-          avatarUrl: z.string().nullable(),
-        })
-        .partial()
-        .passthrough(),
-    ),
+    members: z
+      .array(
+        z
+          .object({
+            id: z.string(),
+            name: z.string(),
+            username: z.string(),
+            avatarUrl: z.string().nullable(),
+          })
+          .partial()
+          .passthrough(),
+      )
+      .optional(),
     currentMembers: z.number().int(),
     isCreator: z.boolean(),
     myJoinStatus: JoinStatus,
   })
-  .partial()
   .passthrough();
 const UpdateCollaborationRequest = z
   .object({
@@ -787,6 +788,16 @@ const endpoints = makeApi([
         name: 'username',
         type: 'Path',
         schema: z.string(),
+      },
+      {
+        name: 'lat',
+        type: 'Query',
+        schema: z.number().optional(),
+      },
+      {
+        name: 'lng',
+        type: 'Query',
+        schema: z.number().optional(),
       },
     ],
     response: CollaborationFeedResponse,

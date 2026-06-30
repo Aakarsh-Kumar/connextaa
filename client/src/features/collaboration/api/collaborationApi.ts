@@ -5,7 +5,8 @@ import {
   CollaborationFeedResponse,
   Category,
   SuccessResponse,
-  CollaborationResponse
+  CollaborationResponse,
+  CollaborationStatus
 } from "@/types";
 
 export const collaborationApi = {
@@ -53,6 +54,28 @@ export const collaborationApi = {
 
   getCollaborationDetails: async (id: string): Promise<CollaborationResponse> => {
     const response = await api.get<CollaborationResponse>(`/collaborations/${id}`);
+    return response.data;
+  },
+
+  updateCollaboration: async (
+    id: string,
+    updateData: {
+      title?: string;
+      description?: string;
+      scheduledAt?: string;
+      maxMembers?: number;
+      status?: CollaborationStatus;
+    }
+  ): Promise<CollaborationResponse> => {
+    const response = await api.patch<CollaborationResponse>(
+      `/collaborations/${id}`,
+      updateData
+    );
+    return response.data;
+  },
+
+  deleteCollaboration: async (id: string): Promise<SuccessResponse> => {
+    const response = await api.delete<SuccessResponse>(`/collaborations/${id}`);
     return response.data;
   },
 };

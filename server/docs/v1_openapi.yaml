@@ -843,6 +843,12 @@ components:
     CollaborationResponse:
       type: object
 
+      required:
+        - collaboration
+        - currentMembers
+        - isCreator
+        - myJoinStatus
+
       properties:
         success:
           type: boolean
