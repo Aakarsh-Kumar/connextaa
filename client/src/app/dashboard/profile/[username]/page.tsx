@@ -46,12 +46,31 @@ export default function PublicProfilePage() {
     const [nextCursor, setNextCursor] = useState<string | null>(null);
     const [loadingMore, setLoadingMore] = useState(false);
 
+    // Geolocation coordinates
+    const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+
     // Join modal state
     const [isJoinSheetOpen, setIsJoinSheetOpen] = useState(false);
     const [selectedActivity, setSelectedActivity] = useState<CollaborationFeedItem | null>(null);
     const [joinMessage, setJoinMessage] = useState("");
     const [joining, setJoining] = useState(false);
     const [pendingRequests, setPendingRequests] = useState<string[]>([]);
+
+    useEffect(() => {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setCoords({
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    });
+                },
+                () => {
+                    // Fallback silently
+                }
+            );
+        }
+    }, []);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -71,7 +90,12 @@ export default function PublicProfilePage() {
     const fetchCollabs = useCallback(async (cursor?: string) => {
         if (!username) return;
         try {
-            const data = await profileApi.getUserCollaborations(username, cursor);
+            const data = await profileApi.getUserCollaborations(
+                username,
+                cursor,
+                coords?.lat,
+                coords?.lng
+            );
             if (cursor) {
                 setCollabs((prev) => [...prev, ...(data.data ?? [])]);
             } else {
@@ -84,7 +108,7 @@ export default function PublicProfilePage() {
             setCollabsLoading(false);
             setLoadingMore(false);
         }
-    }, [username]);
+    }, [username, coords]);
 
     useEffect(() => {
         if (!username) return;

@@ -51,12 +51,31 @@ export default function ProfilePage() {
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
 
+  // Geolocation coordinates
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+
   // Edit Dialog States
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editUsername, setEditUsername] = useState("");
   const [editBio, setEditBio] = useState("");
   const [editCategories, setEditCategories] = useState<Category[]>([]);
   const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCoords({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        () => {
+          // Fallback silently
+        }
+      );
+    }
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -73,7 +92,12 @@ export default function ProfilePage() {
   const fetchCollabs = useCallback(async (cursor?: string) => {
     if (!profile?.user.username) return;
     try {
-      const data = await profileApi.getUserCollaborations(profile.user.username, cursor);
+      const data = await profileApi.getUserCollaborations(
+        profile.user.username,
+        cursor,
+        coords?.lat,
+        coords?.lng
+      );
       if (cursor) {
         setCollabs((prev) => [...prev, ...(data.data ?? [])]);
       } else {
@@ -86,13 +110,12 @@ export default function ProfilePage() {
       setCollabsLoading(false);
       setLoadingMore(false);
     }
-  }, [profile?.user.username]);
+  }, [profile?.user.username, coords]);
 
   useEffect(() => {
     if (!profile?.user.username) return;
     fetchCollabs();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile?.user.username]);
+  }, [fetchCollabs, profile?.user.username]);
 
   const handleLoadMore = () => {
     if (!nextCursor || loadingMore) return;

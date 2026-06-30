@@ -19,10 +19,16 @@ export const profileApi = {
 
   getUserCollaborations: async (
     username: string,
-    cursor?: string
+    cursor?: string,
+    lat?: number,
+    lng?: number
   ): Promise<CollaborationFeedResponse & { nextCursor?: string | null }> => {
     const response = await api.get(`/users/${username}/collaborations`, {
-      params: cursor ? { cursor } : {},
+      params: {
+        ...(cursor ? { cursor } : {}),
+        ...(lat !== undefined ? { lat } : {}),
+        ...(lng !== undefined ? { lng } : {}),
+      },
     });
     return response.data;
   },

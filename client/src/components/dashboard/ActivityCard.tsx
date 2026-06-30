@@ -27,7 +27,7 @@ return date.toLocaleDateString("en-US", {
 };
 
 const formatDistance = (meters?: number | null) => {
-if (meters === undefined || meters === null) return "1.2 km away";
+if (meters === undefined || meters === null) return "0.0 km";
 const km = meters / 1000;
 return `${km.toFixed(1)} km away`;
 };
@@ -43,9 +43,9 @@ export function ActivityCard({
   const isCarpool = activity.category === "CARPOOLING";
   const CategoryIcon = CATEGORIES.find((c) => c.id === activity.category)?.icon ?? Compass;
   const ctaText = isJoined
-    ? "✓ Joined"
+    ? "Joined"
     : isPending
-    ? "⏳ Request Pending"
+    ? "Request Pending"
     : isCarpool
     ? "Request Seat"
     : "Join Activity";

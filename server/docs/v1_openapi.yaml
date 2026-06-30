@@ -1181,6 +1181,16 @@ paths:
 
           schema:
             type: string
+        
+        - name: lat
+          in: query
+          schema:
+            type: number
+
+        - name: lng
+          in: query
+          schema:
+            type: number
 
       responses:
         "200":

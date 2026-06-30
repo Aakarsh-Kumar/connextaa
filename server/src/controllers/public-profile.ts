@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import logger from '../utils/logger';
 import prisma from '../models';
 import { JoinStatus } from '@prisma/client';
+import { getCollaborationsWithDistance, mapToFeedItem } from '../utils/collaborationQuery';
 
 const publicProfileController = async (req: Request, res: Response) => {
     try {
@@ -110,6 +111,11 @@ const userCollaborationsController = async (req: Request, res: Response) => {
         const username = Array.isArray(req.params.username) ? req.params.username[0] : req.params.username;
         const cursor = req.query.cursor as string | undefined;
         const limit = Math.min(Number(req.query.limit ?? 2), 30);
+        
+        // Parse user coordinates if available
+        const userLat = req.query.lat ? Number(req.query.lat) : undefined;
+        const userLng = req.query.lng ? Number(req.query.lng) : undefined;
+
         // Optional: requesting user (may not be authenticated — public endpoint)
         const viewerId = req.user?.id;
 
@@ -123,122 +129,35 @@ const userCollaborationsController = async (req: Request, res: Response) => {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        // Cursor-based pagination — newest collaborations first (createdAt DESC)
-        const collaborations = await prisma.collaboration.findMany({
-            where: {
-                creatorId: profileUser.id,
-                deletedAt: null,
-            },
-            ...(cursor
-                ? {
-                    skip: 1,
-                    cursor: { id: cursor },
-                  }
-                : {}),
-            take: limit,
-            orderBy: { createdAt: 'desc' },
-            select: {
-                id: true,
-                title: true,
-                description: true,
-                category: true,
-                status: true,
-                scheduledAt: true,
-                maxMembers: true,
-                fromLocationName: true,
-                fromLat: true,
-                fromLng: true,
-                toLocationName: true,
-                toLat: true,
-                toLng: true,
-                creator: {
-                    select: {
-                        id: true,
-                        name: true,
-                        username: true,
-                        avatarUrl: true,
-                        email: true,
-                        bio: true,
-                        onboardingCompleted: true,
-                    },
-                },
-                // Count approved members inline
-                members: {
-                    where: { joinStatus: JoinStatus.APPROVED },
-                    select: { userId: true },
-                },
-                // Ratings for the collaboration (to compute avg)
-                ratings: {
-                    select: {
-                        showUpRating: true,
-                        friendlyRating: true,
-                        collaborativeRating: true,
-                        safeRating: true,
-                    },
-                },
-            },
+        // Fetch collaborations using PostGIS spatial logic
+        const collaborations = await getCollaborationsWithDistance({
+            creatorId: profileUser.id,
+            cursor,
+            limit,
+            userLat,
+            userLng,
         });
 
         // If viewer is authenticated, bulk-fetch their membership statuses for all returned collaborations
         const viewerMemberships: Map<string, JoinStatus> = new Map();
-        if (viewerId) {
+        if (viewerId && collaborations.length > 0) {
             const collabIds = collaborations.map((c) => c.id);
-            if (collabIds.length > 0) {
-                const memberships = await prisma.collaborationMember.findMany({
-                    where: {
-                        collaborationId: { in: collabIds },
-                        userId: viewerId,
-                    },
-                    select: { collaborationId: true, joinStatus: true },
-                });
-                memberships.forEach((m) => viewerMemberships.set(m.collaborationId, m.joinStatus));
-            }
+            const memberships = await prisma.collaborationMember.findMany({
+                where: {
+                    collaborationId: { in: collabIds },
+                    userId: viewerId,
+                },
+                select: { collaborationId: true, joinStatus: true },
+            });
+            memberships.forEach((m) => viewerMemberships.set(m.collaborationId, m.joinStatus));
         }
 
-        const data = collaborations.map((c) => {
-            const currentMembers = c.members.length;
-
-            // Compute average creator rating for this collaboration's entries
-            const ratingEntries = c.ratings;
-            const ratingAvg = ratingEntries.length > 0
-                ? Number((ratingEntries.reduce((sum, r) =>
-                    sum + (r.showUpRating + r.friendlyRating + r.collaborativeRating + r.safeRating) / 4, 0
-                  ) / ratingEntries.length).toFixed(1))
-                : null;
-
-            // Determine viewer membership status
-            const isCreatorViewing = viewerId === c.creator.id;
-            const viewerStatus = viewerMemberships.get(c.id);
-            const isJoined = isCreatorViewing || viewerStatus === JoinStatus.APPROVED;
-            const isPending = !isJoined && viewerStatus === JoinStatus.PENDING;
-
-            return {
-                id: c.id,
-                title: c.title,
-                description: c.description,
-                category: c.category,
-                status: c.status,
-                scheduledAt: c.scheduledAt.toISOString(),
-                maxMembers: c.maxMembers,
-                currentMembers,
-                distanceMeters: null,
-                rating: ratingAvg,
-                creator: c.creator,
-                fromLocation: {
-                    name: c.fromLocationName,
-                    lat: c.fromLat,
-                    lng: c.fromLng,
-                },
-                toLocation: {
-                    name: c.toLocationName,
-                    lat: c.toLat,
-                    lng: c.toLng,
-                },
-                // Viewer-specific: passthrough allows extra fields in schema
-                isJoined,
-                isPending,
-            };
-        });
+        const data = collaborations.map((c) => 
+            mapToFeedItem(c, {
+                viewerId,
+                viewerMemberships,
+            })
+        );
 
         const nextCursor = collaborations.length === limit
             ? collaborations[collaborations.length - 1].id
