@@ -14,7 +14,6 @@ export const collaborationApi = {
     collaborationData: CreateCollaborationRequest
   ): Promise<CreateCollaborationResponse> => {
     const response = await api.post("/collaborations", collaborationData);
-    console.log("api", response.data);
     return response.data;
   },
 

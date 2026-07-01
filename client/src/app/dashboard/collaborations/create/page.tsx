@@ -10,7 +10,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuthStore } from "@/store/authStore";
 import {collaborationApi} from "@/features/collaboration/api/collaborationApi";
 import {
-  ArrowLeft,
   MapPin,
   Navigation,
   CalendarDays,
@@ -22,6 +21,12 @@ import {
   Plus,
   Eye,
   Loader2,
+  Share2,
+  Copy,
+  Check,
+  MessageCircle,
+  ArrowRight,
+  PartyPopper,
 } from "lucide-react";
 import { ActivityCard } from "@/components/dashboard/ActivityCard";
 
@@ -171,12 +176,47 @@ export default function CreateCollaborationPage() {
   const [maxMembers, setMaxMembers] = useState(4);
   const [submitting, setSubmitting] = useState(false);
 
+  // Share overlay state
+  const [shareData, setShareData] = useState<{ collaborationId: string; chatRoomId: string } | null>(null);
+  const [copied, setCopied] = useState(false);
+
   const selectedCat = CATEGORIES.find((c) => c.id === category);
 
   const now = new Date();
   const todayStr = now.toISOString().split("T")[0];
   const nowTimeStr = now.toTimeString().slice(0, 5);
   const minTime = date === todayStr ? nowTimeStr : undefined;
+
+  const shareUrl =
+    typeof window !== "undefined" && shareData
+      ? `${window.location.origin}/dashboard/collaborations/${shareData.collaborationId}`
+      : "";
+
+  const handleCopyLink = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      toast.success("Link copied to clipboard!");
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      toast.error("Failed to copy link");
+    }
+  };
+
+  const closeShareOverlay = () => {
+    setShareData(null);
+    setCopied(false);
+  };
+
+  const handleGoToChat = () => {
+    if (!shareData) return;
+
+    const roomId = shareData.chatRoomId;
+
+    closeShareOverlay();
+    router.push(`/dashboard/chats/chat/${roomId}`);
+  };
 
   const handleSubmit = async () => {
     if (!title.trim() || !description.trim()) {
@@ -207,11 +247,10 @@ export default function CreateCollaborationPage() {
         scheduledAt: new Date(`${date}T${time}`).toISOString(),
         maxMembers,
       };
-      console.log("Payload:", payload);
-      
+
       const res = await collaborationApi.createCollaboration(payload);
-      toast.success("Collaboration created successfully!");
-      router.push(`/dashboard/chats/chat/${res.chatRoomId}`);
+      // Instead of immediately redirecting, show the share overlay
+      setShareData({ collaborationId: res.collaborationId, chatRoomId: res.chatRoomId });
     } finally {
       setSubmitting(false);
     }
@@ -219,6 +258,97 @@ export default function CreateCollaborationPage() {
 
   return (
     <div className="max-w-5xl mx-auto pb-40 md:pb-8 space-y-6">
+
+      {/* ── Share Success Overlay ── */}
+      {shareData && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+          <div className="w-full max-w-md bg-[var(--card)] rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 duration-300">
+            {/* Confetti-ish header */}
+            <div className="bg-gradient-to-br from-primary/20 via-primary/10 to-transparent px-6 pt-8 pb-6 text-center border-b border-[var(--border)]">
+              <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center mx-auto mb-4 ring-4 ring-primary/10">
+                <PartyPopper className="w-8 h-8 text-primary" />
+              </div>
+              <h2 className="font-headline-md text-headline-md text-[var(--on-surface)] font-bold mb-1">
+                Activity Created!
+              </h2>
+              <p className="text-sm text-[var(--on-surface-variant)]">
+                Share it with your network to find collaborators faster.
+              </p>
+            </div>
+
+            <div className="px-6 py-5 space-y-4">
+              {/* URL input + copy button */}
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-[var(--on-surface-variant)] uppercase tracking-wider">
+                  Share Link
+                </label>
+                <div className="flex items-center gap-2 p-3 bg-[var(--surface-container-low)] border border-[var(--border)] rounded-xl">
+                  <Share2 className="w-4 h-4 text-[var(--on-surface-variant)] shrink-0" />
+                  <span className="flex-1 text-xs text-[var(--on-surface)] truncate font-mono">
+                    {shareUrl}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary/90 active:scale-95 transition-all"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        Copy
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Native share (mobile) */}
+              {typeof navigator !== "undefined" && "share" in navigator && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await navigator.share({url: shareUrl });
+                    } catch {}
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-[var(--border)] text-sm font-semibold text-[var(--on-surface)] hover:bg-[var(--surface-container-low)] active:scale-[0.98] transition-all"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share via…
+                </button>
+              )}
+
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-[var(--border)]" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-[var(--card)] px-3 text-xs text-[var(--on-surface-variant)]">
+                    or continue
+                  </span>
+                </div>
+              </div>
+
+              {/* Go to Chat CTA */}
+              <button
+                type="button"
+                onClick={handleGoToChat}
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary/90 active:scale-[0.98] transition-all shadow-lg shadow-primary/20"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Go to Activity Chat
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Page Header ── */}
       <header className="mb-stack-lg">

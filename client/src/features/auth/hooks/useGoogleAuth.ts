@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { authApi } from "../api/authApi";
 import { CredentialResponse } from "@react-oauth/google";
@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 
 export const useGoogleAuth = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const setUser = useAuthStore((state) => state.setUser);
   const [loading, setLoading] = useState(false);
 
@@ -19,6 +20,9 @@ export const useGoogleAuth = () => {
       return;
     }
 
+    // Preserve the `from` query param (set by middleware when accessing protected routes unauthenticated)
+    const from = searchParams.get("from") || "/dashboard";
+
     setLoading(true);
     try {
       const response = await authApi.googleLogin(idToken);
@@ -26,14 +30,16 @@ export const useGoogleAuth = () => {
 
       toast.success("Logged in successfully!");
 
-      router.push(
-        response.user.onboardingCompleted
-          ? "/dashboard"
-          : "/onboarding"
-      )
+      if (response.user.onboardingCompleted) {
+        // Redirect directly to the intended page
+        router.push(from);
+      } else {
+        // Pass `from` through onboarding so after completion we still land on the right page
+        router.push(`/onboarding?from=${encodeURIComponent(from)}`);
+      }
     } catch (error: any) {
       console.error("Google login error:", error);
-      toast.error(error.response.message || "Login failed. Please try again.");
+      toast.error(error.response?.data?.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
