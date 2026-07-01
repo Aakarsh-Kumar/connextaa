@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/authStore";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { collaborationApi } from "@/features/collaboration/api/collaborationApi";
@@ -52,9 +53,21 @@ export default function DashboardPage() {
   const [radius, setRadius] = useState(10);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
 
-  const [feed, setFeed] = useState<CollaborationFeedItem[]>([]);
+  const { data: feedData, isLoading: loading } = useQuery({
+    queryKey: ["collaborations", coords.lat, coords.lng, radius, selectedCategory],
+    queryFn: () =>
+      collaborationApi.getCollaborations({
+        page: 1,
+        limit: 20,
+        category: selectedCategory !== "ALL" ? (selectedCategory as Category) : undefined,
+        lat: coords.lat,
+        lng: coords.lng,
+        radius: radius === 9999 ? undefined : radius,
+      }),
+  });
+
+  const feed = feedData?.data ?? [];
   const [userCategories, setUserCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // Join Flow Bottom Sheet States
   const [selectedActivity, setSelectedActivity] = useState<CollaborationFeedItem | null>(null);
@@ -107,90 +120,7 @@ export default function DashboardPage() {
     fetchInterests();
   }, []);
 
-  // Fetch collaborations feed when coordinates, radius, or category filters change
-  useEffect(() => {
-    const fetchFeed = async () => {
-      setLoading(true);
-      try {
-        const data = await collaborationApi.getCollaborations({
-          page: 1,
-          limit: 20,
-          category: selectedCategory !== "ALL" ? (selectedCategory as Category) : undefined,
-          lat: coords.lat,
-          lng: coords.lng,
-          radius: radius === 9999 ? undefined : radius,
-        });
-        if (data.success && data.data) {
-          setFeed(data.data);
-        }
-    //     setFeed([{
-    //   "id": "<string>",
-    //   "category": "STUDY",
-    //   "title": "qwertyuiopqwertyuiopqwertyuiopqwertyuiop",
-    //   "description": "adhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgk",
-    //   "scheduledAt": "<dateTime>",
-    //   "status": "COMPLETED",
-    //   "currentMembers": 1,
-    //   "maxMembers": 30,
-    //   "distanceMeters": 100,
-    //   "creator": {
-    //     "id": "<uuid>",
-    //     "email": "<string>",
-    //     "name": "<string>",
-    //     "onboardingCompleted": true,
-    //     "username": "<string>",
-    //     "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocIzGdK_6Z-rx_2aXKAn70Pf6iaRP0HTZPrkCsgDG9uJzLYSkg=s96-c",
-    //     "bio": "<string>"
-    //   },
-    //   "fromLocation": {
-    //     "name": "SRM Institute of Science and Technology, Potheri, Chengalpattu, Tamil Nadu, India",
-    //     "lat": 12.8230,
-    //     "lng": 80.0444
-    //   },
-    //   "toLocation": {
-    //     "name": "SRM Institute of Science and Technology, Potheri, Chengalpattu, Tamil Nadu, India",
-    //     "lat": 12.9230,
-    //     "lng": 80.0444
-    //   },
-    //   rating: 4.0,
-    // },
-    // {
-    //   "id": "<string>1",
-    //   "category": "PROFESSIONAL",
-    //   "title": "qwertyuiopqwertyuiopqwertyuiopqwertyuiop",
-    //   "description": "adhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasjdhgkjsdhaSDGkshjASDadhasadhasjdhgk",
-    //   "scheduledAt": "<dateTime>",
-    //   "status": "CANCELLED",
-    //   "currentMembers": 10,
-    //   "maxMembers": 30,
-    //   "distanceMeters": 100,
-    //   "creator": {
-    //     "id": "<uuid>",
-    //     "email": "<string>",
-    //     "name": "<string>",
-    //     "onboardingCompleted": true,
-    //     "username": "<string>",
-    //     "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocIzGdK_6Z-rx_2aXKAn70Pf6iaRP0HTZPrkCsgDG9uJzLYSkg=s96-c",
-    //     "bio": "<string>"
-    //   },
-    //   "fromLocation": {
-    //     "name": "<string>",
-    //     "lat": 12.8230,
-    //     "lng": 80.0444
-    //   },
-    //   "toLocation": {
-    //     "name": "<string>",
-    //     "lat": 12.9230,
-    //     "lng": 80.0444
-    //   },
-    //   "rating": 4.1,
-    // }])
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchFeed();
-  }, [coords, radius, selectedCategory]);
+
 
   const handleOpenJoin = (activity: CollaborationFeedItem) => {
     setSelectedActivity(activity);
