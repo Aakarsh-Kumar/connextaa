@@ -9,8 +9,10 @@ export const setAuthCookie = (
     res.cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
-        domain: ".aakarsh.xyz",
+        sameSite: "lax",
+        domain: process.env.NODE_ENV === "production"
+            ? ".aakarsh.xyz"
+            : undefined,
         maxAge: ms(config.jwt.expiration as ms.StringValue)
     });
 };
@@ -19,7 +21,9 @@ export const clearAuthCookie = (res: Response) => {
     res.clearCookie("token",{
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        domain: ".aakarsh.xyz",
-        sameSite: "none",
+        domain: process.env.NODE_ENV === "production"
+            ? ".aakarsh.xyz"
+            : undefined,
+        sameSite: "lax",
     });
 };
