@@ -5,6 +5,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { SocketProvider } from "@/providers/SocketProvider";
+import { PermissionProvider } from "@/providers/PermissionProvider";
 import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
@@ -71,8 +72,10 @@ export default function RootLayout({
           <QueryProvider>
             <AuthProvider>
               <SocketProvider>
-                {children}
-                <Toaster position="top-right" reverseOrder={false} />
+                <PermissionProvider>
+                  {children}
+                  <Toaster position="top-right" reverseOrder={false} />
+                </PermissionProvider>
               </SocketProvider>
             </AuthProvider>
           </QueryProvider>

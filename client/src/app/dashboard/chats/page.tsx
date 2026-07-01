@@ -7,11 +7,44 @@ import { getCategoryIcon, getCategoryStyles } from "@/constants";
 import { LucideMessageSquare, ArrowRightIcon, LucideUser, Search } from "lucide-react";
 import { chatApi } from "@/features/chats/chatApi";
 import { useRouter } from "next/navigation";
+import { usePermissionStore } from "@/store/permissionStore";
+import toast from "react-hot-toast";
+import { Bell } from "lucide-react";
 
 export default function ChatsPage() {
   const router = useRouter();
   const isMobile = useIsMobile();
   const [searchQuery, setSearchQuery] = useState("");
+  const notificationPermission = usePermissionStore((state) => state.notificationPermission);
+  const setNotificationPermission = usePermissionStore((state) => state.setNotificationPermission);
+
+  const handleRequestNotifications = async () => {
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      toast.error("Notifications are not supported by this browser.");
+      return;
+    }
+
+    if (Notification.permission === "denied") {
+      toast.error(
+        "Notifications are blocked in your settings. Please enable them in site configurations.",
+        { duration: 5000 }
+      );
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        setNotificationPermission("granted");
+        toast.success("Notifications enabled successfully!");
+      } else {
+        setNotificationPermission(permission as any);
+        toast.error("Notification permission denied.");
+      }
+    } catch (err) {
+      toast.error("Failed to request notifications.");
+    }
+  };
 
   const {
     data: response,
@@ -72,6 +105,31 @@ export default function ChatsPage() {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Contextual Notification Permission Banner */}
+      {notificationPermission !== "granted" && (
+        <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
+              <Bell className="w-5 h-5 animate-pulse" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-on-surface">
+                Enable notifications to receive new messages.
+              </p>
+              <p className="text-xs text-on-surface-variant">
+                Never miss instant messages from your activity partners.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleRequestNotifications}
+            className="px-5 py-2.5 bg-amber-500 text-white rounded-xl font-bold text-xs shadow-sm hover:bg-amber-600 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+          >
+            {notificationPermission === "denied" ? "How to Enable" : "Enable Notifications"}
+          </button>
+        </div>
+      )}
+
       {/* Search Bar */}
       <div className="relative group">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--outline)] group-focus-within:text-[var(--primary)] transition-colors" />

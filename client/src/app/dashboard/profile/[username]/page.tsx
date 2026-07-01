@@ -28,12 +28,16 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Link from "next/link";
 
+import { usePermissionStore } from "@/store/permissionStore";
+import { LocationFeatureGuard } from "@/components/dashboard/LocationFeatureGuard";
+
 const DEFAULT_AVATAR =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBdjOVVpPF_CyFFwM0PKq5gTHLZoabu_iQdSTAzkNY_nO2fQ3rSoj41BnCu-QDkvsVKGYrd3kGXkUaOPB5NUlV3hiufvfd9X_3vZv7mIZTjfpNxNjVROiEL_YRmXIRYE1VE-kCJ7kNqzSC2Z6gjKDW43MCXJv1ije7ub3Ckpt-w8E4obDbQ6wL7buu2VtMaDkTHEGxhTRT_l-QRgPS_J3VP3ynNS1SOM17PZq67q04cMlIVR0wc45HnV0esb17f9mBpuanGFrrLMjet";
 
 export default function PublicProfilePage() {
     const isMobile = useIsMobile();
     const router = useRouter();
+    const locationPermission = usePermissionStore((state) => state.locationPermission);
 
     const [profile, setProfile] = useState<ProfileResponse | null>(null);
     const [loading, setLoading] = useState(true);
@@ -57,7 +61,7 @@ export default function PublicProfilePage() {
     const [pendingRequests, setPendingRequests] = useState<string[]>([]);
 
     useEffect(() => {
-        if ("geolocation" in navigator) {
+        if (locationPermission === "granted" && "geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     setCoords({
@@ -70,7 +74,7 @@ export default function PublicProfilePage() {
                 }
             );
         }
-    }, []);
+    }, [locationPermission]);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -358,58 +362,60 @@ export default function PublicProfilePage() {
         </section>
 
         {/* ── Collaborations ── */}
-        <section className="space-y-4">
-            <h3 className="font-headline-md text-headline-md text-[var(--foreground)] px-1 tracking-tight">
-            Collaborations
-            </h3>
+        <LocationFeatureGuard onLocationGranted={setCoords}>
+          <section className="space-y-4">
+              <h3 className="font-headline-md text-headline-md text-[var(--foreground)] px-1 tracking-tight">
+              Collaborations
+              </h3>
 
-            {collabsLoading ? (
-            <div className="space-y-4">
-                <SkeletonCard />
-                <SkeletonCard />
-            </div>
-            ) : collabs.length === 0 ? (
-            <div className="bg-[var(--card)] border border-[var(--surface-container-high)] rounded-2xl p-10 text-center space-y-3 flex flex-col items-center">
-                <div className="w-12 h-12 rounded-full bg-[var(--surface-container-low)] flex items-center justify-center">
-                <Compass className="w-6 h-6 text-[var(--outline)]" />
-                </div>
-                <p className="font-semibold text-[var(--on-surface)]">No collaborations yet</p>
-                <p className="text-xs text-[var(--on-surface-variant)]">
-                {profile.user.name} hasn&apos;t posted any collaborations.
-                </p>
-            </div>
-            ) : (
-            <div className="space-y-4">
-                {collabs.map((activity) => (
-                <ActivityCard
-                    key={activity.id}
-                    activity={activity}
-                    pendingRequests={pendingRequests}
-                    onOpenJoin={handleOpenJoin}
-                    isJoined={(activity as any).isJoined}
-                />
-                ))}
+              {collabsLoading ? (
+              <div className="space-y-4">
+                  <SkeletonCard />
+                  <SkeletonCard />
+              </div>
+              ) : collabs.length === 0 ? (
+              <div className="bg-[var(--card)] border border-[var(--surface-container-high)] rounded-2xl p-10 text-center space-y-3 flex flex-col items-center">
+                  <div className="w-12 h-12 rounded-full bg-[var(--surface-container-low)] flex items-center justify-center">
+                  <Compass className="w-6 h-6 text-[var(--outline)]" />
+                  </div>
+                  <p className="font-semibold text-[var(--on-surface)]">No collaborations yet</p>
+                  <p className="text-xs text-[var(--on-surface-variant)]">
+                  {profile.user.name} hasn&apos;t posted any collaborations.
+                  </p>
+              </div>
+              ) : (
+              <div className="space-y-4">
+                  {collabs.map((activity) => (
+                  <ActivityCard
+                      key={activity.id}
+                      activity={activity}
+                      pendingRequests={pendingRequests}
+                      onOpenJoin={handleOpenJoin}
+                      isJoined={(activity as any).isJoined}
+                  />
+                  ))}
 
-                {/* Load more */}
-                {nextCursor && (
-                <button
-                    onClick={handleLoadMore}
-                    disabled={loadingMore}
-                    className="w-full py-3 rounded-xl border border-[var(--border)] text-sm font-semibold text-[var(--on-surface-variant)] hover:bg-[var(--surface-container-low)] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                    {loadingMore ? (
-                    <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Loading...
-                    </>
-                    ) : (
-                    "Load more"
-                    )}
-                </button>
-                )}
-            </div>
-            )}
-        </section>
+                  {/* Load more */}
+                  {nextCursor && (
+                  <button
+                      onClick={handleLoadMore}
+                      disabled={loadingMore}
+                      className="w-full py-3 rounded-xl border border-[var(--border)] text-sm font-semibold text-[var(--on-surface-variant)] hover:bg-[var(--surface-container-low)] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                      {loadingMore ? (
+                      <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Loading...
+                      </>
+                      ) : (
+                      "Load more"
+                      )}
+                  </button>
+                  )}
+              </div>
+              )}
+          </section>
+        </LocationFeatureGuard>
 
         {/* ── Join Request Bottom Sheet ── */}
         <Sheet open={isJoinSheetOpen} onOpenChange={setIsJoinSheetOpen}>

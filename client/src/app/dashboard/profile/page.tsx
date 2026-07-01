@@ -39,10 +39,42 @@ import Image from "next/image";
 const DEFAULT_AVATAR =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBdjOVVpPF_CyFFwM0PKq5gTHLZoabu_iQdSTAzkNY_nO2fQ3rSoj41BnCu-QDkvsVKGYrd3kGXkUaOPB5NUlV3hiufvfd9X_3vZv7mIZTjfpNxNjVROiEL_YRmXIRYE1VE-kCJ7kNqzSC2Z6gjKDW43MCXJv1ije7ub3Ckpt-w8E4obDbQ6wL7buu2VtMaDkTHEGxhTRT_l-QRgPS_J3VP3ynNS1SOM17PZq67q04cMlIVR0wc45HnV0esb17f9mBpuanGFrrLMjet";
 
+import { usePermissionStore } from "@/store/permissionStore";
+
 export default function ProfilePage() {
   const router = useRouter();
   const { user, setUser, logout } = useAuthStore();
   const isMobile = useIsMobile();
+  const notificationPermission = usePermissionStore((state) => state.notificationPermission);
+  const setNotificationPermission = usePermissionStore((state) => state.setNotificationPermission);
+
+  const handleRequestNotifications = async () => {
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      toast.error("Notifications are not supported by this browser.");
+      return;
+    }
+
+    if (Notification.permission === "denied") {
+      toast.error(
+        "Notifications are blocked in your settings. Please enable them in site configurations.",
+        { duration: 5000 }
+      );
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        setNotificationPermission("granted");
+        toast.success("Notifications enabled successfully!");
+      } else {
+        setNotificationPermission(permission as any);
+        toast.error("Notification permission denied.");
+      }
+    } catch (err) {
+      toast.error("Failed to request notifications.");
+    }
+  };
 
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -380,7 +412,30 @@ export default function ProfilePage() {
   /* ─── Page ──────────────────────────────────────────────────── */
   return (
     <div className="max-w-5xl mx-auto py-8 space-y-6">
-    
+      {/* Contextual Notification Warning Banner */}
+      {notificationPermission !== "granted" && (
+        <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
+              <Bell className="w-5 h-5 animate-pulse" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-on-surface">
+                Enable notifications for activity updates.
+              </p>
+              <p className="text-xs text-on-surface-variant">
+                Get notified when others request to join your collaborations or send invitations.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleRequestNotifications}
+            className="px-5 py-2.5 bg-amber-500 text-white rounded-xl font-bold text-xs shadow-sm hover:bg-amber-600 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+          >
+            {notificationPermission === "denied" ? "How to Enable" : "Enable Notifications"}
+          </button>
+        </div>
+      )}
 
       {/* ── Profile Header: centered, no banner ── */}
       <section className="flex flex-col items-center text-center pt-6 pb-8 space-y-4">
