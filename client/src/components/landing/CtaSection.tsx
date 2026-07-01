@@ -2,9 +2,7 @@
 
 import * as React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import Link from "next/link";
-import { useAuthStore } from "@/store/authStore";
-import { GoogleLoginButton } from "@/features/auth/components/GoogleLoginButton";
+import { PwaAwareAuthButton } from "@/components/utils/PwaAwareAuthButton";
 
 export default function CtaSection() {
   const isMobile = useIsMobile();
@@ -20,16 +18,7 @@ export default function CtaSection() {
         <p className="font-body-lg text-body-lg text-on-surface-variant mb-12">
           Join community where people are already sharing rides, studying together, and building local communities.
         </p>
-          {useAuthStore((state) => state.isAuthenticated) ? (
-              <Link
-              href="/dashboard"
-              className={`bg-popover text-primary-foreground ${isMobile ? "px-8 py-4 text-lg" : "px-12 py-5 text-xl"} rounded-[9999px] font-bold card-shadow active:scale-95 hover:bg-primary/95 transition-all cursor-pointer mb-6`}
-              >
-              Go to Dashboard
-              </Link>
-              ) : (
-                  <GoogleLoginButton />
-          )}
+        <PwaAwareAuthButton size={isMobile ? "md" : "lg"} />
       </div>
     </section>
   );
