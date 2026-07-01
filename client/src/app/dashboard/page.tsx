@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState, useRef } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/authStore";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { collaborationApi } from "@/features/collaboration/api/collaborationApi";
@@ -53,20 +53,54 @@ export default function DashboardPage() {
   const [radius, setRadius] = useState(10);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
 
-  const { data: feedData, isLoading: loading } = useQuery({
+  const {
+    data: feedData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: loading,
+  } = useInfiniteQuery({
     queryKey: ["collaborations", coords.lat, coords.lng, radius, selectedCategory],
-    queryFn: () =>
+    queryFn: ({ pageParam }) =>
       collaborationApi.getCollaborations({
-        page: 1,
-        limit: 20,
+        cursor: pageParam as string | undefined,
+        limit: 10,
         category: selectedCategory !== "ALL" ? (selectedCategory as Category) : undefined,
         lat: coords.lat,
         lng: coords.lng,
         radius: radius === 9999 ? undefined : radius,
       }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
 
-  const feed = feedData?.data ?? [];
+  const feed = feedData?.pages.flatMap((page) => page.data ?? []) ?? [];
+
+  const observerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentEl = observerRef.current;
+    if (currentEl) {
+      observer.observe(currentEl);
+    }
+
+    return () => {
+      if (currentEl) {
+        observer.unobserve(currentEl);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
   const [userCategories, setUserCategories] = useState<Category[]>([]);
 
   // Join Flow Bottom Sheet States
@@ -290,6 +324,16 @@ export default function DashboardPage() {
                 onOpenJoin={handleOpenJoin}
               />
             ))}
+            
+            {/* Observer element */}
+            <div ref={observerRef} className="h-4" />
+
+            {/* Loading more spinner */}
+            {isFetchingNextPage && (
+              <div className="flex justify-center py-4">
+                <Loader2 className="w-6 h-6 animate-spin text-[var(--primary)]" />
+              </div>
+            )}
           </div>
         ) : (
           /* Empty State */

@@ -18,14 +18,14 @@ export const collaborationApi = {
   },
 
   getCollaborations: async (params: {
-    page?: number;
+    cursor?: string;
     limit?: number;
     category?: Category;
     lat?: number;
     lng?: number;
     radius?: number;
-  }): Promise<CollaborationFeedResponse> => {
-    const response = await api.get<CollaborationFeedResponse>("/collaborations", {
+  }): Promise<CollaborationFeedResponse & { nextCursor?: string | null }> => {
+    const response = await api.get<CollaborationFeedResponse & { nextCursor?: string | null }>("/collaborations", {
       params,
     });
     return response.data;
