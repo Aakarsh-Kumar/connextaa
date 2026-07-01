@@ -250,7 +250,7 @@ export default function CreateCollaborationPage() {
 
       const res = await collaborationApi.createCollaboration(payload);
       // Instead of immediately redirecting, show the share overlay
-      setShareData({ collaborationId: res.collaborationId, chatRoomId: res.chatRoomId });
+      setShareData({ collaborationId: res.collaborationId as string, chatRoomId: res.chatRoomId as string });
     } finally {
       setSubmitting(false);
     }
