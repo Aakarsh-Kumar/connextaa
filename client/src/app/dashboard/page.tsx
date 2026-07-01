@@ -351,7 +351,7 @@ export default function DashboardPage() {
             <SkeletonCard />
           </div>
         ) : filteredFeed.length > 0 ? (
-          <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full">
+          <div className="flex flex-col gap-6 max-w-5xl mx-auto w-full">
             {filteredFeed.map((activity) => (
               <ActivityCard
                 key={activity.id}

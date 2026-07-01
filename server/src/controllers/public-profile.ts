@@ -136,6 +136,7 @@ const userCollaborationsController = async (req: Request, res: Response) => {
             limit,
             userLat,
             userLng,
+            statuses: ['OPEN', 'FULL', 'COMPLETED'],
         });
 
         // If viewer is authenticated, bulk-fetch their membership statuses for all returned collaborations

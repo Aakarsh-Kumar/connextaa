@@ -50,6 +50,7 @@ const getAllCollaborationsController = async (req: Request, res: Response) => {
             radius,
             excludeUserId: currentUserId,
             orderByDistance: true,
+            statuses: ['OPEN'],
         });
 
         // Bulk-fetch membership statuses for all returned collaborations for the current viewer

@@ -25,6 +25,8 @@ export interface CollaborationDistanceFilter {
   excludeUserId?: string;
   /** Whether to order by distance instead of created_at */
   orderByDistance?: boolean;
+  /** Filter collaborations by their status values (e.g. ['OPEN']) */
+  statuses?: string[];
 }
 
 export interface CollaborationWithDistance {
@@ -100,6 +102,7 @@ export async function getCollaborationsWithDistance(
     radius,
     excludeUserId,
     orderByDistance,
+    statuses,
   } = filters;
 
   const safeLimitValue = Math.min(limit, 30);
@@ -131,6 +134,9 @@ export async function getCollaborationsWithDistance(
           AND cm.user_id = ${excludeUserId}
           AND cm.join_status = 'APPROVED'
       )`);
+    }
+    if (statuses && statuses.length > 0) {
+      whereConditions.push(Prisma.sql`c.status::text IN (${Prisma.join(statuses.map(s => Prisma.sql`${s}`))})`);
     }
     if (radiusMeters) {
       whereConditions.push(Prisma.sql`(
@@ -237,6 +243,7 @@ export async function getCollaborationsWithDistance(
         ...(creatorId ? { creatorId } : {}),
         ...(excludeDeleted ? { deletedAt: null } : {}),
         ...(category ? { category: category as any } : {}),
+        ...(statuses && statuses.length > 0 ? { status: { in: statuses as any } } : {}),
         ...(excludeUserId ? {
           members: {
             none: {

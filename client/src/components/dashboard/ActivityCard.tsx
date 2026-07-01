@@ -185,7 +185,7 @@ export function ActivityCard({
 /* ─── Skeleton Loading Cards ─────────────────────────────── */
 export function SkeletonCard() {
   return (
-    <div className="bg-[var(--card)] rounded-2xl p-6 shadow-[0px_4px_20px_rgba(31,41,55,0.05)] border border-[var(--surface-container-high)] space-y-4 animate-pulse">
+    <div className="max-w-5xl w-full bg-[var(--card)] rounded-2xl p-6 shadow-[0px_4px_20px_rgba(31,41,55,0.05)] border border-[var(--surface-container-high)] space-y-4 animate-pulse">
       <div className="flex justify-between items-center">
         <Skeleton className="h-6 w-20 rounded-full" />
         <Skeleton className="h-6 w-16 rounded-full" />
