@@ -5,20 +5,37 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
-  const { user } = useAuthStore();
+
+  const { user, loading } = useAuthStore();
 
   useEffect(() => {
-    if (user && !user.onboardingCompleted) {
-      router.push("/onboarding");
-    }
-    if(!user){
-      router.push("/")
-    }
-  }, [user, router]);
+    if (loading) return;
 
-  if (user && !user.onboardingCompleted) {
+    if (!user) {
+      router.replace("/");
+      return;
+    }
+
+    if (!user.onboardingCompleted) {
+      router.replace("/onboarding");
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return null; // or your spinner
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  if (!user.onboardingCompleted) {
     return null;
   }
 
