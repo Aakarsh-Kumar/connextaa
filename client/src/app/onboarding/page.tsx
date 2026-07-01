@@ -22,11 +22,18 @@ import {
   CheckCircle2, 
   Loader2,
   LogOut,
+  MapPin,
+  Bell,
+  BellOff,
+  Check,
+  AlertCircle,
+  Lock,
+  Shield,
 } from "lucide-react";
 import { isValidUsername } from "@/constants/validators";
-import { useRef } from "react";
+import { useRef, useCallback } from "react";
 
-type Step = "interests" | "profile" | "complete";
+type Step = "interests" | "profile" | "permissions" | "complete";
 
 
 
@@ -42,6 +49,10 @@ export default function OnboardingPage() {
   const [signingOut, setSigningOut] = useState(false);
   const [username, setUsername] = useState("");
   const initializedRef = useRef(false);
+
+  // Permissions state
+  const [locationGranted, setLocationGranted] = useState(false);
+  const [notificationStatus, setNotificationStatus] = useState<PermissionState | "default" | "granted" | "denied">("default");
 
   // Prepopulate username on mount/auth load
   useEffect(() => {
@@ -59,6 +70,68 @@ export default function OnboardingPage() {
       router.push("/dashboard");
     }
   }, [user, router]);
+
+  // Check current permission states
+  const checkPermissions = useCallback(async () => {
+    if (typeof navigator !== "undefined" && "permissions" in navigator) {
+      try {
+        const geoStatus = await navigator.permissions.query({ name: "geolocation" });
+        setLocationGranted(geoStatus.state === "granted");
+        geoStatus.onchange = () => {
+          setLocationGranted(geoStatus.state === "granted");
+        };
+
+        if ("Notification" in window) {
+          setNotificationStatus(Notification.permission);
+        }
+      } catch (err) {
+        console.error("Error checking permissions:", err);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (step === "permissions") {
+      checkPermissions();
+    }
+  }, [step, checkPermissions]);
+
+  const requestLocation = () => {
+    if (!("geolocation" in navigator)) {
+      toast.error("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocationGranted(true);
+        toast.success("Location permission granted!");
+      },
+      (error) => {
+        setLocationGranted(false);
+        toast.error("Location access is required to use Connectify.");
+      }
+    );
+  };
+
+  const requestNotifications = async () => {
+    if (!("Notification" in window)) {
+      toast.error("Notifications are not supported by this browser.");
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      setNotificationStatus(permission);
+      if (permission === "granted") {
+        toast.success("Notification permission granted!");
+      } else if (permission === "denied") {
+        toast.error("Notification permission denied.");
+      }
+    } catch (err) {
+      console.error("Error requesting notifications:", err);
+    }
+  };
 
   const handleSignOut = async () => {
     setSigningOut(true);
@@ -82,7 +155,6 @@ export default function OnboardingPage() {
     );
   };
 
-
   const handleNextToProfile = () => {
     if (selectedCategories.length === 0) {
       toast.error("Please select at least one interest to continue.");
@@ -91,10 +163,18 @@ export default function OnboardingPage() {
     setStep("profile");
   };
 
-  const handleNextToComplete = async () => {
+  const handleNextToPermissions = async () => {
     const res = await isValidUsername(username);
     if (!res.success) {
       toast.error(res.message);
+      return;
+    }
+    setStep("permissions");
+  };
+
+  const handleNextToComplete = () => {
+    if (!locationGranted) {
+      toast.error("Location permission is mandatory to proceed.");
       return;
     }
     setStep("complete");
@@ -199,8 +279,17 @@ export default function OnboardingPage() {
             </button>
             <button 
               onClick={() => {
-                if (selectedCategories.length > 0 && !isValidUsername(username).then((res) => res.success)) setStep("complete");
+                if (selectedCategories.length > 0 && username.trim()) setStep("permissions");
                 else toast.error("Complete previous steps correctly first.");
+              }} 
+              className={navLinkStyle(step, "permissions")}
+            >
+              Permissions
+            </button>
+            <button 
+              onClick={() => {
+                if (selectedCategories.length > 0 && username.trim() && locationGranted) setStep("complete");
+                else toast.error("Please grant location permission to proceed.");
               }} 
               className={navLinkStyle(step, "complete")}
             >
@@ -212,7 +301,7 @@ export default function OnboardingPage() {
           <div className="flex items-center gap-4">
             {isMobile && (
               <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-primary/10 text-primary uppercase tracking-wider">
-                Step {step === "interests" ? "1" : step === "profile" ? "2" : "3"} of 3
+                Step {step === "interests" ? "1" : step === "profile" ? "2" : step === "permissions" ? "3" : "4"} of 4
               </span>
             )}
             <button 
@@ -386,8 +475,138 @@ export default function OnboardingPage() {
                       <span>Back to Interests</span>
                     </button>
                     <button
-                      onClick={handleNextToComplete}
+                      onClick={handleNextToPermissions}
                       disabled={!username.trim()}
+                      className="bg-primary hover:bg-primary/95 text-white font-semibold px-8 py-3.5 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer"
+                    >
+                      Continue to Permissions
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP: PERMISSIONS */}
+              {step === "permissions" && (
+                <div className="space-y-6">
+                  <div className="text-center space-y-2">
+                    <h1 className="font-headline-lg text-headline-lg text-foreground">
+                      App Permissions
+                    </h1>
+                    <p className="font-body-lg text-body-lg text-muted-foreground max-w-lg mx-auto">
+                      Connectify needs a few permissions to function correctly.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4 mt-6">
+                    {/* Location Permission (Mandatory) */}
+                    <div className={`p-5 rounded-2xl border transition-all duration-300 flex items-start gap-4 ${
+                      locationGranted
+                        ? "border-green-500/30 bg-green-500/5 dark:bg-green-500/10"
+                        : "border-border bg-card"
+                    }`}>
+                      <div className={`p-3 rounded-xl shrink-0 ${
+                        locationGranted 
+                          ? "bg-green-500 text-white" 
+                          : "bg-primary/10 text-primary"
+                      }`}>
+                        <MapPin className="w-6 h-6" />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-foreground text-base tracking-tight">Location Services</h3>
+                          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-destructive/15 text-destructive uppercase tracking-wider">
+                            Mandatory
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-normal">
+                          We use your location to find nearby activities, show you neighborhood collaborations, and compute distances.
+                        </p>
+                        <div className="pt-1">
+                          {locationGranted ? (
+                            <div className="inline-flex items-center gap-1.5 text-green-600 dark:text-green-400 font-semibold text-sm">
+                              <Check className="w-4 h-4" />
+                              <span>Location Access Granted</span>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={requestLocation}
+                              className="px-4 py-2 bg-primary hover:bg-primary/95 text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-sm cursor-pointer"
+                            >
+                              Grant Location Access
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Notification Permission (Optional) */}
+                    <div className={`p-5 rounded-2xl border transition-all duration-300 flex items-start gap-4 ${
+                      notificationStatus === "granted"
+                        ? "border-green-500/30 bg-green-500/5 dark:bg-green-500/10"
+                        : notificationStatus === "denied"
+                        ? "border-destructive/30 bg-destructive/5 dark:bg-destructive/10"
+                        : "border-border bg-card"
+                    }`}>
+                      <div className={`p-3 rounded-xl shrink-0 ${
+                        notificationStatus === "granted"
+                          ? "bg-green-500 text-white"
+                          : notificationStatus === "denied"
+                          ? "bg-destructive/10 text-destructive"
+                          : "bg-primary/10 text-primary"
+                      }`}>
+                        {notificationStatus === "denied" ? (
+                          <BellOff className="w-6 h-6" />
+                        ) : (
+                          <Bell className="w-6 h-6" />
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-foreground text-base tracking-tight">Real-time Notifications</h3>
+                          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary uppercase tracking-wider">
+                            Optional
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-normal">
+                          Get notified when neighbors request to join your activities, approve your requests, or message you.
+                        </p>
+                        <div className="pt-1">
+                          {notificationStatus === "granted" ? (
+                            <div className="inline-flex items-center gap-1.5 text-green-600 dark:text-green-400 font-semibold text-sm">
+                              <Check className="w-4 h-4" />
+                              <span>Notifications Enabled</span>
+                            </div>
+                          ) : notificationStatus === "denied" ? (
+                            <div className="inline-flex items-center gap-1.5 text-destructive font-semibold text-sm">
+                              <AlertCircle className="w-4 h-4" />
+                              <span>Notifications Blocked (Enable in browser settings to receive alerts)</span>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={requestNotifications}
+                              className="px-4 py-2 bg-primary hover:bg-primary/95 text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-sm cursor-pointer"
+                            >
+                              Enable Notifications
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-border flex justify-between items-center">
+                    <button
+                      onClick={() => setStep("profile")}
+                      className="flex items-center gap-1.5 font-label-md text-label-md text-muted-foreground hover:text-foreground font-medium transition-colors cursor-pointer"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>Back to Profile</span>
+                    </button>
+                    <button
+                      onClick={handleNextToComplete}
+                      disabled={!locationGranted}
                       className="bg-primary hover:bg-primary/95 text-white font-semibold px-8 py-3.5 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer"
                     >
                       Review & Confirm
@@ -459,12 +678,12 @@ export default function OnboardingPage() {
 
                   <div className="pt-6 border-t border-border flex justify-between items-center">
                     <button
-                      onClick={() => setStep("profile")}
+                      onClick={() => setStep("permissions")}
                       disabled={submitting}
                       className="flex items-center gap-1.5 font-label-md text-label-md text-muted-foreground hover:text-foreground font-medium transition-colors cursor-pointer disabled:opacity-50"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      <span>Back to Profile</span>
+                      <span>Back to Permissions</span>
                     </button>
                     <button
                       onClick={handleSubmit}
