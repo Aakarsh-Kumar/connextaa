@@ -6,6 +6,7 @@ import { QueryProvider } from "@/providers/QueryProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { SocketProvider } from "@/providers/SocketProvider";
 import { PermissionProvider } from "@/providers/PermissionProvider";
+import { PwaProvider } from "@/providers/PwaProvider";
 import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
@@ -73,8 +74,10 @@ export default function RootLayout({
             <AuthProvider>
               <SocketProvider>
                 <PermissionProvider>
-                  {children}
-                  <Toaster position="top-right" reverseOrder={false} />
+                  <PwaProvider>
+                    {children}
+                    <Toaster position="top-right" reverseOrder={false} />
+                  </PwaProvider>
                 </PermissionProvider>
               </SocketProvider>
             </AuthProvider>

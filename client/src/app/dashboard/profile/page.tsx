@@ -439,7 +439,6 @@ export default function ProfilePage() {
 
       {/* ── Profile Header: centered, no banner ── */}
       <section className="flex flex-col items-center text-center pt-6 pb-8 space-y-4">
-
         {/* Avatar */}
         <div className="relative w-32 h-32">
           <Image

@@ -7,7 +7,8 @@ import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Logo from "@/../public/logo.png"
 import LogoIcon from "@/../public/logo-icon.png"
-import { PwaAwareAuthButton } from "@/components/utils/PwaAwareAuthButton";
+import { useAuthStore } from "@/store/authStore";
+import { GoogleLoginButton } from "@/features/auth/components/GoogleLoginButton";
 
 export default function Navbar() {
   const isMobile = useIsMobile();
@@ -100,7 +101,16 @@ export default function Navbar() {
 
         {/* Action Button & Mobile Menu Toggle */}
         <div className="flex items-center gap-4 flex-shrink-0">
-            <PwaAwareAuthButton size="sm" compactOnMobile />
+            {useAuthStore((state) => state.isAuthenticated) ? (
+                <Link
+                href="/dashboard"
+                className={`bg-popover text-primary-foreground py-2.5 rounded-[999px] ${isMobile ? "text-xs px-2.5" : "text-sm px-6"} font-semibold tracking-[0.05em] active:scale-95 hover:bg-primary/90 transition-all cursor-pointer shadow-sm`}
+                >
+                Go to Dashboard
+                </Link>
+                ) : (
+                    <GoogleLoginButton compactOnMobile />
+            )}
           
           {/* Hamburger Menu Button */}
           <button

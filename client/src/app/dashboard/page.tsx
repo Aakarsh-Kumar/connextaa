@@ -31,6 +31,7 @@ import { getCategoryStyles, CATEGORIES } from "@/constants";
 
 import { usePermissionStore } from "@/store/permissionStore";
 import { LocationFeatureGuard } from "@/components/dashboard/LocationFeatureGuard";
+import { InstallBanner } from "@/components/pwa/InstallBanner";
 
 const CATEG_ITEMS = [{ id: "ALL", name: "All", icon: null }, ...CATEGORIES];
 
@@ -201,6 +202,9 @@ export default function DashboardPage() {
 
 
   return (
+    
+    <>
+      <InstallBanner />
     <div className="max-w-5xl mx-auto space-y-8 pb-16">
       {/* Welcome Header */}
       <header className="mb-stack-lg">
@@ -442,5 +446,6 @@ export default function DashboardPage() {
         </SheetContent>
       </Sheet>
     </div>
+    </>
   );
 }

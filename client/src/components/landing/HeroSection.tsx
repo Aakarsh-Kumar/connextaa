@@ -4,7 +4,9 @@ import * as React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Clock } from "lucide-react";
 import Image from "next/image";
-import { PwaAwareAuthButton } from "@/components/utils/PwaAwareAuthButton";
+import Link from "next/link";
+import { useAuthStore } from "@/store/authStore";
+import { GoogleLoginButton } from "@/features/auth/components/GoogleLoginButton";
 
 export default function HeroSection() {
   const isMobile = useIsMobile();
@@ -20,10 +22,19 @@ export default function HeroSection() {
           <p className="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-xl mx-auto lg:mx-0">
             Need a ride, a study buddy, a travel companion, or someone attending the same event? Connect with people nearby instantly.
           </p>
-
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
-            <PwaAwareAuthButton size={isMobile ? "md" : "lg"} />
-
+            {useAuthStore((state) => state.isAuthenticated) ? (
+              <Link
+                href="/dashboard"
+                className={`bg-popover text-primary-foreground ${
+                  isMobile ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"
+                } rounded-[9999px] font-bold card-shadow active:scale-95 hover:bg-primary/95 transition-all cursor-pointer text-center`}
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <GoogleLoginButton />
+            )}
             <a
               href="#features"
               className={`bg-transparent border border-outline-variant text-on-surface-variant ${isMobile ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"} rounded-[9999px] font-bold hover:bg-muted transition-all cursor-pointer flex items-center justify-center`}
@@ -49,12 +60,13 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Right column: Floating Visual Cards — hidden on mobile */}
+        {/* Right column: Floating Visual Cards */}
+        {/* Hidden on mobile viewports (< 768px) per HTML structure */}
         {!isMobile && (
           <div className="relative h-[500px] hidden lg:block">
             {/* Card 1: Carpool to Coachella */}
-            <div
-              className="absolute top-0 right-10 w-72 bg-white p-6 rounded-[24px] card-shadow activity-card-float"
+            <div 
+              className="absolute top-0 right-10 w-72 bg-white p-6 rounded-[24px] card-shadow activity-card-float" 
               style={{ animationDelay: "0s" }}
             >
               <div className="flex items-center gap-4 mb-4">
@@ -66,9 +78,9 @@ export default function HeroSection() {
                   <p className="font-label-sm text-label-sm text-on-surface-variant">2 seats left</p>
                 </div>
               </div>
-              <Image
-                className="w-full h-32 object-cover rounded-md mb-4"
-                alt="A sun-drenched wide shot of a festival landscape with colorful tents and distant palm trees against a bright blue sky."
+              <Image 
+                className="w-full h-32 object-cover rounded-md mb-4" 
+                alt="A sun-drenched wide shot of a festival landscape with colorful tents and distant palm trees against a bright blue sky, capturing the vibrant and energetic mood of a modern outdoor music festival in a clean light-mode aesthetic with warm orange and teal accents." 
                 width={400}
                 height={400}
                 loading="lazy"
@@ -80,8 +92,8 @@ export default function HeroSection() {
             </div>
 
             {/* Card 2: Study at Joe's Coffee */}
-            <div
-              className="absolute top-48 left-0 w-72 bg-white p-6 rounded-[24px] card-shadow activity-card-float"
+            <div 
+              className="absolute top-48 left-0 w-72 bg-white p-6 rounded-[24px] card-shadow activity-card-float" 
               style={{ animationDelay: "1.5s" }}
             >
               <div className="flex items-center gap-4 mb-4">
@@ -103,8 +115,8 @@ export default function HeroSection() {
             </div>
 
             {/* Card 3: Hiking Trip Yosemite */}
-            <div
-              className="absolute bottom-4 right-0 w-72 bg-white p-6 rounded-[24px] card-shadow activity-card-float"
+            <div 
+              className="absolute bottom-4 right-0 w-72 bg-white p-6 rounded-[24px] card-shadow activity-card-float" 
               style={{ animationDelay: "3s" }}
             >
               <div className="flex items-center gap-4 mb-4">
@@ -116,9 +128,9 @@ export default function HeroSection() {
                   <p className="font-label-sm text-label-sm text-on-surface-variant">Intermediate Skill</p>
                 </div>
               </div>
-              <Image
-                className="w-full h-32 object-cover rounded-md mb-4"
-                alt="A panoramic view of a majestic mountain valley with towering granite cliffs and lush green forests under soft morning light."
+              <Image 
+                className="w-full h-32 object-cover rounded-md mb-4" 
+                alt="A panoramic view of a majestic mountain valley with towering granite cliffs and lush green forests under soft morning light. The composition is balanced and serene, utilizing a clean and high-contrast light-mode style that feels approachable and trustworthy, reflecting a healthy outdoor lifestyle." 
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk_c82F4WA8aqGIlAgPWxUSiTFGwpu53f4T3E_r_QQNKBKTm97wtXiNC7axEpKItvCQ7di7vIJQL5cR6a6e07kM4SDoAynTb5IYmcvRQ-sSQdOpBy_TnFwXoz_wFWWz7O250C4D7kVYo5Mc7L4JZ6-TMi4rW6jy5BRF2Nj4g4PbJVUKuI4jZNZ7bzqp3FDweyC8cVftMchyHbGZFt_q0XLgqpXwEJO7Fshjiw6ZEh-wgQdwN1u2i9P22fmdpBpBVeZai-wTsY5k_i3"
                 width={400}
                 height={400}
