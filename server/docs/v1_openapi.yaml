@@ -1397,6 +1397,55 @@ paths:
               schema:
                 $ref: "#/components/schemas/SuccessResponse"
 
+  /collaborations/{id}/complete:
+    patch:
+      tags:
+        - Collaborations
+
+      summary: Complete Collaboration
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Completed Successfully
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationResponse"
+
+        "400":
+          description: Invalid Request or Status Transition
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "403":
+          description: Only Creator Can Complete
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "404":
+          description: Collaboration Not Found
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /collaborations/{id}/join:
     post:
       tags:

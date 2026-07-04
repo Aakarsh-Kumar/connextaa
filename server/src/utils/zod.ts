@@ -564,6 +564,37 @@ const endpoints = makeApi([
     response: SuccessResponse,
   },
   {
+    method: 'patch',
+    path: '/collaborations/:id/complete',
+    alias: 'patchCollaborationsIdcomplete',
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'id',
+        type: 'Path',
+        schema: z.string().uuid(),
+      },
+    ],
+    response: CollaborationResponse,
+    errors: [
+      {
+        status: 400,
+        description: `Invalid Request or Status Transition`,
+        schema: ErrorResponse,
+      },
+      {
+        status: 403,
+        description: `Only Creator Can Complete`,
+        schema: ErrorResponse,
+      },
+      {
+        status: 404,
+        description: `Collaboration Not Found`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
     method: 'post',
     path: '/collaborations/:id/join',
     alias: 'postCollaborationsIdjoin',

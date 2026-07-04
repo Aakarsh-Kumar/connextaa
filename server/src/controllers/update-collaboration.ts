@@ -43,6 +43,10 @@ const updateCollaborationController = async (req: Request, res: Response) => {
       return res.status(403).json({ success: false, message: 'Only the creator can update the collaboration' });
     }
 
+    if (collaboration.status === CollaborationStatus.COMPLETED || collaboration.status === CollaborationStatus.CANCELLED) {
+      return res.status(400).json({ success: false, message: 'Completed or cancelled collaborations cannot be edited' });
+    }
+
     // Get current approved members count
     const approvedMembersCount = await prisma.collaborationMember.count({
       where: {
@@ -182,8 +186,8 @@ const deleteCollaborationController = async (req: Request, res: Response) => {
     }
 
     const collaboration = await prisma.collaboration.findUnique({
-      where: { id, deletedAt: null },
-      select: { creatorId: true }
+      where: { id },
+      select: { creatorId: true, status: true }
     });
 
     if (!collaboration) {
@@ -194,14 +198,25 @@ const deleteCollaborationController = async (req: Request, res: Response) => {
       return res.status(403).json({ success: false, message: 'Only the creator can delete the collaboration' });
     }
 
+    if (collaboration.status !== CollaborationStatus.OPEN && collaboration.status !== CollaborationStatus.FULL) {
+      return res.status(400).json({
+        success: false,
+        message: 'Only active collaborations can be cancelled.'
+      });
+    }
+
     // Soft-delete: update status to CANCELLED and set deletedAt
     await prisma.collaboration.update({
       where: { id },
       data: {
         deletedAt: new Date(),
-        status: 'CANCELLED',
+        status: CollaborationStatus.CANCELLED,
       },
     });
+
+    // TODO:
+    // When collaboration is cancelled (deleted):
+    // - create notifications (COLLABORATION_CANCELLED) for all approved members
 
     return res.status(200).json({
       success: true,
@@ -214,4 +229,168 @@ const deleteCollaborationController = async (req: Request, res: Response) => {
   }
 };
 
-export { updateCollaborationController, deleteCollaborationController };
+const completeCollaborationController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { id } = req.params as { id: string };
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const collaboration = await prisma.collaboration.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        creatorId: true,
+        status: true,
+        scheduledAt: true,
+        title: true,
+        category: true,
+        maxMembers: true,
+        fromLocationName: true,
+        fromLat: true,
+        fromLng: true,
+        toLocationName: true,
+        toLat: true,
+        toLng: true,
+        creator: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            onboardingCompleted: true,
+            username: true,
+            avatarUrl: true,
+            bio: true,
+          }
+        }
+      }
+    });
+
+    if (!collaboration) {
+      return res.status(404).json({ success: false, message: 'Collaboration not found' });
+    }
+
+    if (collaboration.creatorId !== userId) {
+      return res.status(403).json({ success: false, message: 'Only the creator can complete the collaboration' });
+    }
+
+    // 1. Explicit Status Validation
+    if (collaboration.status !== CollaborationStatus.OPEN && collaboration.status !== CollaborationStatus.FULL) {
+      return res.status(400).json({
+        success: false,
+        message: 'Only active collaborations can be completed.'
+      });
+    }
+
+    // 2. Timing Validation
+    const now = new Date();
+    const canCompleteAt = new Date(collaboration.scheduledAt);
+    canCompleteAt.setMinutes(canCompleteAt.getMinutes() - 30);
+
+    if (now < canCompleteAt) {
+      return res.status(400).json({
+        success: false,
+        message: 'This activity cannot be completed before it starts.'
+      });
+    }
+
+    // 3. Participant Count Validation
+    const approvedMembersCount = await prisma.collaborationMember.count({
+      where: {
+        collaborationId: id,
+        joinStatus: JoinStatus.APPROVED
+      }
+    });
+
+    if (approvedMembersCount < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'At least one participant must join before completing the activity.'
+      });
+    }
+
+    // Update status to COMPLETED
+    const updated = await prisma.collaboration.update({
+      where: { id },
+      data: {
+        status: CollaborationStatus.COMPLETED
+      },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            onboardingCompleted: true,
+            username: true,
+            avatarUrl: true,
+            bio: true,
+          }
+        },
+        members: {
+          where: { joinStatus: JoinStatus.APPROVED },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                avatarUrl: true,
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // TODO:
+    // When collaboration is completed:
+    // - create notifications (COLLABORATION_COMPLETED) for all approved members
+    // - enable participant ratings
+    // - schedule chat deletion (7 days)
+
+    // Format members to match CollaborationResponse structure
+    const formattedMembers = updated.members.map((m: any) => ({
+      id: m.user.id,
+      name: m.user.name,
+      username: m.user.username,
+      avatarUrl: m.user.avatarUrl,
+    }));
+
+    return res.status(200).json({
+      success: true,
+      collaboration: {
+        id: updated.id,
+        title: updated.title,
+        description: updated.description,
+        fromLocation: {
+          name: updated.fromLocationName,
+          lat: updated.fromLat,
+          lng: updated.fromLng,
+        },
+        toLocation: {
+          name: updated.toLocationName,
+          lat: updated.toLat,
+          lng: updated.toLng,
+        },
+        scheduledAt: updated.scheduledAt.toISOString(),
+        maxMembers: updated.maxMembers,
+        status: updated.status,
+        creator: updated.creator,
+        category: updated.category,
+      },
+      members: formattedMembers,
+      currentMembers: approvedMembersCount,
+      isCreator: true,
+      myJoinStatus: JoinStatus.APPROVED,
+    });
+
+  } catch (error) {
+    logger.error('Error completing collaboration', { error });
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export { updateCollaborationController, deleteCollaborationController, completeCollaborationController };

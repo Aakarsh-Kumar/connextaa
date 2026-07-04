@@ -73,6 +73,13 @@ export const collaborationApi = {
     return response.data;
   },
 
+  completeCollaboration: async (id: string): Promise<CollaborationResponse> => {
+    const response = await api.patch<CollaborationResponse>(
+      `/collaborations/${id}/complete`
+    );
+    return response.data;
+  },
+
   deleteCollaboration: async (id: string): Promise<SuccessResponse> => {
     const response = await api.delete<SuccessResponse>(`/collaborations/${id}`);
     return response.data;

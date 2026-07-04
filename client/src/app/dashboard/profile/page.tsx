@@ -189,10 +189,7 @@ export default function ProfilePage() {
   };
 
   const handleMarkCompleted = async (id: string) => {
-      const response = await collaborationApi.updateCollaboration(id, {
-        status: "COMPLETED",
-      });
-
+    const response = await collaborationApi.completeCollaboration(id);
       setCollabs((prev) =>
         prev.map((c) =>
           c.id === id
@@ -203,7 +200,6 @@ export default function ProfilePage() {
             : c
         )
       );
-
       toast.success("Collaboration marked as completed!");
   };
 
