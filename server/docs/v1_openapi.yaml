@@ -717,9 +717,13 @@ components:
       properties:
         title:
           type: string
+          minLength: 3
+          maxLength: 40
 
         description:
           type: string
+          minLength: 10
+          maxLength: 250
 
         scheduledAt:
           type: string
@@ -727,6 +731,8 @@ components:
 
         maxMembers:
           type: integer
+          minimum: 2
+          maximum: 30
 
     JoinRequest:
       type: object

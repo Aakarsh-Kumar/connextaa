@@ -7,7 +7,7 @@ const updateCollaborationController = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
     const { id } = req.params as { id: string };
-    const { title, description, scheduledAt, maxMembers, status, fromLocation, toLocation } = req.body;
+    const { title, description, scheduledAt, maxMembers } = req.body;
 
     if (!userId) {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
@@ -30,21 +30,36 @@ const updateCollaborationController = async (req: Request, res: Response) => {
             username: true,
             avatarUrl: true,
             bio: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     if (!collaboration) {
-      return res.status(404).json({ success: false, message: 'Collaboration not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: 'Collaboration not found' });
     }
 
     if (collaboration.creatorId !== userId) {
-      return res.status(403).json({ success: false, message: 'Only the creator can update the collaboration' });
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: 'Only the creator can update the collaboration',
+        });
     }
 
-    if (collaboration.status === CollaborationStatus.COMPLETED || collaboration.status === CollaborationStatus.CANCELLED) {
-      return res.status(400).json({ success: false, message: 'Completed or cancelled collaborations cannot be edited' });
+    if (
+      collaboration.status === CollaborationStatus.COMPLETED ||
+      collaboration.status === CollaborationStatus.CANCELLED
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: 'Completed or cancelled collaborations cannot be edited',
+        });
     }
 
     // Get current approved members count
@@ -62,76 +77,69 @@ const updateCollaborationController = async (req: Request, res: Response) => {
         message: `Maximum members cannot be less than the current count of approved members (${approvedMembersCount})`,
       });
     }
+    if (scheduledAt !== undefined) {
+      const date = new Date(scheduledAt);
+
+      if (isNaN(date.getTime())) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid scheduled date',
+        });
+      }
+
+      if (date <= new Date()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Scheduled date must be in the future',
+        });
+      }
+    }
+
+    if (maxMembers !== undefined && maxMembers < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Maximum members must be at least 2.',
+      });
+    }
 
     // Perform database updates
-    const updated = await prisma.$transaction(async (tx) => {
-      // Build data object
-      const updateData: any = {};
-      if (title !== undefined) updateData.title = title;
-      if (description !== undefined) updateData.description = description;
-      if (scheduledAt !== undefined) updateData.scheduledAt = new Date(scheduledAt);
-      if (maxMembers !== undefined) updateData.maxMembers = maxMembers;
-      if (status !== undefined) updateData.status = status as CollaborationStatus;
+    // Build data object
+    const updateData: any = {};
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (scheduledAt !== undefined)
+      updateData.scheduledAt = new Date(scheduledAt);
+    if (maxMembers !== undefined) updateData.maxMembers = maxMembers;
 
-      if (fromLocation) {
-        updateData.fromLocationName = fromLocation.name;
-        if (fromLocation.lat !== undefined) updateData.fromLat = fromLocation.lat;
-        if (fromLocation.lng !== undefined) updateData.fromLng = fromLocation.lng;
-      }
-      if (toLocation) {
-        updateData.toLocationName = toLocation.name;
-        if (toLocation.lat !== undefined) updateData.toLat = toLocation.lat;
-        if (toLocation.lng !== undefined) updateData.toLng = toLocation.lng;
-      }
-
-      const collab = await tx.collaboration.update({
-        where: { id },
-        data: updateData,
-        include: {
-          creator: {
-            select: {
-              id: true,
-              email: true,
-              name: true,
-              onboardingCompleted: true,
-              username: true,
-              avatarUrl: true,
-              bio: true,
-            }
+    const updated = await prisma.collaboration.update({
+      where: { id },
+      data: updateData,
+      include: {
+        creator: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            onboardingCompleted: true,
+            username: true,
+            avatarUrl: true,
+            bio: true,
           },
-          members: {
-            where: { joinStatus: JoinStatus.APPROVED },
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  username: true,
-                  avatarUrl: true,
-                }
-              }
-            }
-          }
-        }
-      });
-
-      // Update PostGIS geography point columns if location changes
-      if (fromLocation && fromLocation.lng !== undefined && fromLocation.lat !== undefined) {
-        await tx.$executeRaw`
-          UPDATE collaborations
-          SET from_point = ST_SetSRID(ST_MakePoint(${fromLocation.lng}, ${fromLocation.lat}), 4326)::geography
-          WHERE id = ${id}
-        `;
-      }
-      if (toLocation && toLocation.lng !== undefined && toLocation.lat !== undefined) {
-        await tx.$executeRaw`
-          UPDATE collaborations
-          SET to_point = ST_SetSRID(ST_MakePoint(${toLocation.lng}, ${toLocation.lat}), 4326)::geography
-          WHERE id = ${id}
-        `;
-      }
-
-      return collab;
+        },
+        members: {
+          where: { joinStatus: JoinStatus.APPROVED },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     // Format members to match CollaborationResponse structure
@@ -169,17 +177,18 @@ const updateCollaborationController = async (req: Request, res: Response) => {
       isCreator: true,
       myJoinStatus: JoinStatus.APPROVED,
     });
-
   } catch (error) {
     logger.error('Error updating collaboration', { error });
-    return res.status(500).json({ success: false, message: 'Internal server error' });
+    return res
+      .status(500)
+      .json({ success: false, message: 'Internal server error' });
   }
 };
 
 const deleteCollaborationController = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
-    const { id } = req.params as {id:string};
+    const { id } = req.params as { id: string };
 
     if (!userId) {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
@@ -187,21 +196,31 @@ const deleteCollaborationController = async (req: Request, res: Response) => {
 
     const collaboration = await prisma.collaboration.findUnique({
       where: { id },
-      select: { creatorId: true, status: true }
+      select: { creatorId: true, status: true },
     });
 
     if (!collaboration) {
-      return res.status(404).json({ success: false, message: 'Collaboration not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: 'Collaboration not found' });
     }
 
     if (collaboration.creatorId !== userId) {
-      return res.status(403).json({ success: false, message: 'Only the creator can delete the collaboration' });
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: 'Only the creator can delete the collaboration',
+        });
     }
 
-    if (collaboration.status !== CollaborationStatus.OPEN && collaboration.status !== CollaborationStatus.FULL) {
+    if (
+      collaboration.status !== CollaborationStatus.OPEN &&
+      collaboration.status !== CollaborationStatus.FULL
+    ) {
       return res.status(400).json({
         success: false,
-        message: 'Only active collaborations can be cancelled.'
+        message: 'Only active collaborations can be cancelled.',
       });
     }
 
@@ -222,10 +241,11 @@ const deleteCollaborationController = async (req: Request, res: Response) => {
       success: true,
       message: 'Collaboration deleted successfully',
     });
-
   } catch (error) {
     logger.error('Error deleting collaboration', { error });
-    return res.status(500).json({ success: false, message: 'Internal server error' });
+    return res
+      .status(500)
+      .json({ success: false, message: 'Internal server error' });
   }
 };
 
@@ -263,24 +283,34 @@ const completeCollaborationController = async (req: Request, res: Response) => {
             username: true,
             avatarUrl: true,
             bio: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     if (!collaboration) {
-      return res.status(404).json({ success: false, message: 'Collaboration not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: 'Collaboration not found' });
     }
 
     if (collaboration.creatorId !== userId) {
-      return res.status(403).json({ success: false, message: 'Only the creator can complete the collaboration' });
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: 'Only the creator can complete the collaboration',
+        });
     }
 
     // 1. Explicit Status Validation
-    if (collaboration.status !== CollaborationStatus.OPEN && collaboration.status !== CollaborationStatus.FULL) {
+    if (
+      collaboration.status !== CollaborationStatus.OPEN &&
+      collaboration.status !== CollaborationStatus.FULL
+    ) {
       return res.status(400).json({
         success: false,
-        message: 'Only active collaborations can be completed.'
+        message: 'Only active collaborations can be completed.',
       });
     }
 
@@ -292,7 +322,7 @@ const completeCollaborationController = async (req: Request, res: Response) => {
     if (now < canCompleteAt) {
       return res.status(400).json({
         success: false,
-        message: 'This activity cannot be completed before it starts.'
+        message: 'This activity cannot be completed before it starts.',
       });
     }
 
@@ -300,14 +330,15 @@ const completeCollaborationController = async (req: Request, res: Response) => {
     const approvedMembersCount = await prisma.collaborationMember.count({
       where: {
         collaborationId: id,
-        joinStatus: JoinStatus.APPROVED
-      }
+        joinStatus: JoinStatus.APPROVED,
+      },
     });
 
     if (approvedMembersCount < 2) {
       return res.status(400).json({
         success: false,
-        message: 'At least one participant must join before completing the activity.'
+        message:
+          'At least one participant must join before completing the activity.',
       });
     }
 
@@ -315,7 +346,7 @@ const completeCollaborationController = async (req: Request, res: Response) => {
     const updated = await prisma.collaboration.update({
       where: { id },
       data: {
-        status: CollaborationStatus.COMPLETED
+        status: CollaborationStatus.COMPLETED,
       },
       include: {
         creator: {
@@ -327,7 +358,7 @@ const completeCollaborationController = async (req: Request, res: Response) => {
             username: true,
             avatarUrl: true,
             bio: true,
-          }
+          },
         },
         members: {
           where: { joinStatus: JoinStatus.APPROVED },
@@ -338,11 +369,11 @@ const completeCollaborationController = async (req: Request, res: Response) => {
                 name: true,
                 username: true,
                 avatarUrl: true,
-              }
-            }
-          }
-        }
-      }
+              },
+            },
+          },
+        },
+      },
     });
 
     // TODO:
@@ -386,11 +417,16 @@ const completeCollaborationController = async (req: Request, res: Response) => {
       isCreator: true,
       myJoinStatus: JoinStatus.APPROVED,
     });
-
   } catch (error) {
     logger.error('Error completing collaboration', { error });
-    return res.status(500).json({ success: false, message: 'Internal server error' });
+    return res
+      .status(500)
+      .json({ success: false, message: 'Internal server error' });
   }
 };
 
-export { updateCollaborationController, deleteCollaborationController, completeCollaborationController };
+export {
+  updateCollaborationController,
+  deleteCollaborationController,
+  completeCollaborationController,
+};

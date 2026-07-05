@@ -183,10 +183,10 @@ const CollaborationResponse = z
   .passthrough();
 const UpdateCollaborationRequest = z
   .object({
-    title: z.string(),
-    description: z.string(),
+    title: z.string().min(3).max(40),
+    description: z.string().min(10).max(250),
     scheduledAt: z.string().datetime({ offset: true }),
-    maxMembers: z.number().int(),
+    maxMembers: z.number().int().gte(2).lte(30),
   })
   .partial()
   .passthrough();
