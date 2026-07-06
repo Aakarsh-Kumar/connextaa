@@ -1049,7 +1049,7 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    page?: number;
+                    cursor?: string;
                     limit?: number;
                 };
                 header?: never;
@@ -1270,6 +1270,8 @@ export interface components {
         CollaborationStatus: "OPEN" | "FULL" | "COMPLETED" | "CANCELLED";
         /** @enum {string} */
         JoinStatus: "PENDING" | "APPROVED" | "REJECTED" | "LEFT";
+        /** @enum {string} */
+        NotificationType: "JOIN_REQUEST" | "JOIN_APPROVED" | "JOIN_REJECTED" | "CHAT_CREATED" | "NEW_MESSAGE" | "COLLABORATION_COMPLETED" | "COLLABORATION_CANCELLED";
         User: {
             /** Format: uuid */
             id: string;
@@ -1341,13 +1343,15 @@ export interface components {
             sender?: components["schemas"]["User"];
         };
         Notification: {
-            id?: string;
-            type?: string;
-            title?: string;
-            body?: string;
-            isRead?: boolean;
+            /** Format: uuid */
+            id: string;
+            type: components["schemas"]["NotificationType"];
+            title: string;
+            body: string;
+            referenceId: string;
+            isRead: boolean;
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
         };
         GoogleAuthRequest: {
             idToken: string;
@@ -1437,8 +1441,9 @@ export interface components {
             data?: components["schemas"]["Message"][];
         };
         NotificationsResponse: {
-            success?: boolean;
-            data?: components["schemas"]["Notification"][];
+            success: boolean;
+            data: components["schemas"]["Notification"][];
+            nextCursor: string | null;
         };
     };
     responses: never;

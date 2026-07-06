@@ -6,10 +6,17 @@ import {
   Flame,
   Compass,
   MoreHorizontal,
+  PartyPopper,
+  Ban,
+  Users,
+  CheckCircle,
+  XCircle,
+  MessageSquare,
+  MessageCircle,
   type LucideIcon,
 } from "lucide-react";
 
-import type { Category } from "@/types";
+import type { Category, NotificationType } from "@/types";
 
 export interface CategoryCard {
   id: Category;
@@ -85,3 +92,87 @@ export const getCategoryStyles = (id?: Category) =>
 
 export const getCategoryIcon = (id?: Category): LucideIcon =>
   CATEGORIES.find((c) => c.id === id)?.icon ?? MoreHorizontal;
+
+// ─── Notification type config ───────────────────────────────────────────────
+
+interface NotificationConfig {
+  icon: React.ElementType;
+  iconBg: string;
+  iconColor: string;
+  cardBg: string;
+  cardBorder: string;
+  actionLabel: string;
+  getRedirectPath: (referenceId: string) => string;
+}
+
+export const NOTIFICATION_CONFIG: Record<NotificationType, NotificationConfig> = {
+  JOIN_REQUEST: {
+    icon: Users,
+    iconBg: "bg-[var(--primary)]/10",
+    iconColor: "text-[var(--primary)]",
+    cardBg: "bg-[var(--surface-container-low)]",
+    cardBorder: "border-[var(--primary)]/20",
+    actionLabel: "Review Request",
+    getRedirectPath: (referenceId) =>
+      `/dashboard/chats/requests`,
+  },
+  JOIN_APPROVED: {
+    icon: CheckCircle,
+    iconBg: "bg-emerald-50",
+    iconColor: "text-emerald-600",
+    cardBg: "bg-emerald-50/40",
+    cardBorder: "border-emerald-200/60",
+    actionLabel: "View Collaboration",
+    getRedirectPath: (referenceId) =>
+      `/dashboard/collaborations/${referenceId}`,
+  },
+  JOIN_REJECTED: {
+    icon: XCircle,
+    iconBg: "bg-red-50",
+    iconColor: "text-red-500",
+    cardBg: "bg-red-50/30",
+    cardBorder: "border-red-200/50",
+    actionLabel: "Browse Activities",
+    getRedirectPath: () => `/dashboard`,
+  },
+  CHAT_CREATED: {
+    icon: MessageCircle,
+    iconBg: "bg-violet-50",
+    iconColor: "text-violet-600",
+    cardBg: "bg-violet-50/30",
+    cardBorder: "border-violet-200/50",
+    actionLabel: "Open Chat",
+    getRedirectPath: (referenceId) =>
+      `/dashboard/chats/chat/${referenceId}`,
+  },
+  NEW_MESSAGE: {
+    icon: MessageSquare,
+    iconBg: "bg-[var(--surface-container-high)]",
+    iconColor: "text-[var(--on-surface-variant)]",
+    cardBg: "bg-[var(--card)]",
+    cardBorder: "border-[var(--border)]",
+    actionLabel: "Open Chat",
+    getRedirectPath: (referenceId) =>
+      `/dashboard/chats/chat/${referenceId}`,
+  },
+  COLLABORATION_COMPLETED: {
+    icon: PartyPopper,
+    iconBg: "bg-[var(--secondary)]/10",
+    iconColor: "text-[var(--secondary)]",
+    cardBg: "bg-orange-50/40",
+    cardBorder: "border-orange-200/50",
+    actionLabel: "Rate Participants",
+    getRedirectPath: (referenceId) =>
+      `/dashboard/collaborations/${referenceId}`,
+  },
+  COLLABORATION_CANCELLED: {
+    icon: Ban,
+    iconBg: "bg-slate-100",
+    iconColor: "text-slate-500",
+    cardBg: "bg-slate-50/50",
+    cardBorder: "border-slate-200/50",
+    actionLabel: "View Details",
+    getRedirectPath: (referenceId) =>
+      `/dashboard/collaborations/${referenceId}`,
+  },
+};

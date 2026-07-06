@@ -275,20 +275,32 @@ const SubmitRatingRequest = z
     comment: z.string().optional(),
   })
   .passthrough();
+const NotificationType = z.enum([
+  'JOIN_REQUEST',
+  'JOIN_APPROVED',
+  'JOIN_REJECTED',
+  'CHAT_CREATED',
+  'NEW_MESSAGE',
+  'COLLABORATION_COMPLETED',
+  'COLLABORATION_CANCELLED',
+]);
 const Notification = z
   .object({
-    id: z.string(),
-    type: z.string(),
+    id: z.string().uuid(),
+    type: NotificationType,
     title: z.string(),
     body: z.string(),
+    referenceId: z.string(),
     isRead: z.boolean(),
     createdAt: z.string().datetime({ offset: true }),
   })
-  .partial()
   .passthrough();
 const NotificationsResponse = z
-  .object({ success: z.boolean(), data: z.array(Notification) })
-  .partial()
+  .object({
+    success: z.boolean(),
+    data: z.array(Notification),
+    nextCursor: z.string().nullable(),
+  })
   .passthrough();
 
 export const schemas = {
@@ -321,6 +333,7 @@ export const schemas = {
   MessagesResponse,
   SendMessageRequest,
   SubmitRatingRequest,
+  NotificationType,
   Notification,
   NotificationsResponse,
 };
@@ -703,9 +716,9 @@ const endpoints = makeApi([
     requestFormat: 'json',
     parameters: [
       {
-        name: 'page',
+        name: 'cursor',
         type: 'Query',
-        schema: z.number().int().optional().default(1),
+        schema: z.string().optional(),
       },
       {
         name: 'limit',

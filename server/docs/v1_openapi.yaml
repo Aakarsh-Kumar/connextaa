@@ -324,6 +324,18 @@ components:
         - REJECTED
         - LEFT
 
+    NotificationType:
+      type: string
+
+      enum:
+        - JOIN_REQUEST
+        - JOIN_APPROVED
+        - JOIN_REJECTED
+        - CHAT_CREATED
+        - NEW_MESSAGE
+        - COLLABORATION_COMPLETED
+        - COLLABORATION_CANCELLED
+        
     #################################################
     # USER
     #################################################
@@ -596,14 +608,18 @@ components:
       properties:
         id:
           type: string
+          format: uuid
 
         type:
-          type: string
+          $ref: "#/components/schemas/NotificationType"
 
         title:
           type: string
 
         body:
+          type: string
+
+        referenceId:
           type: string
 
         isRead:
@@ -612,6 +628,15 @@ components:
         createdAt:
           type: string
           format: date-time
+      
+      required:
+        - id
+        - type
+        - title
+        - body
+        - referenceId
+        - isRead
+        - createdAt
 
     #################################################
     # REQUEST DTOs
@@ -945,6 +970,14 @@ components:
 
           items:
             $ref: "#/components/schemas/Notification"
+        nextCursor:
+          type: string
+          nullable: true
+
+      required:
+        - success
+        - data
+        - nextCursor
 
 paths:
   #################################################
@@ -1779,13 +1812,12 @@ paths:
       summary: Get Notifications
 
       parameters:
-        - name: page
+        - name: cursor
 
           in: query
 
           schema:
-            type: integer
-            default: 1
+            type: string
 
         - name: limit
 
