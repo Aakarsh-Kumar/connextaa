@@ -730,6 +730,13 @@ const endpoints = makeApi([
     response: SuccessResponse,
   },
   {
+    method: 'post',
+    path: '/notifications/device-token',
+    alias: 'postNotificationsdeviceToken',
+    requestFormat: 'json',
+    response: z.void(),
+  },
+  {
     method: 'patch',
     path: '/notifications/read-all',
     alias: 'patchNotificationsreadAll',

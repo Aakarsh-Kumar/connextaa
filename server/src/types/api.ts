@@ -1151,6 +1151,32 @@ export interface paths {
         };
         trace?: never;
     };
+    "/notifications/device-token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register Device Token for Push Notifications */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: never;
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1394,6 +1420,12 @@ export interface components {
             safeRating: number;
             collaborativeRating: number;
             comment?: string;
+        };
+        DeviceTokenRequest: {
+            /** @example <string> */
+            deviceToken: string;
+            /** @example <string> */
+            platform: string;
         };
         AuthResponse: {
             success: boolean;
