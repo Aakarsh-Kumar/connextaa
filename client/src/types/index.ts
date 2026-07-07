@@ -23,4 +23,6 @@ export type SendMessageRequest = components["schemas"]["SendMessageRequest"];
 export type MessagesResponse = components["schemas"]["MessagesResponse"];
 
 export type CollaborationResponse = components["schemas"]["CollaborationResponse"]
-
+export type Notification = components["schemas"]["Notification"]
+export type NotificationsResponse = components["schemas"]["NotificationsResponse"]
+export type NotificationType = components["schemas"]["NotificationType"]
