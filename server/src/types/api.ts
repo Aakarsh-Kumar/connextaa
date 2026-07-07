@@ -1168,7 +1168,11 @@ export interface paths {
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["DeviceTokenRequest"];
+                };
+            };
             responses: never;
         };
         delete?: never;

@@ -1902,7 +1902,7 @@ paths:
 
       summary: Register Device Token for Push Notifications
 
-      requestbody:
+      requestBody:
         required: true
 
         content:

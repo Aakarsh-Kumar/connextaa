@@ -302,6 +302,9 @@ const NotificationsResponse = z
     nextCursor: z.string().nullable(),
   })
   .passthrough();
+const DeviceTokenRequest = z
+  .object({ deviceToken: z.string(), platform: z.string() })
+  .passthrough();
 
 export const schemas = {
   GoogleAuthRequest,
@@ -336,6 +339,7 @@ export const schemas = {
   NotificationType,
   Notification,
   NotificationsResponse,
+  DeviceTokenRequest,
 };
 
 const endpoints = makeApi([
@@ -747,6 +751,13 @@ const endpoints = makeApi([
     path: '/notifications/device-token',
     alias: 'postNotificationsdeviceToken',
     requestFormat: 'json',
+    parameters: [
+      {
+        name: 'body',
+        type: 'Body',
+        schema: DeviceTokenRequest,
+      },
+    ],
     response: z.void(),
   },
   {
