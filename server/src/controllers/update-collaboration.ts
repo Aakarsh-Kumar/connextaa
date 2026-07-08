@@ -77,23 +77,6 @@ const updateCollaborationController = async (req: Request, res: Response) => {
         message: `Maximum members cannot be less than the current count of approved members (${approvedMembersCount})`,
       });
     }
-    if (scheduledAt !== undefined) {
-      const date = new Date(scheduledAt);
-
-      if (isNaN(date.getTime())) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid scheduled date',
-        });
-      }
-
-      if (date <= new Date()) {
-        return res.status(400).json({
-          success: false,
-          message: 'Scheduled date must be in the future',
-        });
-      }
-    }
 
     if (maxMembers !== undefined && maxMembers < 2) {
       return res.status(400).json({

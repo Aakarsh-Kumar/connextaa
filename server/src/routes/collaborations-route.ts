@@ -90,6 +90,7 @@ router.patch('/:id',
     isAuthenticated,
     isOnboarded,
     validate(schemas.UpdateCollaborationRequest),
+    validateTime,
     validateResponse(schemas.CollaborationResponse),
     updateCollaborationController,
 );

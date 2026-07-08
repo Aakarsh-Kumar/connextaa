@@ -23,7 +23,7 @@ const features = [
   {
     icon: Lock,
     title: "Secure Group Chats",
-    desc: "Coordinate safely within our encrypted messaging platform.",
+    desc: "Coordinate safely within our messaging platform.",
   },
 ];
 
