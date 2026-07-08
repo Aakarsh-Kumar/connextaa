@@ -821,6 +821,24 @@ components:
         comment:
           type: string
 
+    DeviceTokenRequest:
+      type: object
+
+      required:
+        - deviceToken
+        - platform
+
+      properties:
+        deviceToken: 
+          type: string
+          maxLength: 500
+          example: "<string>"
+
+        platform:
+          type: string
+          maxLength: 50
+          example: "<string>"
+
     #################################################
     # RESPONSE DTOs
     #################################################
@@ -1878,3 +1896,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SuccessResponse"
+
+  /notifications/device-token:
+    post:
+      tags:
+        - Notifications
+
+      summary: Register Device Token for Push Notifications
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviceTokenRequest"
+                
+        responses:
+          "200":
+            description: Device Token Received
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+

@@ -15,7 +15,7 @@ import UserRoutes from './routes/user-route';
 import CollaborationRoutes from './routes/collaborations-route';
 import './types';
 import ChatRoutes from './routes/chat-route';
-
+import NotificationRoutes from './routes/notification-route'
 const app = express();
 
 // Configure Express to trust proxy headers
@@ -131,7 +131,7 @@ app.use(`/api/${config.apiVersion}/users`, UserRoutes);
 app.use(`/api/${config.apiVersion}/collaborations`, CollaborationRoutes);
 
 app.use(`/api/${config.apiVersion}/chat`, ChatRoutes);
-
+app.use(`/api/${config.apiVersion}/notifications`, NotificationRoutes);
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
