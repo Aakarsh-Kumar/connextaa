@@ -303,7 +303,7 @@ const NotificationsResponse = z
   })
   .passthrough();
 const DeviceTokenRequest = z
-  .object({ deviceToken: z.string(), platform: z.string() })
+  .object({ deviceToken: z.string().max(500), platform: z.string().max(50) })
   .passthrough();
 
 export const schemas = {

@@ -831,10 +831,12 @@ components:
       properties:
         deviceToken: 
           type: string
+          maxLength: 500
           example: "<string>"
 
         platform:
           type: string
+          maxLength: 50
           example: "<string>"
 
     #################################################
@@ -1918,7 +1920,5 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SuccessResponse"
-            
 
 
-        
