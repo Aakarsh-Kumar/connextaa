@@ -19,6 +19,7 @@ const getRoomsController = async (req: Request, res: Response) => {
                     in: [
                         CollaborationStatus.OPEN,
                         CollaborationStatus.FULL,
+                        CollaborationStatus.COMPLETED,
                     ],
                 },
                 deletedAt: null,
@@ -31,6 +32,7 @@ const getRoomsController = async (req: Request, res: Response) => {
                     title: true,
                     category: true,
                     scheduledAt: true,
+                    status: true,
                     members: {
                         where: {
                             joinStatus: JoinStatus.APPROVED,
@@ -60,8 +62,21 @@ const getRoomsController = async (req: Request, res: Response) => {
         },
     });
 
-    const data = rooms.map((room) => {
+    const data = await Promise.all(rooms.map(async (room) => {
         const lastMsg = room.messages[0];
+        const approvedMembersCount = room.collaboration.members.length;
+        let remainingRatings = 0;
+
+        if (room.collaboration.status === CollaborationStatus.COMPLETED) {
+            const ratingsGiven = await prisma.rating.count({
+                where: {
+                    collaborationId: room.collaboration.id,
+                    reviewerId: req.user?.id,
+                },
+            });
+            remainingRatings = Math.max(0, approvedMembersCount - 1 - ratingsGiven);
+        }
+
         return {
             roomId: room.id,
             collaboration: {
@@ -71,11 +86,12 @@ const getRoomsController = async (req: Request, res: Response) => {
                 scheduledAt: room.collaboration.scheduledAt.toISOString(),
             },
             unreadCount: 0,
-            memberCount: room.collaboration.members.length,
+            memberCount: approvedMembersCount,
             lastMessage: lastMsg ? lastMsg.message : undefined,
             lastMessageSenderName: lastMsg ? lastMsg.sender.name : undefined,
+            remainingRatings,
         };
-    });
+    }));
     
     return res.status(200).json({
         success: true,
@@ -282,4 +298,101 @@ const sendMessageController = async (req: Request, res: Response) => {
   }
 };
 
-export { getRoomsController, getMessagesController, sendMessageController };
+const getSingleRoomController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const roomId = req.params.id as string;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const room = await prisma.chatRoom.findUnique({
+      where: { id: roomId },
+      include: {
+        collaboration: {
+          select: {
+            id: true,
+            title: true,
+            category: true,
+            scheduledAt: true,
+            status: true,
+            members: {
+              where: {
+                joinStatus: JoinStatus.APPROVED,
+              },
+              select: {
+                userId: true,
+              },
+            },
+          },
+        },
+        messages: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 1,
+          include: {
+            sender: {
+              select: {
+                id: true,
+                name: true,
+                avatarUrl: true,
+                username: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!room) {
+      return res.status(404).json({ success: false, message: 'Chat room not found' });
+    }
+
+    // Check if current user is an approved member of this room
+    const isApprovedMember = room.collaboration.members.some(m => m.userId === userId);
+    if (!isApprovedMember) {
+      return res.status(403).json({ success: false, message: 'You are not a member of this chat room' });
+    }
+
+    const approvedMembersCount = room.collaboration.members.length;
+    let remainingRatings = 0;
+
+    if (room.collaboration.status === CollaborationStatus.COMPLETED) {
+      const ratingsGiven = await prisma.rating.count({
+        where: {
+          collaborationId: room.collaboration.id,
+          reviewerId: userId,
+        },
+      });
+      remainingRatings = Math.max(0, approvedMembersCount - 1 - ratingsGiven);
+    }
+
+    const lastMsg = room.messages[0];
+    const data = {
+      roomId: room.id,
+      collaboration: {
+        id: room.collaboration.id,
+        title: room.collaboration.title,
+        category: room.collaboration.category,
+        scheduledAt: room.collaboration.scheduledAt.toISOString(),
+      },
+      unreadCount: 0,
+      memberCount: approvedMembersCount,
+      lastMessage: lastMsg ? lastMsg.message : undefined,
+      lastMessageSenderName: lastMsg ? lastMsg.sender.name : undefined,
+      remainingRatings,
+    };
+
+    return res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    logger.error('Error fetching chat room', { error });
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export { getRoomsController, getMessagesController, sendMessageController, getSingleRoomController };

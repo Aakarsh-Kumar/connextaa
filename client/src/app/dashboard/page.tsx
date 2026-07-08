@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/authStore";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { collaborationApi } from "@/features/collaboration/api/collaborationApi";
 import { profileApi } from "@/features/profile/api/profileApi";
-import { type Category, type CollaborationFeedItem } from "@/types";
+import { ratingsApi } from "@/features/ratings/api/ratingsApi";
+import { type Category, type CollaborationFeedItem, type PendingRatingItem } from "@/types";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { ActivityCard, SkeletonCard } from "@/components/dashboard/ActivityCard";
@@ -25,7 +27,11 @@ import {
   Compass,
   Plus,
   Map,
-  Loader2
+  Loader2,
+  Star,
+  ChevronRight,
+  Calendar,
+  Users,
 } from "lucide-react";
 import { getCategoryStyles, CATEGORIES } from "@/constants";
 
@@ -33,11 +39,13 @@ import { usePermissionStore } from "@/store/permissionStore";
 import { LocationFeatureGuard } from "@/components/dashboard/LocationFeatureGuard";
 import { InstallBanner } from "@/components/pwa/InstallBanner";
 
+
 const CATEG_ITEMS = [{ id: "ALL", name: "All", icon: null }, ...CATEGORIES];
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
   const isMobile = useIsMobile();
+  const router = useRouter();
   const locationPermission = usePermissionStore((state) => state.locationPermission);
 
   // Coordinates (default to SRM University)
@@ -80,6 +88,14 @@ export default function DashboardPage() {
   });
 
   const feed = feedData?.pages.flatMap((page) => page.data ?? []) ?? [];
+
+  // Pending ratings query
+  const { data: pendingRatingsData } = useQuery({
+    queryKey: ["pendingRatings"],
+    queryFn: ratingsApi.getPendingRatings,
+    staleTime: 30_000,
+  });
+  const pendingRatings: PendingRatingItem[] = pendingRatingsData?.pending ?? [];
 
   const observerRef = useRef<HTMLDivElement | null>(null);
 
@@ -218,6 +234,53 @@ export default function DashboardPage() {
           Find something interesting nearby today.
         </p>
       </header>
+
+      {/* ── Pending Ratings Card ────────────────────────────────────────── */}
+      {pendingRatings.length > 0 && (
+        <section className="bg-gradient-to-br from-[var(--primary)]/8 via-[var(--secondary)]/5 to-transparent border border-[var(--primary)]/20 rounded-2xl p-5 shadow-sm space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[var(--secondary)]/15 flex items-center justify-center shrink-0">
+              <Star className="w-5 h-5 text-[var(--secondary)] fill-[var(--secondary)]" />
+            </div>
+            <div>
+              <h2 className="font-bold text-[var(--on-surface)] text-base">Pending Ratings</h2>
+              <p className="text-xs text-[var(--on-surface-variant)] mt-0.5">
+                You still have feedback to submit for completed activities.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {pendingRatings.map((item) => (
+              <div
+                key={item.collaborationId}
+                className="bg-[var(--card)] rounded-xl p-4 border border-[var(--outline-variant)]/30 flex items-center gap-3 shadow-xs"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-[var(--on-surface)] truncate">{item.title}</p>
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="flex items-center gap-1 text-xs text-[var(--outline)]">
+                      <Calendar className="w-3 h-3" />
+                      {new Date(item.completedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    </span>
+                    <span className="flex items-center gap-1 text-xs text-[var(--secondary)] font-semibold">
+                      <Users className="w-3 h-3" />
+                      {item.remainingRatings} remaining
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => router.push(`/dashboard/chats/chat/${item.chatRoomId}?rating=true`)}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-[var(--primary)] text-white rounded-xl text-xs font-bold transition-all hover:opacity-90 active:scale-95 shrink-0 shadow-sm"
+                >
+                  Rate Now
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <LocationFeatureGuard onLocationGranted={setCoords}>
         {/* Search & Filters Container */}

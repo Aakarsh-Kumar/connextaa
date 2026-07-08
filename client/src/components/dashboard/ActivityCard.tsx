@@ -87,6 +87,7 @@ export function ActivityCard({
     ? "Request Seat"
     : "Join Activity";
   const [isLocationExpanded, setIsLocationExpanded] = useState(false);
+  console.log(activity, 'activity');
   return (
     <article className="bg-[var(--card)] rounded-2xl p-6 shadow-[0px_4px_20px_rgba(31,41,55,0.05)] hover:shadow-[0px_6px_30px_rgba(31,41,55,0.1)] transition-all border border-[var(--surface-container-high)] flex flex-col gap-4 w-full">
       <div className="flex justify-between items-center">

@@ -4,11 +4,17 @@ import {
   MessagesResponse,
   Message,
   SendMessageRequest,
+  SingleChatRoomResponse
 } from "@/types";
 
 export const chatApi = {
   getChatRooms: async (): Promise<ChatRoomsResponse> => {
     const response = await api.get<ChatRoomsResponse>("/chat/rooms");
+    return response.data;
+  },
+
+  getChatRoom: async (roomId: string): Promise<SingleChatRoomResponse> => {
+    const response = await api.get<SingleChatRoomResponse>(`/chat/rooms/${roomId}`);
     return response.data;
   },
 

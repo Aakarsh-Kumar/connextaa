@@ -913,6 +913,53 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/chat/rooms/{roomId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Single Room */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    roomId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Single Room */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SingleChatRoomResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/chat/rooms/{roomId}/messages": {
         parameters: {
             query?: never;
@@ -1032,6 +1079,116 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ratings/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Pending Ratings */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Pending Ratings */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PendingRatingsResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ratings/{collaborationId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Rating Queue for Collaboration */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    collaborationId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Rating Queue */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RatingQueueResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Collaboration Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1364,6 +1521,7 @@ export interface components {
             lastMessage: string;
             memberCount: number;
             lastMessageSenderName: string;
+            remainingRatings: number;
         };
         Message: {
             id?: string;
@@ -1371,6 +1529,19 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
             sender?: components["schemas"]["User"];
+        };
+        PendingRatingItem: {
+            collaborationId: string;
+            chatRoomId: string;
+            title: string;
+            completedAt: string;
+            remainingRatings: number;
+        };
+        RatingQueueUser: {
+            id: string;
+            name: string;
+            username: string;
+            avatarUrl?: string | null;
         };
         Notification: {
             /** Format: uuid */
@@ -1472,6 +1643,10 @@ export interface components {
             success?: boolean;
             data?: components["schemas"]["ChatRoom"][];
         };
+        SingleChatRoomResponse: {
+            success: boolean;
+            data: components["schemas"]["ChatRoom"];
+        };
         MessagesResponse: {
             success?: boolean;
             data?: components["schemas"]["Message"][];
@@ -1480,6 +1655,13 @@ export interface components {
             success: boolean;
             data: components["schemas"]["Notification"][];
             nextCursor: string | null;
+        };
+        PendingRatingsResponse: {
+            success: boolean;
+            pending: components["schemas"]["PendingRatingItem"][];
+        };
+        RatingQueueResponse: {
+            participants: components["schemas"]["RatingQueueUser"][];
         };
     };
     responses: never;

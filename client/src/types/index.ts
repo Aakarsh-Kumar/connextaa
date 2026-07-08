@@ -18,6 +18,7 @@ export type PendingJoinRequestsResponse = components["schemas"]["PendingJoinRequ
 
 export type ChatRoom = components["schemas"]["ChatRoom"];
 export type ChatRoomsResponse = components["schemas"]["ChatRoomsResponse"];
+export type SingleChatRoomResponse = components["schemas"]["SingleChatRoomResponse"]
 export type Message = components["schemas"]["Message"];
 export type SendMessageRequest = components["schemas"]["SendMessageRequest"];
 export type MessagesResponse = components["schemas"]["MessagesResponse"];
@@ -26,3 +27,9 @@ export type CollaborationResponse = components["schemas"]["CollaborationResponse
 export type Notification = components["schemas"]["Notification"]
 export type NotificationsResponse = components["schemas"]["NotificationsResponse"]
 export type NotificationType = components["schemas"]["NotificationType"]
+
+export type SubmitRatingRequest = components["schemas"]["SubmitRatingRequest"];
+export type PendingRatingItem = components["schemas"]["PendingRatingItem"];
+export type PendingRatingsResponse = components["schemas"]["PendingRatingsResponse"];
+export type RatingQueueUser = components["schemas"]["RatingQueueUser"];
+export type RatingQueueResponse = components["schemas"]["RatingQueueResponse"];

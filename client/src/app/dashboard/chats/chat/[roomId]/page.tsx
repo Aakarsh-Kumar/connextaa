@@ -4,7 +4,7 @@ import { use, useEffect, useRef, useState } from "react";
 import { useQuery, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuthStore } from "@/store/authStore";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { chatApi } from "@/features/chats/chatApi";
 import { collaborationApi } from "@/features/collaboration/api/collaborationApi";
 import { CATEGORIES, getCategoryStyles } from "@/constants";
@@ -26,6 +26,7 @@ import {
   Star,
 } from "lucide-react";
 import Link from "next/link";
+import { RatingFlowModal } from "@/components/chats/RatingFlowModal";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -70,6 +71,7 @@ const formatDate = (s?: string | null) => {
 export default function ChatRoomPage({ params }: PageProps) {
   const { roomId } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const isMobile = useIsMobile();
   const { user } = useAuthStore();
 
@@ -82,6 +84,7 @@ export default function ChatRoomPage({ params }: PageProps) {
   const [typingName, setTypingName] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [ratingFlowOpen, setRatingFlowOpen] = useState(false);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
@@ -171,6 +174,23 @@ export default function ChatRoomPage({ params }: PageProps) {
 
   const room = roomsData?.data?.find((r) => r.roomId === roomId);
   const collabId = room?.collaboration?.id;
+
+  // Fetch individual room details (includes remainingRatings)
+  const { data: roomDetailData, refetch: refetchRoomDetail } = useQuery({
+    queryKey: ["chatRoom", roomId],
+    queryFn: () => chatApi.getChatRoom(roomId),
+    staleTime: 10_000,
+  });
+
+  const remainingRatings: number = roomDetailData?.data?.remainingRatings ?? room?.remainingRatings ?? 0;
+  const needsRating = remainingRatings > 0;
+
+  // Auto-open rating flow if ?rating=true is present in URL
+  useEffect(() => {
+    if (searchParams.get("rating") === "true" && needsRating) {
+      setRatingFlowOpen(true);
+    }
+  }, [searchParams, needsRating]);
 
   const { data: collabData } = useQuery({
     queryKey: ["collab", collabId],
@@ -628,6 +648,27 @@ export default function ChatRoomPage({ params }: PageProps) {
         </div>
       )}
 
+      {/* ── Rating Banner ────────────────────────────────────────── */}
+      {needsRating && !ratingFlowOpen && (
+        <div className="mx-3 my-2 px-4 py-3 bg-gradient-to-r from-[var(--primary)]/10 via-[var(--secondary)]/8 to-[var(--primary)]/5 border border-[var(--primary)]/25 rounded-2xl flex items-center gap-3 shrink-0 shadow-sm">
+          <div className="w-8 h-8 rounded-xl bg-[var(--secondary)]/20 flex items-center justify-center shrink-0">
+            <Star className="w-4 h-4 text-[var(--secondary)] fill-[var(--secondary)]" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-[var(--on-surface)]">Rate Participants</p>
+            <p className="text-xs text-[var(--on-surface-variant)] truncate">
+              Help build a trusted community · {remainingRatings} participant{remainingRatings !== 1 ? "s" : ""} remaining
+            </p>
+          </div>
+          <button
+            onClick={() => setRatingFlowOpen(true)}
+            className="px-4 py-2 bg-[var(--primary)] text-white text-xs font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all shrink-0 shadow-sm"
+          >
+            Start Rating
+          </button>
+        </div>
+      )}
+
       {/* ── Messages Area ────────────────────────────────────────────────── */}
       <div
         ref={messagesAreaRef}
@@ -745,6 +786,18 @@ export default function ChatRoomPage({ params }: PageProps) {
           <Send className="w-4.5 h-4.5" />
         </button>
       </form>
+
+      {/* ── Rating Flow Modal ────────────────────────────────────────── */}
+      {ratingFlowOpen && collabId && (
+        <RatingFlowModal
+          collaborationId={collabId}
+          onClose={() => setRatingFlowOpen(false)}
+          onComplete={() => {
+            setRatingFlowOpen(false);
+            refetchRoomDetail();
+          }}
+        />
+      )}
     </div>
   );
 }

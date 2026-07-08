@@ -242,11 +242,15 @@ const ChatRoom = z
     lastMessage: z.string(),
     memberCount: z.number().int(),
     lastMessageSenderName: z.string(),
+    remainingRatings: z.number().int(),
   })
   .passthrough();
 const ChatRoomsResponse = z
   .object({ success: z.boolean(), data: z.array(ChatRoom) })
   .partial()
+  .passthrough();
+const SingleChatRoomResponse = z
+  .object({ success: z.boolean(), data: ChatRoom })
   .passthrough();
 const Message = z
   .object({
@@ -274,6 +278,29 @@ const SubmitRatingRequest = z
     collaborativeRating: z.number().int().gte(1).lte(5),
     comment: z.string().optional(),
   })
+  .passthrough();
+const PendingRatingItem = z
+  .object({
+    collaborationId: z.string(),
+    chatRoomId: z.string(),
+    title: z.string(),
+    completedAt: z.string(),
+    remainingRatings: z.number().int(),
+  })
+  .passthrough();
+const PendingRatingsResponse = z
+  .object({ success: z.boolean(), pending: z.array(PendingRatingItem) })
+  .passthrough();
+const RatingQueueUser = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    username: z.string(),
+    avatarUrl: z.string().nullish(),
+  })
+  .passthrough();
+const RatingQueueResponse = z
+  .object({ participants: z.array(RatingQueueUser) })
   .passthrough();
 const NotificationType = z.enum([
   'JOIN_REQUEST',
@@ -332,10 +359,15 @@ export const schemas = {
   PendingJoinRequestsResponse,
   ChatRoom,
   ChatRoomsResponse,
+  SingleChatRoomResponse,
   Message,
   MessagesResponse,
   SendMessageRequest,
   SubmitRatingRequest,
+  PendingRatingItem,
+  PendingRatingsResponse,
+  RatingQueueUser,
+  RatingQueueResponse,
   NotificationType,
   Notification,
   NotificationsResponse,
@@ -398,6 +430,27 @@ const endpoints = makeApi([
     alias: 'getChatrooms',
     requestFormat: 'json',
     response: ChatRoomsResponse,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: 'get',
+    path: '/chat/rooms/:roomId',
+    alias: 'getChatroomsRoomId',
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'roomId',
+        type: 'Path',
+        schema: z.string().uuid(),
+      },
+    ],
+    response: SingleChatRoomResponse,
     errors: [
       {
         status: 401,
@@ -815,6 +868,51 @@ const endpoints = makeApi([
       {
         status: 403,
         description: `Cannot Rate User`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: 'get',
+    path: '/ratings/:collaborationId',
+    alias: 'getRatingsCollaborationId',
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'collaborationId',
+        type: 'Path',
+        schema: z.string().uuid(),
+      },
+    ],
+    response: RatingQueueResponse,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: ErrorResponse,
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: ErrorResponse,
+      },
+      {
+        status: 404,
+        description: `Collaboration Not Found`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: 'get',
+    path: '/ratings/pending',
+    alias: 'getRatingspending',
+    requestFormat: 'json',
+    response: PendingRatingsResponse,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
         schema: ErrorResponse,
       },
     ],
