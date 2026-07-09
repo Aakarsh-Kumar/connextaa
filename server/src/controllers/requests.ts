@@ -195,6 +195,7 @@ const createJoinRequestController = async (
       success: true,
       message: "Join request submitted successfully",
     });
+    //notification jadu to be done here(convert into transaction(bcoz 2 database is being called extraction for consistency when operations are done in 2 or tables))
   } catch (error) {
     logger.error("createJoinRequestController error", {
       error,
