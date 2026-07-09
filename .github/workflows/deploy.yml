@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "server/**"
+      - ".github/workflows/deploy.yml"
 
 jobs:
   deploy:
@@ -37,7 +40,8 @@ jobs:
       - name: Build & Push Docker Image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./server
+          file: ./server/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
