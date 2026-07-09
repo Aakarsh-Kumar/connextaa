@@ -22,3 +22,6 @@ bun.lockb
 
 #typescript
 tsconfig.tsbuildinfo
+
+#oracle
+oracle/
