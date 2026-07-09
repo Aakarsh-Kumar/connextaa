@@ -13,8 +13,6 @@ import {
   Share2,
   Copy,
   Check,
-  ArrowRight,
-  MessageCircle,
 } from "lucide-react";
 
 import toast from "react-hot-toast";
@@ -28,20 +26,23 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
+import { useRouter } from "next/navigation";
+
 interface ActivityCardProps {
   activity: CollaborationFeedItem;
   pendingRequests: string[];
   onOpenJoin?: (act: CollaborationFeedItem) => void;
   isJoined?: boolean;
+  variant?: "collaboration" | "landing";
 }
 
 const formatDate = (dateString?: string) => {
 if (!dateString) return "Today";
 const date = new Date(dateString);
-return date.toLocaleDateString("en-US", {
+return date.toLocaleDateString("en-IN", {
     month: "short",
     day: "numeric",
-    year: "numeric",
+    year: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
 });
@@ -56,9 +57,11 @@ return `${km.toFixed(1)} km away`;
 export function ActivityCard({
   activity,
   pendingRequests,
+  variant="collaboration",
   onOpenJoin,
   isJoined = false,
 }: ActivityCardProps) {
+  const router = useRouter()
   const [isExpanded, setIsExpanded] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -204,10 +207,10 @@ export function ActivityCard({
             <Calendar className="w-4 h-4 shrink-0" />
             <span className="font-semibold">{formatDate(activity.scheduledAt)}</span>
           </div>
-          <div className="flex items-center gap-1 text-xs">
+          {variant !== "landing" && (<div className="flex items-center gap-1 text-xs">
             <Compass className="w-4 h-4 shrink-0" />
             <span className="font-semibold">{formatDistance(activity.distanceMeters)}</span>
-          </div>
+          </div>)}
         </div>
         <div className="flex items-center gap-1 text-[var(--primary)]">
           <Users className="w-4.5 h-4.5 shrink-0" />
@@ -218,7 +221,7 @@ export function ActivityCard({
       </div>
 
       {/* CTA Trigger — pinned to bottom */}
-      <button
+      {variant === "collaboration" ? (<button
         disabled={isJoined || isPending || activity.id === "preview"}
         onClick={() => onOpenJoin?.(activity)}
         className={`mt-auto w-full py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] shadow-sm text-sm cursor-pointer disabled:opacity-50 ${
@@ -231,7 +234,14 @@ export function ActivityCard({
         
       >
         {ctaText}
+      </button>):(
+        <button
+        onClick={() => router.push(`/dashboard/collaborations/${activity.id}`)}
+        className={`mt-auto w-full py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] shadow-sm text-sm cursor-pointer disabled:opacity-50 bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 `}
+      >
+        View Collaboration
       </button>
+      )}
 
       {/* Share Collaboration Dialog */}
      <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>

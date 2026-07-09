@@ -9,6 +9,7 @@ import logger from './utils/logger';
 import { extractClientIP, isPrivateOrLocalIP } from './utils/ipUtils';
 import HealthRoutes from './routes/health';
 import SampleRoutes from './routes/sample-route';
+import LandingRoutes from './routes/landing-route';
 import AuthRoutes from './routes/auth-route';
 import OnboardingRoutes from './routes/onboarding-route';
 import UserRoutes from './routes/user-route';
@@ -124,6 +125,8 @@ app.get('/', (req, res) => {
 app.use('/api/health', HealthRoutes);
 // Sample route
 app.use('/api/sample', SampleRoutes);
+
+app.use(`/api/${config.apiVersion}/landing`, LandingRoutes);
 
 app.use(`/api/${config.apiVersion}/auth`, AuthRoutes);
 app.use(`/api/${config.apiVersion}/onboarding`, OnboardingRoutes);
