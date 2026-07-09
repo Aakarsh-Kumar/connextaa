@@ -1,0 +1,16 @@
+services:
+  backend:
+
+    build: .
+
+    image: connectify-api:latest
+
+    container_name: connectify-api
+
+    env_file:
+      - .env
+
+    ports:
+      - "8080:8080"
+
+    restart: unless-stopped
