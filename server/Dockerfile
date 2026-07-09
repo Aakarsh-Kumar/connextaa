@@ -36,7 +36,7 @@ FROM deps AS build
 COPY . .
 
 # Generate Prisma Client
-RUN npx prisma generate --schema=prisma/v1.schema.prisma
+RUN npx prisma generate --config=src/prisma.config.ts
 
 # Compile TypeScript
 RUN npm run build

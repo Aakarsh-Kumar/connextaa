@@ -63,7 +63,7 @@ export default function DashboardPage() {
     { label: "25km+", value: 9999 },
   ];
 
-  const [radius, setRadius] = useState(10);
+  const [radius, setRadius] = useState(9999);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
 
   const {
