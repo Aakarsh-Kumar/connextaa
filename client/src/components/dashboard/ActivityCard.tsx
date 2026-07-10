@@ -25,6 +25,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import { useRouter } from "next/navigation";
 
@@ -51,7 +52,7 @@ return date.toLocaleDateString("en-IN", {
 const formatDistance = (meters?: number | null) => {
 if (meters === undefined || meters === null) return "0.0 km";
 const km = meters / 1000;
-return `${km.toFixed(1)} km away`;
+return `${km.toFixed(1)} km`;
 };
 
 export function ActivityCard({
@@ -70,6 +71,8 @@ export function ActivityCard({
   const CategoryIcon = CATEGORIES.find((c) => c.id === activity.category)?.icon ?? Compass;
 
   const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/dashboard/collaborations/${activity.id}` : "";
+
+  const isMobile = useIsMobile();
 
   const handleCopyLink = async () => {
     try {
@@ -209,13 +212,13 @@ export function ActivityCard({
           </div>
           {variant !== "landing" && (<div className="flex items-center gap-1 text-xs">
             <Compass className="w-4 h-4 shrink-0" />
-            <span className="font-semibold">{formatDistance(activity.distanceMeters)}</span>
+            <span className="font-semibold">{formatDistance(activity.distanceMeters)} {!isMobile && "away"}</span>
           </div>)}
         </div>
         <div className="flex items-center gap-1 text-[var(--primary)]">
           <Users className="w-4.5 h-4.5 shrink-0" />
           <span className="text-label-md font-bold">
-            {activity.currentMembers || 1} / {activity.maxMembers || 5} Members
+            {activity.currentMembers || 1} / {activity.maxMembers || 5} {!isMobile && "Members"}
           </span>
         </div>
       </div>
