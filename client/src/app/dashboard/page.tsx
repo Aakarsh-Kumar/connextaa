@@ -442,7 +442,7 @@ export default function DashboardPage() {
 
       {/* Join Request Bottom Sheet Drawer */}
       <Sheet open={isJoinSheetOpen} onOpenChange={setIsJoinSheetOpen}>
-        <SheetContent side="bottom" className="p-6 pb-8 rounded-t-3xl border-t border-[var(--border)] max-w-lg mx-auto bg-[var(--card)]">
+        <SheetContent side="bottom" className="p-6 pb-20 md:pb-8 rounded-t-3xl border-t border-[var(--border)] max-w-lg mx-auto bg-[var(--card)]">
           <SheetHeader className="space-y-1">
             <SheetTitle className="text-xl font-bold font-headline-md text-[var(--foreground)]">
               Join Activity

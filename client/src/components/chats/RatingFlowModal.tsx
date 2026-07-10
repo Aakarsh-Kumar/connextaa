@@ -330,7 +330,7 @@ export function RatingFlowModal({ collaborationId, onClose, onComplete }: Rating
         </div>
 
         {/* Submit Button */}
-        <div className="px-6 pb-6 pt-2 shrink-0 border-t border-[var(--outline-variant)]/20">
+        <div className="px-6 pb-20 sm:pb-6 pt-2 shrink-0 border-t border-[var(--outline-variant)]/20">
           <button
             onClick={handleSubmit}
             disabled={!allRated || mutation.isPending}
