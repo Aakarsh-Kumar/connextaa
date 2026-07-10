@@ -780,7 +780,7 @@ export default function ChatRoomPage({ params }: PageProps) {
       {/* ── Composer ────────────────────────────────────────────────────── */}
       <form
         onSubmit={handleSend}
-        className="px-4 py-3 bg-[var(--card)] border-t border-[var(--outline-variant)]/30 flex items-center gap-3 shrink-0"
+        className="px-4 py-3 pb-4 md:pb-3 bg-[var(--card)] border-t border-[var(--outline-variant)]/30 flex items-center gap-3 shrink-0"
       >
         <input
           className="flex-1 bg-[var(--surface-container-low)] border-none rounded-full px-5 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all text-[var(--foreground)] placeholder:text-[var(--outline)]"

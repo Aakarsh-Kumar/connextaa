@@ -265,7 +265,7 @@ export default function DashboardPage() {
                     </span>
                     <span className="flex items-center gap-1 text-xs text-[var(--secondary)] font-semibold">
                       <Users className="w-3 h-3" />
-                      {item.remainingRatings} remaining
+                      {item.remainingRatings} {!isMobile&&"remaining"}
                     </span>
                   </div>
                 </div>
