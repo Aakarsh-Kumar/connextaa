@@ -91,29 +91,6 @@ export default function PublicProfilePage() {
         fetchProfile();
     }, [username,router]);
 
-    // const fetchCollabs = useCallback(async (cursor?: string) => {
-    //     if (!username) return;
-    //     try {
-    //         const data = await profileApi.getUserCollaborations(
-    //             username,
-    //             cursor,
-    //             coords?.lat,
-    //             coords?.lng
-    //         );
-    //         if (cursor) {
-    //             setCollabs((prev) => [...prev, ...(data.data ?? [])]);
-    //         } else {
-    //             setCollabs(data.data ?? []);
-    //         }
-    //         setNextCursor((data as any).nextCursor ?? null);
-    //     } catch {
-    //         // silently fail — collabs are not critical
-    //     } finally {
-    //         setCollabsLoading(false);
-    //         setLoadingMore(false);
-    //     }
-    // }, [username, coords]);
-
     useEffect(() => {
         if (!username) return;
 

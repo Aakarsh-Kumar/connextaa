@@ -119,7 +119,7 @@ export function ActivityCard({
         </div>
       </div>
 
-      {/* Title — always fully visible, no clamp */}
+      {/* Title always fully visible, no clamp */}
       <h3 className="font-headline-md text-headline-md text-[var(--on-surface)] leading-tight break-words [overflow-wrap:anywhere]">
         {activity.title}
       </h3>

@@ -86,7 +86,6 @@ export function Navbar() {
 
         {/* ── Right: user + logout ── */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Notification bell (mobile only — desktop uses nav link) */}
           <Link
             href="/dashboard/notifications"
             className="md:hidden relative p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-all"

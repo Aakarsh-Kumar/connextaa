@@ -116,7 +116,6 @@ const userCollaborationsController = async (req: Request, res: Response) => {
         const userLat = req.query.lat ? Number(req.query.lat) : undefined;
         const userLng = req.query.lng ? Number(req.query.lng) : undefined;
 
-        // Optional: requesting user (may not be authenticated — public endpoint)
         const viewerId = req.user?.id;
 
         // Resolve the profile user by username

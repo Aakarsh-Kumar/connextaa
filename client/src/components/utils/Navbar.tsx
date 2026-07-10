@@ -21,10 +21,10 @@ export default function Navbar() {
   }
 
   React.useEffect(() => {
-    const sections = ["features", "categories", "how-it-works"];
+    const sections = ["categories", "how-it-works", "features", "safety"];
     const observerOptions = {
       root: null,
-      rootMargin: "-40% 0px -40% 0px", // Trigger when section occupies the middle part of the screen
+      rootMargin: "-35% 0px -45% 0px",
       threshold: 0,
     };
 
@@ -32,9 +32,10 @@ export default function Navbar() {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const id = entry.target.getAttribute("id");
-          if (id === "features") setActiveTab("Features");
           if (id === "categories") setActiveTab("Categories");
           if (id === "how-it-works") setActiveTab("How It Works");
+          if (id === "features") setActiveTab("Features");
+          if (id === "safety") setActiveTab("Safety");
         }
       });
     }, observerOptions);
@@ -53,9 +54,10 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: "Features", href: "#features" },
-    { name: "Categories", href: "#categories" },
-    { name: "How It Works", href: "#how-it-works" },
+    { name: "Categories", href: "/#categories" },
+    { name: "How It Works", href: "/#how-it-works" },
+    { name: "Features", href: "/#features" },
+    { name: "Safety", href: "/#safety" },
   ];
 
   return (
@@ -66,7 +68,7 @@ export default function Navbar() {
         {/* 💡 h-full sets constraints, max-w prevents stretching, flex-shrink-0 keeps it from collapsing */}
         <Link
           href="/"
-          className="relative h-12 w-10 md:w-40 flex-shrink-0 flex items-center group"
+          className="relative h-12 w-10 md:w-40 shrink-0 flex items-center group"
         >
           <Image
             alt="Connectify Logo"
@@ -87,7 +89,7 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 onClick={() => setActiveTab(link.name)}
-                className={`text-sm tracking-[0.05em] py-1 border-b-2 transition-all duration-200 ${
+                className={`text-sm tracking-wider py-1 border-b-2 transition-all duration-200 ${
                   isActive
                     ? "text-popover border-popover font-bold"
                     : "text-foreground/80 font-semibold border-transparent hover:text-popover hover:border-popover/30"
@@ -100,11 +102,11 @@ export default function Navbar() {
         </div>
 
         {/* Action Button & Mobile Menu Toggle */}
-        <div className="flex items-center gap-4 flex-shrink-0">
+        <div className="flex items-center gap-4 shrink-0">
             {useAuthStore((state) => state.isAuthenticated) ? (
                 <Link
                 href="/dashboard"
-                className={`bg-popover text-primary-foreground py-2.5 rounded-[999px] ${isMobile ? "text-xs px-2.5" : "text-sm px-6"} font-semibold tracking-[0.05em] active:scale-95 hover:bg-primary/90 transition-all cursor-pointer shadow-sm`}
+          className={`bg-popover text-primary-foreground py-2.5 rounded-[999px] ${isMobile ? "text-xs px-2.5" : "text-sm px-6"} font-semibold tracking-wider active:scale-95 hover:bg-primary/90 transition-all cursor-pointer shadow-sm`}
                 >
                 Go to Dashboard
                 </Link>
@@ -141,7 +143,7 @@ export default function Navbar() {
                     setActiveTab(link.name);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`text-base tracking-[0.05em] py-2 px-3 rounded-xl transition-all duration-150 ${
+                  className={`text-base tracking-wider py-2 px-3 rounded-xl transition-all duration-150 ${
                     isActive
                       ? "text-popover bg-primary/5 font-bold"
                       : "text-foreground/80 font-semibold hover:text-popover hover:bg-popover/5"
