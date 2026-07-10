@@ -396,7 +396,7 @@ export default function PublicProfilePage() {
 
         {/* ── Join Request Bottom Sheet ── */}
         <Sheet open={isJoinSheetOpen} onOpenChange={setIsJoinSheetOpen}>
-            <SheetContent side="bottom" className="p-6 pb-20 md:pb-8 rounded-t-3xl border-t border-[var(--border)] max-w-lg mx-auto bg-[var(--card)] max-h-[92dvh] overflow-y-auto">
+            <SheetContent side="bottom" className="p-6 pb-20 md:pb-8 rounded-t-3xl border-t border-[var(--border)] max-w-lg mx-auto bg-[var(--card)] max-h-[88dvh] overflow-y-auto">
             <SheetHeader className="space-y-1">
                 <SheetTitle className="text-xl font-bold font-headline-md text-[var(--foreground)]">
                 Join Activity
