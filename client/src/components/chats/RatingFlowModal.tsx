@@ -207,10 +207,10 @@ export function RatingFlowModal({ collaborationId, onClose, onComplete }: Rating
   // ── Rating Form ───────────────────────────────────────────────────────────────
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-sm overflow-hidden">
       <div
         className="bg-[var(--card)] w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 sm:fade-in sm:zoom-in-95 duration-300"
-        style={{ maxHeight: "95dvh" }}
+        style={{ maxHeight: "88dvh" }}
       >
         {/* Header */}
         <div className="px-6 pt-6 pb-4 flex items-center justify-between shrink-0">
