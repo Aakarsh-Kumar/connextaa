@@ -135,5 +135,30 @@ const updateMeProfileController = async (req: Request, res: Response) => {
     }
 };
 
+const usernameValidityController = async(req: Request, res: Response) =>{
+    const {username} = req.query;
+    console.log(username);
+    const userId = req.user?.id as string;
+    if (!username || !userId) {
+        res.status(400).json({
+            success: false,
+            message: "Username or userId is not valid",
+        });
+        return;
+    }
+    const response = await isValidUsername(username as string, userId)
+    if (response.success){
+        res.status(200).json({
+            success: true,
+            message: response.message,
+        });
+    }else{
+        res.status(200).json({
+            success: false,
+            message: response.message,
+        });
+    }
 
-export { updateMeProfileController };
+};
+
+export { updateMeProfileController, usernameValidityController };
