@@ -76,7 +76,7 @@ const AuthMeResponse = z
   .object({ success: z.boolean(), user: User })
   .passthrough();
 const SuccessResponse = z
-  .object({ success: z.boolean(), message: z.string().optional() })
+  .object({ success: z.boolean(), message: z.string() })
   .passthrough();
 const OnboardingRequest = z
   .object({
@@ -695,6 +695,25 @@ const endpoints = makeApi([
     parameters: [
       {
         name: 'id',
+        type: 'Path',
+        schema: z.string(),
+      },
+    ],
+    response: SuccessResponse,
+  },
+  {
+    method: 'delete',
+    path: '/collaborations/:id/member/:memberId',
+    alias: 'deleteCollaborationsIdmemberMemberId',
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'id',
+        type: 'Path',
+        schema: z.string(),
+      },
+      {
+        name: 'memberId',
         type: 'Path',
         schema: z.string(),
       },

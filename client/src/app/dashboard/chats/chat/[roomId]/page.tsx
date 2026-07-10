@@ -14,7 +14,6 @@ import { socket } from "@/services/socket";
 import {
   ArrowLeft,
   Info,
-  X,
   MapPin,
   Calendar,
   Users,
@@ -186,11 +185,11 @@ export default function ChatRoomPage({ params }: PageProps) {
   const needsRating = remainingRatings > 0;
 
   // Auto-open rating flow if ?rating=true is present in URL
-  useEffect(() => {
+
     if (searchParams.get("rating") === "true" && needsRating) {
       setRatingFlowOpen(true);
     }
-  }, [searchParams, needsRating]);
+
 
   const { data: collabData } = useQuery({
     queryKey: ["collab", collabId],
@@ -344,6 +343,14 @@ export default function ChatRoomPage({ params }: PageProps) {
     await collaborationApi.leaveCollaboration(collabId as string);
     router.push("/dashboard/chats");
   };
+
+  const handleMemberRemoval=async(memberId:string)=>{
+    const response = await collaborationApi.removeFromCollaboration(collabId!,memberId);
+      toast.success(response.message);
+      //re update the members list
+      queryClient.invalidateQueries({queryKey:["collab",collabId]});
+  }
+  
 
   // ── Derived ──────────────────────────────────────────────────────────────────
 
@@ -558,7 +565,7 @@ export default function ChatRoomPage({ params }: PageProps) {
               onClick={() => setMembersOpen(false)}
               className="text-[var(--outline)] hover:text-[var(--on-surface)] transition-colors p-1 rounded-full"
             >
-              <X className="w-4 h-4" />
+              <ChevronUp className="w-4 h-4" />
             </button>
           </div>
           <div className="space-y-2 overflow-y-auto max-h-44 pr-1">
@@ -582,7 +589,7 @@ export default function ChatRoomPage({ params }: PageProps) {
                   <p className="text-sm font-semibold text-[var(--on-surface)] truncate">{collab.creator.name}</p>
                   <p className="text-xs text-[var(--outline)]">@{collab.creator.username} · Creator</p>
                 </div>
-                <Star className="w-3.5 h-3.5 text-yellow-500 shrink-0" />
+                <Star className="w-4.5 h-4.5 text-yellow-500 shrink-0" />
               </Link>
             )}
             {/* Other members */}
@@ -607,12 +614,17 @@ export default function ChatRoomPage({ params }: PageProps) {
                     <p className="text-sm font-semibold text-[var(--on-surface)] truncate">{m.name}</p>
                     <p className="text-xs text-[var(--outline)]">@{m.username}</p>
                   </div>
+                  {user?.id === collab?.creator?.id && m.id !== user?.id && <LogOut className="w-4.5 h-4.5 text-red-500 shrink-0" onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleMemberRemoval(m.id);
+                  }} />}
                 </Link>
               ))}
             {/* Placeholder members when no API data yet */}
             {!collab && (
               <>
-                {["Aakarsh", "Sneha", "Rahul"].map((name) => (
+                {["Aakarsh", "Aarohi"].map((name) => (
                   <div key={name} className="flex items-center gap-3 p-2 rounded-xl">
                     <div className="w-9 h-9 rounded-full bg-[var(--surface-container)] flex items-center justify-center border border-[var(--border)]">
                       <User className="w-4 h-4 text-[var(--outline)]" />

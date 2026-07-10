@@ -51,6 +51,13 @@ export const collaborationApi = {
     return response.data;
   },
 
+  removeFromCollaboration: async(id:string, memberId:string): Promise<SuccessResponse>=>{
+    const response = await api.delete<SuccessResponse>(
+      `/collaborations/${id}/member/${memberId}`
+    );
+    return response.data;
+  },
+
   getCollaborationDetails: async (id: string): Promise<CollaborationResponse> => {
     const response = await api.get<CollaborationResponse>(`/collaborations/${id}`);
     return response.data;

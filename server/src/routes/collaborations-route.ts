@@ -5,7 +5,7 @@ import { validate, validateResponse } from '../middlewares/validate';
 import { schemas } from '../utils/zod';
 import isOnboarded from '../middlewares/onboardedCheck';
 import validateTime from '../middlewares/validateTime';
-import { getRequestsController, createJoinRequestController, approveJoinRequestController, rejectJoinRequestController, leaveRequestController } from '../controllers/requests';
+import { getRequestsController, createJoinRequestController, approveJoinRequestController, rejectJoinRequestController, leaveRequestController, removeMemberController } from '../controllers/requests';
 import { getCollaborationDetailsController } from '../controllers/collaboration-detail';
 import { updateCollaborationController, deleteCollaborationController, completeCollaborationController } from '../controllers/update-collaboration';
 import { getAllCollaborationsController } from '../controllers/get-collaborations-feed'
@@ -78,6 +78,13 @@ router.post('/:id/leave',
     validateResponse(schemas.SuccessResponse),
     leaveRequestController,
 )
+
+router.delete(
+    "/:id/member/:memberId",
+    isAuthenticated,
+    isOnboarded,
+    removeMemberController
+);
 
 router.get('/:id',
     isAuthenticated,
