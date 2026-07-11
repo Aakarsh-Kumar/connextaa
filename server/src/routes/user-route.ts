@@ -20,6 +20,12 @@ router.patch('/me',
   updateMeProfileController,
 );
 
+router.get('/check-username',
+  isAuthenticated,
+  validateResponse(schemas.SuccessResponse),
+  usernameValidityController,
+)
+
 router.get('/:username',
   validateResponse(schemas.ProfileResponse),
   publicProfileController,
@@ -31,11 +37,6 @@ router.get('/:username/collaborations',
   userCollaborationsController,
 )
 
-router.get('/check-username',
-  isAuthenticated,
-  validateResponse(schemas.SuccessResponse),
-  usernameValidityController,
-)
 
 
 export default router;
