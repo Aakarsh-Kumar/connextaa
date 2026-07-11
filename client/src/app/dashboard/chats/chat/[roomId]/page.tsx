@@ -23,6 +23,7 @@ import {
   Compass,
   ChevronUp,
   Star,
+  Share,
 } from "lucide-react";
 import Link from "next/link";
 import { RatingFlowModal } from "@/components/chats/RatingFlowModal";
@@ -413,6 +414,13 @@ export default function ChatRoomPage({ params }: PageProps) {
             </div>
           ) : (
             <>
+              <button
+                onClick={() => router.push(`/dashboard/collaborations/${collabId}`)}
+                title="View Collaboration"
+                className="p-2 rounded-full hover:bg-[var(--surface-container-low)] transition-colors text-[var(--outline)] hover:text-[var(--primary)]"
+              >
+                <Share className="w-5 h-5" />
+              </button>
               {/* Members */}
               <button
                 onClick={() => { setMembersOpen((v) => !v); setInfoOpen(false); }}
