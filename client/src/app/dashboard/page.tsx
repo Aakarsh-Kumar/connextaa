@@ -55,6 +55,16 @@ export default function DashboardPage() {
   });
 
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const DISTANCE_OPTIONS = [
     { label: "2 km", value: 2 },
     { label: "5 km", value: 5 },
@@ -73,7 +83,7 @@ export default function DashboardPage() {
     isFetchingNextPage,
     isLoading: loading,
   } = useInfiniteQuery({
-    queryKey: ["collaborations", coords.lat, coords.lng, radius, selectedCategory],
+    queryKey: ["collaborations", coords.lat, coords.lng, radius, selectedCategory, debouncedSearch],
     queryFn: ({ pageParam }) =>
       collaborationApi.getCollaborations({
         cursor: pageParam as string | undefined,
@@ -82,6 +92,7 @@ export default function DashboardPage() {
         lat: coords.lat,
         lng: coords.lng,
         radius: radius === 9999 ? undefined : radius,
+        search: debouncedSearch || undefined,
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
@@ -201,16 +212,6 @@ export default function DashboardPage() {
     }
   };
 
-  // Filter activities locally by search input
-  const filteredFeed = feed.filter((activity) => {
-    if (!search.trim()) return true;
-    const query = search.toLowerCase();
-    return (
-      activity.title?.toLowerCase().includes(query) ||
-      activity.description?.toLowerCase().includes(query)
-    );
-  });
-
   // Calculate recommended activities matching user profile categories
   // const recommendedActivities = feed.filter((activity) =>
   //   activity.category ? userCategories.includes(activity.category) : false
@@ -291,7 +292,7 @@ export default function DashboardPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--outline)] group-focus-within:text-[var(--primary)] transition-colors" />
             <input
               className="w-full pl-12 pr-4 py-4 bg-[var(--surface-container-low)] border-none rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all text-body-md text-[var(--foreground)] placeholder:text-[var(--outline)]"
-              placeholder="What would you like to do today?"
+              placeholder="Search by activity or location..."
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -386,9 +387,9 @@ export default function DashboardPage() {
               <SkeletonCard />
               <SkeletonCard />
             </div>
-          ) : filteredFeed.length > 0 ? (
+          ) : feed.length > 0 ? (
             <div className="flex flex-col gap-6 max-w-5xl mx-auto w-full">
-              {filteredFeed.map((activity) => (
+              {feed.map((activity) => (
                 <ActivityCard
                   key={activity.id}
                   activity={activity}

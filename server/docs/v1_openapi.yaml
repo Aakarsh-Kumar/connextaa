@@ -1414,7 +1414,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-                
+
   #################################################
   # COLLABORATIONS
   #################################################
@@ -1459,6 +1459,12 @@ paths:
           schema:
             type: number
             default: 10
+
+        - name: search
+          in: query
+          schema:
+            type: string
+            example: "srm"
 
       responses:
         '200':

@@ -17,6 +17,7 @@ const getAllCollaborationsController = async (req: Request, res: Response) => {
         // Parse query params
         const cursor = req.query.cursor as string | undefined;
         const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 20;
+        const search = typeof req.query.search === 'string' && req.query.search.trim() !== '' ? req.query.search.trim(): undefined;
         
         // Validate Category filter
         const validCategories = Object.values(Category);
@@ -48,6 +49,7 @@ const getAllCollaborationsController = async (req: Request, res: Response) => {
             userLng,
             category,
             radius,
+            search,
             excludeUserId: currentUserId,
             orderByDistance: true,
             statuses: ['OPEN'],

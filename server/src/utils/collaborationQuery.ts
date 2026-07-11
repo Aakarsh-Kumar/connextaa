@@ -27,6 +27,8 @@ export interface CollaborationDistanceFilter {
   orderByDistance?: boolean;
   /** Filter collaborations by their status values (e.g. ['OPEN']) */
   statuses?: string[];
+  /** Optional search string for title/from_location_name/to_location_name */
+  search?: string;
 }
 
 export interface CollaborationWithDistance {
@@ -107,11 +109,12 @@ export async function getCollaborationsWithDistance(
     excludeUserId,
     orderByDistance,
     statuses,
+    search
   } = filters;
 
   const safeLimitValue = Math.min(limit, 30);
   const hasLocation = userLat != null && userLng != null && !isNaN(userLat) && !isNaN(userLng);
-
+  
   let rawRows: any[];
 
   if (hasLocation) {
@@ -130,6 +133,15 @@ export async function getCollaborationsWithDistance(
     }
     if (category) {
       whereConditions.push(Prisma.sql`c.category = ${category}::"Category"`);
+    }
+    if (search) {
+      whereConditions.push(
+        Prisma.sql`(
+          LOWER(c.title) LIKE LOWER(${`%${search}%`})
+          OR LOWER(c.from_location_name) LIKE LOWER(${`%${search}%`})
+          OR LOWER(c.to_location_name) LIKE LOWER(${`%${search}%`})
+        )`
+      );
     }
     if (excludeUserId) {
       whereConditions.push(Prisma.sql`NOT EXISTS (
@@ -256,6 +268,30 @@ export async function getCollaborationsWithDistance(
             },
           },
         } : {}),
+        ...(search
+          ? {
+              OR: [
+                {
+                  title: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  fromLocationName: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  toLocationName: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+              ],
+            }
+          : {}),
       },
       ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
       take: safeLimitValue,

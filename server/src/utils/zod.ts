@@ -548,6 +548,11 @@ const endpoints = makeApi([
         type: 'Query',
         schema: z.number().optional().default(10),
       },
+      {
+        name: 'search',
+        type: 'Query',
+        schema: z.string().optional(),
+      },
     ],
     response: CollaborationFeedResponse,
   },

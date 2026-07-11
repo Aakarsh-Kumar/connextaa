@@ -184,7 +184,9 @@ model Collaboration {
   //////////////////////////////////////////////////
   // INDEXES
   //////////////////////////////////////////////////
-
+  @@index([title])
+  @@index([fromLocationName])
+  @@index([toLocationName])
   @@index([creatorId])
   @@index([category])
   @@index([status])

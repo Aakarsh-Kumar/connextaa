@@ -494,6 +494,7 @@ export interface paths {
                     lat?: number;
                     lng?: number;
                     radius?: number;
+                    search?: string;
                 };
                 header?: never;
                 path?: never;
