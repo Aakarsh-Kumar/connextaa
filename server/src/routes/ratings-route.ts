@@ -11,28 +11,29 @@ import {
 
 const router = Router();
 
-router.post('/',
+router.post(
+  '/',
   isAuthenticated,
   isOnboarded,
   validate(schemas.SubmitRatingRequest),
   validateResponse(schemas.SuccessResponse),
-  submitRatingController
+  submitRatingController,
 );
 
-router.get('/:collaborationId',
-  isAuthenticated,
-  isOnboarded,
-  validateResponse(schemas.RatingQueueResponse),
-  getRatingQueueController
-);
-
-router.get('/pending',
+router.get(
+  '/pending',
   isAuthenticated,
   isOnboarded,
   validateResponse(schemas.PendingRatingsResponse),
-  getPendingRatingsController
+  getPendingRatingsController,
 );
 
-
+router.get(
+  '/:collaborationId',
+  isAuthenticated,
+  isOnboarded,
+  validateResponse(schemas.RatingQueueResponse),
+  getRatingQueueController,
+);
 
 export default router;

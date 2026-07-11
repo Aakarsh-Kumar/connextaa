@@ -7,12 +7,13 @@ import { schemas } from '../utils/zod';
 
 const router = Router();
 
-router.post('/',
-    isAuthenticated,
-    validate(schemas.OnboardingRequest),
-    validateOnboarding,
-    validateResponse(schemas.SuccessResponse),
-    onboardingController,
+router.post(
+  '/',
+  isAuthenticated,
+  validate(schemas.OnboardingRequest),
+  validateOnboarding,
+  validateResponse(schemas.SuccessResponse),
+  onboardingController,
 );
 
 export default router;
