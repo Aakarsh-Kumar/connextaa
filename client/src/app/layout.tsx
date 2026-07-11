@@ -42,13 +42,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Connectify",
-    title: "Connectify — Find People For Anything",
+    title: "Connectify | Find People For Anything",
     description:
       "Discover nearby activities and connect with people around you.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Connectify — Find People For Anything",
+    title: "Connectify | Find People For Anything",
     description:
       "Discover nearby activities and connect with people around you.",
   },

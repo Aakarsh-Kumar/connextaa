@@ -1,9 +1,16 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
-const GoogleAuthRequest = z
-  .object({ idToken: z.string().max(2048) })
-  .passthrough();
+const Category = z.enum([
+  'CARPOOLING',
+  'EVENTS',
+  'STUDY',
+  'PROFESSIONAL',
+  'SPORTS',
+  'TRIPS',
+  'OTHER',
+]);
+const CollaborationStatus = z.enum(['OPEN', 'FULL', 'COMPLETED', 'CANCELLED']);
 const User = z
   .object({
     id: z.string().uuid(),
@@ -15,6 +22,50 @@ const User = z
     bio: z.string().nullish(),
   })
   .passthrough();
+const Location = z
+  .object({
+    name: z.string().min(3).max(200),
+    lat: z.number().gte(-90).lte(90),
+    lng: z.number().gte(-180).lte(180),
+  })
+  .passthrough();
+const CollaborationFeedItem = z
+  .object({
+    id: z.string(),
+    category: Category,
+    title: z.string(),
+    description: z.string(),
+    scheduledAt: z.string().datetime({ offset: true }),
+    status: CollaborationStatus,
+    currentMembers: z.number().int(),
+    maxMembers: z.number().int(),
+    distanceMeters: z.number().nullable(),
+    rating: z.number().int().nullable(),
+    creator: User,
+    fromLocation: Location,
+    toLocation: Location,
+  })
+  .passthrough();
+const PaginationMeta = z
+  .object({
+    page: z.number().int(),
+    limit: z.number().int(),
+    total: z.number().int(),
+    hasMore: z.boolean(),
+  })
+  .partial()
+  .passthrough();
+const CollaborationFeedResponse = z
+  .object({
+    success: z.boolean(),
+    data: z.array(CollaborationFeedItem),
+    pagination: PaginationMeta,
+  })
+  .partial()
+  .passthrough();
+const GoogleAuthRequest = z
+  .object({ idToken: z.string().max(2048) })
+  .passthrough();
 const AuthResponse = z
   .object({ success: z.boolean(), user: User })
   .passthrough();
@@ -25,17 +76,8 @@ const AuthMeResponse = z
   .object({ success: z.boolean(), user: User })
   .passthrough();
 const SuccessResponse = z
-  .object({ success: z.boolean(), message: z.string().optional() })
+  .object({ success: z.boolean(), message: z.string() })
   .passthrough();
-const Category = z.enum([
-  'CARPOOLING',
-  'EVENTS',
-  'STUDY',
-  'PROFESSIONAL',
-  'SPORTS',
-  'TRIPS',
-  'OTHER',
-]);
 const OnboardingRequest = z
   .object({
     username: z.string().min(3).max(20),
@@ -80,48 +122,6 @@ const UpdateProfileRequest = z
     username: z.string().min(3).max(20),
     bio: z.string().max(160),
     categories: z.array(Category),
-  })
-  .partial()
-  .passthrough();
-const CollaborationStatus = z.enum(['OPEN', 'FULL', 'COMPLETED', 'CANCELLED']);
-const Location = z
-  .object({
-    name: z.string().min(3).max(200),
-    lat: z.number().gte(-90).lte(90),
-    lng: z.number().gte(-180).lte(180),
-  })
-  .passthrough();
-const CollaborationFeedItem = z
-  .object({
-    id: z.string(),
-    category: Category,
-    title: z.string(),
-    description: z.string(),
-    scheduledAt: z.string().datetime({ offset: true }),
-    status: CollaborationStatus,
-    currentMembers: z.number().int(),
-    maxMembers: z.number().int(),
-    distanceMeters: z.number().nullable(),
-    rating: z.number().int().nullable(),
-    creator: User,
-    fromLocation: Location,
-    toLocation: Location,
-  })
-  .passthrough();
-const PaginationMeta = z
-  .object({
-    page: z.number().int(),
-    limit: z.number().int(),
-    total: z.number().int(),
-    hasMore: z.boolean(),
-  })
-  .partial()
-  .passthrough();
-const CollaborationFeedResponse = z
-  .object({
-    success: z.boolean(),
-    data: z.array(CollaborationFeedItem),
-    pagination: PaginationMeta,
   })
   .partial()
   .passthrough();
@@ -334,21 +334,21 @@ const DeviceTokenRequest = z
   .passthrough();
 
 export const schemas = {
-  GoogleAuthRequest,
-  User,
-  AuthResponse,
-  ErrorResponse,
-  AuthMeResponse,
-  SuccessResponse,
   Category,
-  OnboardingRequest,
-  ProfileResponse,
-  UpdateProfileRequest,
   CollaborationStatus,
+  User,
   Location,
   CollaborationFeedItem,
   PaginationMeta,
   CollaborationFeedResponse,
+  GoogleAuthRequest,
+  AuthResponse,
+  ErrorResponse,
+  AuthMeResponse,
+  SuccessResponse,
+  OnboardingRequest,
+  ProfileResponse,
+  UpdateProfileRequest,
   CreateCollaborationRequest,
   CreateCollaborationResponse,
   Collaboration,
@@ -548,6 +548,11 @@ const endpoints = makeApi([
         type: 'Query',
         schema: z.number().optional().default(10),
       },
+      {
+        name: 'search',
+        type: 'Query',
+        schema: z.string().optional(),
+      },
     ],
     response: CollaborationFeedResponse,
   },
@@ -702,9 +707,9 @@ const endpoints = makeApi([
     response: SuccessResponse,
   },
   {
-    method: 'get',
-    path: '/collaborations/:id/requests',
-    alias: 'getCollaborationsIdrequests',
+    method: 'delete',
+    path: '/collaborations/:id/member/:memberId',
+    alias: 'deleteCollaborationsIdmemberMemberId',
     requestFormat: 'json',
     parameters: [
       {
@@ -712,24 +717,13 @@ const endpoints = makeApi([
         type: 'Path',
         schema: z.string(),
       },
+      {
+        name: 'memberId',
+        type: 'Path',
+        schema: z.string(),
+      },
     ],
-    response: z
-      .object({
-        success: z.boolean(),
-        data: z.array(
-          z
-            .object({
-              requestId: z.string(),
-              joinMessage: z.string(),
-              status: JoinStatus,
-              user: User,
-            })
-            .partial()
-            .passthrough(),
-        ),
-      })
-      .partial()
-      .passthrough(),
+    response: SuccessResponse,
   },
   {
     method: 'get',
@@ -765,6 +759,13 @@ const endpoints = makeApi([
       },
     ],
     response: SuccessResponse,
+  },
+  {
+    method: 'get',
+    path: '/landing/trending',
+    alias: 'getLandingtrending',
+    requestFormat: 'json',
+    response: CollaborationFeedResponse,
   },
   {
     method: 'get',
@@ -965,6 +966,32 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `User Not Found`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: 'get',
+    path: '/users/check-username',
+    alias: 'getUserscheckUsername',
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'username',
+        type: 'Query',
+        schema: z.string(),
+      },
+    ],
+    response: SuccessResponse,
+    errors: [
+      {
+        status: 400,
+        description: `Validation Error`,
+        schema: ErrorResponse,
+      },
+      {
+        status: 401,
+        description: `Unauthorized`,
         schema: ErrorResponse,
       },
     ],

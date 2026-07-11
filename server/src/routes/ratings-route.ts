@@ -11,12 +11,21 @@ import {
 
 const router = Router();
 
+router.post(
+  '/',
+  isAuthenticated,
+  isOnboarded,
+  validate(schemas.SubmitRatingRequest),
+  validateResponse(schemas.SuccessResponse),
+  submitRatingController,
+);
+
 router.get(
   '/pending',
   isAuthenticated,
   isOnboarded,
   validateResponse(schemas.PendingRatingsResponse),
-  getPendingRatingsController
+  getPendingRatingsController,
 );
 
 router.get(
@@ -24,16 +33,7 @@ router.get(
   isAuthenticated,
   isOnboarded,
   validateResponse(schemas.RatingQueueResponse),
-  getRatingQueueController
-);
-
-router.post(
-  '/',
-  isAuthenticated,
-  isOnboarded,
-  validate(schemas.SubmitRatingRequest),
-  validateResponse(schemas.SuccessResponse),
-  submitRatingController
+  getRatingQueueController,
 );
 
 export default router;

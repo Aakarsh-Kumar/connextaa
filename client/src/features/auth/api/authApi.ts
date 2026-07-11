@@ -1,5 +1,5 @@
 import { api } from "@/services/api";
-import { AuthResponse } from "@/types";
+import { AuthResponse,SuccessResponse } from "@/types";
 
 export const authApi = {
   googleLogin: async (idToken: string): Promise<AuthResponse> => {
@@ -12,8 +12,16 @@ export const authApi = {
       return response.data;
   },
 
-  logout: async (): Promise<{ success: boolean }> => {
-      const response = await api.post<{ success: boolean }>("/auth/logout");
-      return response.data;
+  checkUsername: async (username: string) => {
+    const response = await api.get<SuccessResponse>("/users/check-username", {
+      params: { username },
+    });
+
+    return response.data;
+  },
+
+  logout: async (): Promise<SuccessResponse> => {
+    const response = await api.post<SuccessResponse>("/auth/logout");
+    return response.data;
   },
 };

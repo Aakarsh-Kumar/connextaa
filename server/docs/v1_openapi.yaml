@@ -20,6 +20,7 @@ servers:
     description: Local Development
 
 tags:
+  - name: Landing
   - name: Auth
   - name: Onboarding
   - name: Users
@@ -65,6 +66,7 @@ components:
 
       required:
         - success
+        - message
 
       properties:
         success:
@@ -107,8 +109,8 @@ components:
           type: boolean
 
         user:
-          $ref: "#/components/schemas/User"
-          
+          $ref: '#/components/schemas/User'
+
     ProfileResponse:
       type: object
 
@@ -159,7 +161,7 @@ components:
               type: array
 
               items:
-                $ref: "#/components/schemas/Category"
+                $ref: '#/components/schemas/Category'
 
               example:
                 - TRIPS
@@ -260,7 +262,7 @@ components:
                     type: string
 
                   category:
-                    $ref: "#/components/schemas/Category"
+                    $ref: '#/components/schemas/Category'
 
               joinMessage:
                 type: string
@@ -271,7 +273,7 @@ components:
                 format: date-time
 
               status:
-                $ref: "#/components/schemas/JoinStatus"
+                $ref: '#/components/schemas/JoinStatus'
 
               user:
                 type: object
@@ -335,7 +337,7 @@ components:
         - NEW_MESSAGE
         - COLLABORATION_COMPLETED
         - COLLABORATION_CANCELLED
-        
+
     #################################################
     # USER
     #################################################
@@ -358,7 +360,7 @@ components:
 
         email:
           type: string
-          
+
         onboardingCompleted:
           type: boolean
 
@@ -436,7 +438,7 @@ components:
           type: string
 
         category:
-          $ref: "#/components/schemas/Category"
+          $ref: '#/components/schemas/Category'
 
         title:
           type: string
@@ -449,10 +451,10 @@ components:
           maxLength: 250
 
         fromLocation:
-          $ref: "#/components/schemas/Location"
+          $ref: '#/components/schemas/Location'
 
         toLocation:
-          $ref: "#/components/schemas/Location"
+          $ref: '#/components/schemas/Location'
 
         scheduledAt:
           type: string
@@ -464,14 +466,14 @@ components:
           maxLength: 30
 
         status:
-          $ref: "#/components/schemas/CollaborationStatus"
+          $ref: '#/components/schemas/CollaborationStatus'
 
         creator:
-          $ref: "#/components/schemas/User"          
+          $ref: '#/components/schemas/User'
 
     CollaborationFeedItem:
       type: object
-      
+
       required:
         - id
         - category
@@ -492,7 +494,7 @@ components:
           type: string
 
         category:
-          $ref: "#/components/schemas/Category"
+          $ref: '#/components/schemas/Category'
 
         title:
           type: string
@@ -505,7 +507,7 @@ components:
           format: date-time
 
         status:
-          $ref: "#/components/schemas/CollaborationStatus"
+          $ref: '#/components/schemas/CollaborationStatus'
 
         currentMembers:
           type: integer
@@ -516,19 +518,19 @@ components:
         distanceMeters:
           type: number
           nullable: true
-        
-        rating: 
+
+        rating:
           type: integer
           nullable: true
 
         creator:
-          $ref: "#/components/schemas/User"
+          $ref: '#/components/schemas/User'
 
         fromLocation:
-          $ref: "#/components/schemas/Location"
+          $ref: '#/components/schemas/Location'
 
         toLocation:
-          $ref: "#/components/schemas/Location"
+          $ref: '#/components/schemas/Location'
 
     #################################################
     # CHAT
@@ -565,7 +567,7 @@ components:
             title:
               type: string
             category:
-              $ref: "#/components/schemas/Category"
+              $ref: '#/components/schemas/Category'
             scheduledAt:
               type: string
               format: date-time
@@ -575,9 +577,9 @@ components:
 
         lastMessage:
           type: string
-        
+
         memberCount:
-          type: integer   
+          type: integer
 
         lastMessageSenderName:
           type: string
@@ -600,7 +602,7 @@ components:
           format: date-time
 
         sender:
-          $ref: "#/components/schemas/User"
+          $ref: '#/components/schemas/User'
 
     #################################################
     # RATING
@@ -642,7 +644,7 @@ components:
         avatarUrl:
           type: string
           nullable: true
-          
+
     #################################################
     # NOTIFICATION
     #################################################
@@ -656,7 +658,7 @@ components:
           format: uuid
 
         type:
-          $ref: "#/components/schemas/NotificationType"
+          $ref: '#/components/schemas/NotificationType'
 
         title:
           type: string
@@ -673,7 +675,7 @@ components:
         createdAt:
           type: string
           format: date-time
-      
+
       required:
         - id
         - type
@@ -719,7 +721,7 @@ components:
           type: array
 
           items:
-            $ref: "#/components/schemas/Category"
+            $ref: '#/components/schemas/Category'
 
     UpdateProfileRequest:
       type: object
@@ -738,7 +740,7 @@ components:
           type: array
 
           items:
-            $ref: "#/components/schemas/Category"
+            $ref: '#/components/schemas/Category'
 
     CreateCollaborationRequest:
       type: object
@@ -754,7 +756,7 @@ components:
 
       properties:
         category:
-          $ref: "#/components/schemas/Category"
+          $ref: '#/components/schemas/Category'
 
         title:
           type: string
@@ -767,10 +769,10 @@ components:
           maxLength: 250
 
         fromLocation:
-          $ref: "#/components/schemas/Location"
+          $ref: '#/components/schemas/Location'
 
         toLocation:
-          $ref: "#/components/schemas/Location"
+          $ref: '#/components/schemas/Location'
 
         scheduledAt:
           type: string
@@ -874,15 +876,15 @@ components:
         - platform
 
       properties:
-        deviceToken: 
+        deviceToken:
           type: string
           maxLength: 500
-          example: "<string>"
+          example: '<string>'
 
         platform:
           type: string
           maxLength: 50
-          example: "<string>"
+          example: '<string>'
 
     #################################################
     # RESPONSE DTOs
@@ -900,7 +902,7 @@ components:
           type: boolean
 
         user:
-          $ref: "#/components/schemas/User"
+          $ref: '#/components/schemas/User'
 
     UserProfileResponse:
       type: object
@@ -915,10 +917,10 @@ components:
           type: boolean
 
         user:
-          $ref: "#/components/schemas/User"
+          $ref: '#/components/schemas/User'
 
         stats:
-          $ref: "#/components/schemas/UserStats"
+          $ref: '#/components/schemas/UserStats'
 
     CreateCollaborationResponse:
       type: object
@@ -948,7 +950,7 @@ components:
           type: boolean
 
         collaboration:
-          $ref: "#/components/schemas/Collaboration"
+          $ref: '#/components/schemas/Collaboration'
 
         members:
           type: array
@@ -977,7 +979,7 @@ components:
           type: boolean
 
         myJoinStatus:
-          $ref: "#/components/schemas/JoinStatus"
+          $ref: '#/components/schemas/JoinStatus'
 
     CollaborationFeedResponse:
       type: object
@@ -990,10 +992,10 @@ components:
           type: array
 
           items:
-            $ref: "#/components/schemas/CollaborationFeedItem"
+            $ref: '#/components/schemas/CollaborationFeedItem'
 
         pagination:
-          $ref: "#/components/schemas/PaginationMeta"
+          $ref: '#/components/schemas/PaginationMeta'
 
     ChatRoomsResponse:
       type: object
@@ -1006,7 +1008,7 @@ components:
           type: array
 
           items:
-            $ref: "#/components/schemas/ChatRoom"
+            $ref: '#/components/schemas/ChatRoom'
 
     SingleChatRoomResponse:
       type: object
@@ -1014,10 +1016,10 @@ components:
         - success
         - data
       properties:
-        success: 
+        success:
           type: boolean
-        data: 
-          $ref: "#/components/schemas/ChatRoom"
+        data:
+          $ref: '#/components/schemas/ChatRoom'
 
     MessagesResponse:
       type: object
@@ -1030,7 +1032,7 @@ components:
           type: array
 
           items:
-            $ref: "#/components/schemas/Message"
+            $ref: '#/components/schemas/Message'
 
     NotificationsResponse:
       type: object
@@ -1043,7 +1045,7 @@ components:
           type: array
 
           items:
-            $ref: "#/components/schemas/Notification"
+            $ref: '#/components/schemas/Notification'
         nextCursor:
           type: string
           nullable: true
@@ -1064,7 +1066,7 @@ components:
         pending:
           type: array
           items:
-            $ref: "#/components/schemas/PendingRatingItem"
+            $ref: '#/components/schemas/PendingRatingItem'
 
     RatingQueueResponse:
       type: object
@@ -1074,9 +1076,31 @@ components:
         participants:
           type: array
           items:
-            $ref: "#/components/schemas/RatingQueueUser"
+            $ref: '#/components/schemas/RatingQueueUser'
 
 paths:
+  #################################################
+  # LANDING
+  #################################################
+
+  /landing/trending:
+    get:
+      tags:
+        - Landing
+
+      summary: Trending Posts
+
+      security: []
+
+      responses:
+        '200':
+          description: Trending Collaborations
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollaborationFeedResponse'
+
   #################################################
   # AUTH
   #################################################
@@ -1096,24 +1120,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/GoogleAuthRequest"
+              $ref: '#/components/schemas/GoogleAuthRequest'
 
       responses:
-        "200":
+        '200':
           description: Login Success
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthResponse"
+                $ref: '#/components/schemas/AuthResponse'
 
-        "400":
+        '400':
           description: Invalid Google Token
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /auth/me:
     get:
@@ -1123,21 +1147,21 @@ paths:
       summary: Current Authenticated User
 
       responses:
-        "200":
+        '200':
           description: Current User
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthMeResponse"
+                $ref: '#/components/schemas/AuthMeResponse'
 
-        "401":
+        '401':
           description: Unauthorized
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /auth/logout:
     post:
@@ -1147,21 +1171,21 @@ paths:
       summary: Logout User
 
       responses:
-        "200":
+        '200':
           description: Logout Success
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
+                $ref: '#/components/schemas/SuccessResponse'
 
-        "401":
+        '401':
           description: Unauthorized
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
   #################################################
   # ONBOARDING
   #################################################
@@ -1179,32 +1203,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/OnboardingRequest"
+              $ref: '#/components/schemas/OnboardingRequest'
 
       responses:
-        "200":
+        '200':
           description: Onboarding Completed
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
+                $ref: '#/components/schemas/SuccessResponse'
 
-        "400":
+        '400':
           description: Validation Error
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
-        "401":
+        '401':
           description: Unauthorized
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   #################################################
   # USERS
@@ -1218,21 +1242,21 @@ paths:
       summary: Get My Profile
 
       responses:
-        "200":
+        '200':
           description: My Profile
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileResponse"
+                $ref: '#/components/schemas/ProfileResponse'
 
-        "401":
+        '401':
           description: Unauthorized
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
     patch:
       tags:
@@ -1246,32 +1270,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateProfileRequest"
+              $ref: '#/components/schemas/UpdateProfileRequest'
 
       responses:
-        "200":
+        '200':
           description: Updated Profile
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileResponse"
+                $ref: '#/components/schemas/ProfileResponse'
 
-        "400":
+        '400':
           description: Validation Error
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
-        "401":
+        '401':
           description: Unauthorized
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /users/{username}:
     get:
@@ -1291,21 +1315,21 @@ paths:
             type: string
 
       responses:
-        "200":
+        '200':
           description: Public Profile
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileResponse"
+                $ref: '#/components/schemas/ProfileResponse'
 
-        "404":
+        '404':
           description: User Not Found
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /users/{username}/collaborations:
     get:
@@ -1323,7 +1347,7 @@ paths:
 
           schema:
             type: string
-        
+
         - name: lat
           in: query
           schema:
@@ -1335,22 +1359,62 @@ paths:
             type: number
 
       responses:
-        "200":
+        '200':
           description: User Collaborations
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CollaborationFeedResponse"
+                $ref: '#/components/schemas/CollaborationFeedResponse'
 
-        "404":
+        '404':
           description: User Not Found
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
-                
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/check-username:
+    get:
+      tags:
+        - Users
+
+      summary: Check Username Validity
+
+      parameters:
+        - name: username
+
+          in: query
+
+          required: true
+
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Username Validity
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Validation Error
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   #################################################
   # COLLABORATIONS
   #################################################
@@ -1378,7 +1442,7 @@ paths:
         - name: category
           in: query
           schema:
-            $ref: "#/components/schemas/Category"
+            $ref: '#/components/schemas/Category'
 
         - name: lat
           in: query
@@ -1396,14 +1460,20 @@ paths:
             type: number
             default: 10
 
+        - name: search
+          in: query
+          schema:
+            type: string
+            example: "srm"
+
       responses:
-        "200":
+        '200':
           description: Collaboration Feed
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CollaborationFeedResponse"
+                $ref: '#/components/schemas/CollaborationFeedResponse'
 
     post:
       tags:
@@ -1417,24 +1487,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateCollaborationRequest"
+              $ref: '#/components/schemas/CreateCollaborationRequest'
 
       responses:
-        "201":
+        '201':
           description: Collaboration Created
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateCollaborationResponse"
+                $ref: '#/components/schemas/CreateCollaborationResponse'
 
-        "400":
+        '400':
           description: Validation Error
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /collaborations/{id}:
     get:
@@ -1453,21 +1523,21 @@ paths:
             format: uuid
 
       responses:
-        "200":
+        '200':
           description: Collaboration Details
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CollaborationResponse"
+                $ref: '#/components/schemas/CollaborationResponse'
 
-        "404":
+        '404':
           description: Collaboration Not Found
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
     patch:
       tags:
@@ -1490,24 +1560,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateCollaborationRequest"
+              $ref: '#/components/schemas/UpdateCollaborationRequest'
 
       responses:
-        "200":
+        '200':
           description: Updated Successfully
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CollaborationResponse"
+                $ref: '#/components/schemas/CollaborationResponse'
 
-        "403":
+        '403':
           description: Only Creator Can Update
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
     delete:
       tags:
@@ -1525,13 +1595,13 @@ paths:
             format: uuid
 
       responses:
-        "200":
+        '200':
           description: Deleted Successfully
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
+                $ref: '#/components/schemas/SuccessResponse'
 
   /collaborations/{id}/complete:
     patch:
@@ -1550,37 +1620,37 @@ paths:
             format: uuid
 
       responses:
-        "200":
+        '200':
           description: Completed Successfully
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CollaborationResponse"
+                $ref: '#/components/schemas/CollaborationResponse'
 
-        "400":
+        '400':
           description: Invalid Request or Status Transition
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
-        "403":
+        '403':
           description: Only Creator Can Complete
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
-        "404":
+        '404':
           description: Collaboration Not Found
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /collaborations/{id}/join:
     post:
@@ -1604,63 +1674,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/JoinRequest"
+              $ref: '#/components/schemas/JoinRequest'
 
       responses:
-        "200":
+        '200':
           description: Join Request Submitted
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-
-  /collaborations/{id}/requests:
-    get:
-      tags:
-        - Memberships
-
-      summary: Get Pending Join Requests
-
-      parameters:
-        - name: id
-          in: path
-          required: true
-
-          schema:
-            type: string
-
-      responses:
-        "200":
-          description: Pending Requests
-
-          content:
-            application/json:
-              schema:
-                type: object
-
-                properties:
-                  success:
-                    type: boolean
-
-                  data:
-                    type: array
-
-                    items:
-                      type: object
-
-                      properties:
-                        requestId:
-                          type: string
-
-                        joinMessage:
-                          type: string
-
-                        status:
-                          $ref: "#/components/schemas/JoinStatus"
-
-                        user:
-                          $ref: "#/components/schemas/User"
+                $ref: '#/components/schemas/SuccessResponse'
 
   /collaborations/requests:
     get:
@@ -1670,13 +1693,13 @@ paths:
       summary: Get Pending Join Requests for current user
 
       responses:
-        "200":
+        '200':
           description: Pending Requests
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PendingJoinRequestsResponse"
+                $ref: '#/components/schemas/PendingJoinRequestsResponse'
 
   /collaborations/requests/{requestId}/approve:
     post:
@@ -1693,13 +1716,13 @@ paths:
             type: string
 
       responses:
-        "200":
+        '200':
           description: Request Approved
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
+                $ref: '#/components/schemas/SuccessResponse'
 
   /collaborations/requests/{requestId}/reject:
     post:
@@ -1716,13 +1739,13 @@ paths:
             type: string
 
       responses:
-        "200":
+        '200':
           description: Request Rejected
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
+                $ref: '#/components/schemas/SuccessResponse'
 
   /collaborations/{id}/leave:
     post:
@@ -1740,14 +1763,42 @@ paths:
             type: string
 
       responses:
-        "200":
+        '200':
           description: Left Collaboration
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
+                $ref: '#/components/schemas/SuccessResponse'
 
+  /collaborations/{id}/member/{memberId}:
+    delete:
+      tags:
+        - Memberships
+
+      summary: Remove Member from Collaboration
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+
+        - name: memberId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Member Removed
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
   #################################################
   # CHAT
   #################################################
@@ -1760,21 +1811,21 @@ paths:
       summary: Get User Chat Rooms
 
       responses:
-        "200":
+        '200':
           description: Chat Rooms
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ChatRoomsResponse"
+                $ref: '#/components/schemas/ChatRoomsResponse'
 
-        "401":
+        '401':
           description: Unauthorized
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /chat/rooms/{roomId}:
     get:
@@ -1789,18 +1840,18 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Single Room
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SingleChatRoomResponse"
-        "401":
+                $ref: '#/components/schemas/SingleChatRoomResponse'
+        '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /chat/rooms/{roomId}/messages:
     get:
@@ -1837,13 +1888,13 @@ paths:
             default: 50
 
       responses:
-        "200":
+        '200':
           description: Messages
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessagesResponse"
+                $ref: '#/components/schemas/MessagesResponse'
 
     post:
       tags:
@@ -1868,16 +1919,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SendMessageRequest"
+              $ref: '#/components/schemas/SendMessageRequest'
 
       responses:
-        "201":
+        '201':
           description: Message Sent
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Message"
+                $ref: '#/components/schemas/Message'
 
   #################################################
   # RATINGS
@@ -1896,32 +1947,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SubmitRatingRequest"
+              $ref: '#/components/schemas/SubmitRatingRequest'
 
       responses:
-        "201":
+        '201':
           description: Rating Submitted
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
+                $ref: '#/components/schemas/SuccessResponse'
 
-        "400":
+        '400':
           description: Invalid Rating
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
-        "403":
+        '403':
           description: Cannot Rate User
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /ratings/pending:
     get:
@@ -1931,18 +1982,18 @@ paths:
       summary: Get Pending Ratings
 
       responses:
-        "200":
+        '200':
           description: Pending Ratings
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PendingRatingsResponse"
-        "401":
+                $ref: '#/components/schemas/PendingRatingsResponse'
+        '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /ratings/{collaborationId}:
     get:
@@ -1960,30 +2011,30 @@ paths:
             format: uuid
 
       responses:
-        "200":
+        '200':
           description: Rating Queue
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RatingQueueResponse"
-        "401":
+                $ref: '#/components/schemas/RatingQueueResponse'
+        '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "403":
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "404":
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
           description: Collaboration Not Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   #################################################
   # NOTIFICATIONS
@@ -2013,13 +2064,13 @@ paths:
             default: 20
 
       responses:
-        "200":
+        '200':
           description: Notifications
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NotificationsResponse"
+                $ref: '#/components/schemas/NotificationsResponse'
 
   /notifications/{id}/read:
     patch:
@@ -2040,13 +2091,13 @@ paths:
             format: uuid
 
       responses:
-        "200":
+        '200':
           description: Notification Marked Read
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
+                $ref: '#/components/schemas/SuccessResponse'
 
   /notifications/read-all:
     patch:
@@ -2056,13 +2107,13 @@ paths:
       summary: Mark All Notifications Read
 
       responses:
-        "200":
+        '200':
           description: All Notifications Read
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
+                $ref: '#/components/schemas/SuccessResponse'
 
   /notifications/device-token:
     post:
@@ -2077,15 +2128,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/DeviceTokenRequest"
-                
+              $ref: '#/components/schemas/DeviceTokenRequest'
+
         responses:
-          "200":
+          '200':
             description: Device Token Received
 
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-
-
+                $ref: '#/components/schemas/SuccessResponse'

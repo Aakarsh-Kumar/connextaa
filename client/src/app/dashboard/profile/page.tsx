@@ -626,7 +626,7 @@ export default function ProfilePage() {
             </button>
           ))}
 
-          {/* Logout — destructive */}
+          {/* Logout destructive */}
           <button
             onClick={handleLogout}
             className="w-full bg-[var(--card)] px-6 py-4 rounded-2xl flex justify-between items-center border border-[var(--surface-container-high)] hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors shadow-sm group"

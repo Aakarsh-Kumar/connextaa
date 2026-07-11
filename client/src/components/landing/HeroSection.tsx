@@ -17,10 +17,12 @@ export default function HeroSection() {
         {/* Left column: Text content */}
         <div className="z-10 text-center lg:text-left">
           <h1 className="font-display-lg text-[42px] leading-tight md:text-display-lg text-on-background mb-6">
-            Find People For Anything.
+            Rides. Sports. Trips.
+            <br />
+            Find Your People.
           </h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-xl mx-auto lg:mx-0">
-            Need a ride, a study buddy, a travel companion, or someone attending the same event? Connect with people nearby instantly.
+            Airport to college. Concert to afterparty. Weekend trip with people you have never met. Find someone nearby for the moment you are in, right now.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
             {useAuthStore((state) => state.isAuthenticated) ? (
@@ -44,7 +46,7 @@ export default function HeroSection() {
           </div>
 
           {/* Stats Sub-section */}
-          <div className="mt-16 flex flex-wrap justify-center lg:justify-start gap-12">
+          {/* <div className="mt-16 flex flex-wrap justify-center lg:justify-start gap-12">
             <div>
               <div className="text-3xl font-extrabold text-popover">12k+</div>
               <div className="text-on-surface-variant font-label-md text-label-md">Activities Created</div>
@@ -57,7 +59,7 @@ export default function HeroSection() {
               <div className="text-3xl font-extrabold text-popover">98%</div>
               <div className="text-on-surface-variant font-label-md text-label-md">Happy Meetups</div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Right column: Floating Visual Cards */}
@@ -74,7 +76,7 @@ export default function HeroSection() {
                   JD
                 </div>
                 <div>
-                  <h4 className="font-bold text-on-surface">Carpool to Coachella</h4>
+                  <h4 className="font-bold text-on-surface">Airport to College</h4>
                   <p className="font-label-sm text-label-sm text-on-surface-variant">2 seats left</p>
                 </div>
               </div>
@@ -101,8 +103,8 @@ export default function HeroSection() {
                   AL
                 </div>
                 <div>
-                  <h4 className="font-bold text-on-surface">Study at Joe&rsquo;s Coffee</h4>
-                  <p className="font-label-sm text-label-sm text-on-surface-variant">Focus: Midterms</p>
+                  <h4 className="font-bold text-on-surface">Turf Match</h4>
+                  <p className="font-label-sm text-label-sm text-on-surface-variant">football</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 mb-4 text-on-surface-variant">
@@ -110,7 +112,7 @@ export default function HeroSection() {
                 <span className="font-label-sm text-label-sm text-on-surface-variant">Tomorrow, 9:00 AM</span>
               </div>
               <button className="w-full py-2 bg-primary-container/20 text-on-primary-container rounded-md font-bold transition-colors hover:bg-primary-container/30 cursor-pointer">
-                Let&rsquo;s Study
+                Let&rsquo;s Play
               </button>
             </div>
 
@@ -124,8 +126,8 @@ export default function HeroSection() {
                   MK
                 </div>
                 <div>
-                  <h4 className="font-bold text-on-surface">Hiking Trip Yosemite</h4>
-                  <p className="font-label-sm text-label-sm text-on-surface-variant">Intermediate Skill</p>
+                  <h4 className="font-bold text-on-surface">Trip to Ooty</h4>
+                  <p className="font-label-sm text-label-sm text-on-surface-variant">Mountains</p>
                 </div>
               </div>
               <Image 

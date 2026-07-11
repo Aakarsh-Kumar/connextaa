@@ -14,7 +14,6 @@ import { socket } from "@/services/socket";
 import {
   ArrowLeft,
   Info,
-  X,
   MapPin,
   Calendar,
   Users,
@@ -186,11 +185,11 @@ export default function ChatRoomPage({ params }: PageProps) {
   const needsRating = remainingRatings > 0;
 
   // Auto-open rating flow if ?rating=true is present in URL
-  useEffect(() => {
+
     if (searchParams.get("rating") === "true" && needsRating) {
       setRatingFlowOpen(true);
     }
-  }, [searchParams, needsRating]);
+
 
   const { data: collabData } = useQuery({
     queryKey: ["collab", collabId],
@@ -345,6 +344,14 @@ export default function ChatRoomPage({ params }: PageProps) {
     router.push("/dashboard/chats");
   };
 
+  const handleMemberRemoval=async(memberId:string)=>{
+    const response = await collaborationApi.removeFromCollaboration(collabId!,memberId);
+      toast.success(response.message);
+      //re update the members list
+      queryClient.invalidateQueries({queryKey:["collab",collabId]});
+  }
+  
+
   // ── Derived ──────────────────────────────────────────────────────────────────
 
   const category = room?.collaboration?.category;
@@ -359,8 +366,8 @@ export default function ChatRoomPage({ params }: PageProps) {
   return (
     <div
       ref={wrapperRef}
-      className="flex flex-col w-full max-w-5xl mx-auto bg-[var(--card)] rounded-2xl shadow-sm border border-[var(--surface-container-high)] overflow-hidden"
-      style={{ height: isMobile ? "calc(100dvh - 120px)" : "calc(100dvh - 140px)" }}
+      className="flex flex-col w-full max-w-5xl mx-auto bg-[var(--card)] rounded-2xl shadow-sm border border-[var(--surface-container-high)] overflow-hidden max-md:fixed max-md:left-0 max-md:right-0 max-md:top-16 max-md:bottom-16 max-md:z-40 max-md:rounded-none max-md:border-none"
+      style={{ height: isMobile ? "calc(100dvh - 128px)" : "calc(100dvh - 140px)" }}
     >
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <header className="px-4 py-3 flex items-center gap-3 border-b border-[var(--outline-variant)]/30 bg-[var(--card)] shrink-0">
@@ -558,7 +565,7 @@ export default function ChatRoomPage({ params }: PageProps) {
               onClick={() => setMembersOpen(false)}
               className="text-[var(--outline)] hover:text-[var(--on-surface)] transition-colors p-1 rounded-full"
             >
-              <X className="w-4 h-4" />
+              <ChevronUp className="w-4 h-4" />
             </button>
           </div>
           <div className="space-y-2 overflow-y-auto max-h-44 pr-1">
@@ -582,7 +589,7 @@ export default function ChatRoomPage({ params }: PageProps) {
                   <p className="text-sm font-semibold text-[var(--on-surface)] truncate">{collab.creator.name}</p>
                   <p className="text-xs text-[var(--outline)]">@{collab.creator.username} · Creator</p>
                 </div>
-                <Star className="w-3.5 h-3.5 text-yellow-500 shrink-0" />
+                <Star className="w-4.5 h-4.5 text-yellow-500 shrink-0" />
               </Link>
             )}
             {/* Other members */}
@@ -607,12 +614,17 @@ export default function ChatRoomPage({ params }: PageProps) {
                     <p className="text-sm font-semibold text-[var(--on-surface)] truncate">{m.name}</p>
                     <p className="text-xs text-[var(--outline)]">@{m.username}</p>
                   </div>
+                  {user?.id === collab?.creator?.id && m.id !== user?.id && <LogOut className="w-4.5 h-4.5 text-red-500 shrink-0" onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleMemberRemoval(m.id);
+                  }} />}
                 </Link>
               ))}
             {/* Placeholder members when no API data yet */}
             {!collab && (
               <>
-                {["Aakarsh", "Sneha", "Rahul"].map((name) => (
+                {["Aakarsh", "Aarohi"].map((name) => (
                   <div key={name} className="flex items-center gap-3 p-2 rounded-xl">
                     <div className="w-9 h-9 rounded-full bg-[var(--surface-container)] flex items-center justify-center border border-[var(--border)]">
                       <User className="w-4 h-4 text-[var(--outline)]" />
@@ -768,7 +780,7 @@ export default function ChatRoomPage({ params }: PageProps) {
       {/* ── Composer ────────────────────────────────────────────────────── */}
       <form
         onSubmit={handleSend}
-        className="px-4 py-3 bg-[var(--card)] border-t border-[var(--outline-variant)]/30 flex items-center gap-3 shrink-0"
+        className="px-4 py-3 pb-4 md:pb-3 bg-[var(--card)] border-t border-[var(--outline-variant)]/30 flex items-center gap-3 shrink-0"
       >
         <input
           className="flex-1 bg-[var(--surface-container-low)] border-none rounded-full px-5 py-3 text-sm focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all text-[var(--foreground)] placeholder:text-[var(--outline)]"

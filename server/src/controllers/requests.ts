@@ -552,4 +552,170 @@ const leaveRequestController = async (req: Request, res: Response) => {
   }
 };
 
-export { getRequestsController, createJoinRequestController, approveJoinRequestController, rejectJoinRequestController, leaveRequestController };
+const removeMemberController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const creatorId = req.user?.id;
+    const { id: collaborationId, memberId } = req.params as {
+      id: string;
+      memberId: string;
+    };
+
+    if (!creatorId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const collaboration = await prisma.collaboration.findUnique({
+      where: {
+        id: collaborationId,
+      },
+      select: {
+        id: true,
+        creatorId: true,
+        status: true,
+        maxMembers: true,
+        deletedAt: true,
+        chatRoom: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    if (!collaboration || collaboration.deletedAt) {
+      return res.status(404).json({
+        success: false,
+        message: "Collaboration not found",
+      });
+    }
+
+    if (collaboration.creatorId !== creatorId) {
+      return res.status(403).json({
+        success: false,
+        message: "Only the creator can remove members",
+      });
+    }
+
+    if (
+      collaboration.status === CollaborationStatus.COMPLETED ||
+      collaboration.status === CollaborationStatus.CANCELLED
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Members cannot be removed from completed or cancelled collaborations",
+      });
+    }
+
+    const member = await prisma.collaborationMember.findUnique({
+      where: {
+        collaborationId_userId: {
+          collaborationId,
+          userId: memberId,
+        },
+      },
+      select: {
+        id: true,
+        role: true,
+        joinStatus: true,
+      },
+    });
+
+    if (!member) {
+      return res.status(404).json({
+        success: false,
+        message: "Member not found",
+      });
+    }
+
+    if (member.role === MemberRole.CREATOR) {
+      return res.status(400).json({
+        success: false,
+        message: "Creator cannot be removed",
+      });
+    }
+
+    if (member.joinStatus !== JoinStatus.APPROVED) {
+      return res.status(400).json({
+        success: false,
+        message: "Only approved members can be removed",
+      });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // Mark member as left
+      await tx.collaborationMember.update({
+        where: {
+          id: member.id,
+        },
+        data: {
+          joinStatus: JoinStatus.LEFT,
+        },
+      });
+
+      // Remove from chat if chat exists
+      if (collaboration.chatRoom) {
+        await tx.chatMember.deleteMany({
+          where: {
+            roomId: collaboration.chatRoom.id,
+            userId: memberId,
+          },
+        });
+      }
+
+      // Count approved members after removal
+      const approvedMembers = await tx.collaborationMember.count({
+        where: {
+          collaborationId,
+          joinStatus: JoinStatus.APPROVED,
+        },
+      });
+
+      // If collaboration was FULL and now has space, reopen it
+      if (
+        collaboration.status === CollaborationStatus.FULL &&
+        approvedMembers < collaboration.maxMembers
+      ) {
+        await tx.collaboration.update({
+          where: {
+            id: collaborationId,
+          },
+          data: {
+            status: CollaborationStatus.OPEN,
+          },
+        });
+      }
+
+      // TODO:
+      // Create MEMBER_REMOVED notification
+
+      // TODO:
+      // Emit socket event to removed member
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Member removed successfully",
+    });
+  } catch (error) {
+    logger.error("removeMemberController error", {
+      error,
+      creatorId: req.user?.id,
+      collaborationId: req.params.id,
+      memberId: req.params.memberId,
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export { getRequestsController, createJoinRequestController, approveJoinRequestController, rejectJoinRequestController, leaveRequestController, removeMemberController };

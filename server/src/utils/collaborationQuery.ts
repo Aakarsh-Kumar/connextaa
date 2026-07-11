@@ -27,6 +27,8 @@ export interface CollaborationDistanceFilter {
   orderByDistance?: boolean;
   /** Filter collaborations by their status values (e.g. ['OPEN']) */
   statuses?: string[];
+  /** Optional search string for title/from_location_name/to_location_name */
+  search?: string;
 }
 
 export interface CollaborationWithDistance {
@@ -58,13 +60,17 @@ export interface CollaborationWithDistance {
     email: string;
     bio: string | null;
     onboardingCompleted: boolean;
+
+    ratingsReceived: {
+      showUpRating: number;
+      friendlyRating: number;
+      collaborativeRating: number;
+      safeRating: number;
+    }[];
   };
-  members: { userId: string }[];
-  ratings: {
-    showUpRating: number;
-    friendlyRating: number;
-    collaborativeRating: number;
-    safeRating: number;
+
+  members: {
+    userId: string;
   }[];
 }
 
@@ -103,11 +109,12 @@ export async function getCollaborationsWithDistance(
     excludeUserId,
     orderByDistance,
     statuses,
+    search
   } = filters;
 
   const safeLimitValue = Math.min(limit, 30);
   const hasLocation = userLat != null && userLng != null && !isNaN(userLat) && !isNaN(userLng);
-
+  
   let rawRows: any[];
 
   if (hasLocation) {
@@ -126,6 +133,15 @@ export async function getCollaborationsWithDistance(
     }
     if (category) {
       whereConditions.push(Prisma.sql`c.category = ${category}::"Category"`);
+    }
+    if (search) {
+      whereConditions.push(
+        Prisma.sql`(
+          LOWER(c.title) LIKE LOWER(${`%${search}%`})
+          OR LOWER(c.from_location_name) LIKE LOWER(${`%${search}%`})
+          OR LOWER(c.to_location_name) LIKE LOWER(${`%${search}%`})
+        )`
+      );
     }
     if (excludeUserId) {
       whereConditions.push(Prisma.sql`NOT EXISTS (
@@ -252,6 +268,30 @@ export async function getCollaborationsWithDistance(
             },
           },
         } : {}),
+        ...(search
+          ? {
+              OR: [
+                {
+                  title: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  fromLocationName: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  toLocationName: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+              ],
+            }
+          : {}),
       },
       ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
       take: safeLimitValue,
@@ -316,19 +356,20 @@ export async function getCollaborationsWithDistance(
           email: true,
           bio: true,
           onboardingCompleted: true,
+
+          ratingsReceived: {
+            select: {
+              showUpRating: true,
+              friendlyRating: true,
+              collaborativeRating: true,
+              safeRating: true,
+            },
+          },
         },
       },
       members: {
         where: { joinStatus: JoinStatus.APPROVED },
         select: { userId: true },
-      },
-      ratings: {
-        select: {
-          showUpRating: true,
-          friendlyRating: true,
-          collaborativeRating: true,
-          safeRating: true,
-        },
       },
     },
   });
@@ -343,10 +384,11 @@ export async function getCollaborationsWithDistance(
       return {
         ...row,
         distance_meters:
-          row.distance_meters != null ? Math.round(Number(row.distance_meters)) : null,
+          row.distance_meters != null
+            ? Math.round(Number(row.distance_meters))
+            : null,
         creator: rel.creator,
         members: rel.members,
-        ratings: rel.ratings,
       } as CollaborationWithDistance;
     });
 }
@@ -354,6 +396,32 @@ export async function getCollaborationsWithDistance(
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared mapping helper — converts raw row → CollaborationFeedItem shape
 // ─────────────────────────────────────────────────────────────────────────────
+
+export function calculateUserRating(
+  ratings: {
+    showUpRating: number;
+    friendlyRating: number;
+    collaborativeRating: number;
+    safeRating: number;
+  }[],
+): number | null {
+  if (ratings.length === 0) return null;
+
+  const total = ratings.reduce(
+    (sum, rating) =>
+      sum +
+      (
+        rating.showUpRating +
+        rating.friendlyRating +
+        rating.collaborativeRating +
+        rating.safeRating
+      ) /
+        4,
+    0,
+  );
+
+  return Number((total / ratings.length).toFixed(1));
+}
 
 export function mapToFeedItem(
   c: CollaborationWithDistance,
@@ -365,20 +433,9 @@ export function mapToFeedItem(
   const { viewerId, viewerMemberships } = opts;
   const currentMembers = c.members.length;
 
-  const ratingEntries = c.ratings;
-  const ratingAvg =
-    ratingEntries.length > 0
-      ? Number(
-          (
-            ratingEntries.reduce(
-              (sum, r) =>
-                sum +
-                (r.showUpRating + r.friendlyRating + r.collaborativeRating + r.safeRating) / 4,
-              0,
-            ) / ratingEntries.length
-          ).toFixed(1),
-        )
-      : null;
+  const ratingAvg = calculateUserRating(
+    c.creator.ratingsReceived,
+  );
 
   const isCreatorViewing = viewerId != null && viewerId === c.creator.id;
   const viewerStatus = viewerMemberships?.get(c.id);

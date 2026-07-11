@@ -13,8 +13,6 @@ import {
   Share2,
   Copy,
   Check,
-  ArrowRight,
-  MessageCircle,
 } from "lucide-react";
 
 import toast from "react-hot-toast";
@@ -27,21 +25,25 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+import { useRouter } from "next/navigation";
 
 interface ActivityCardProps {
   activity: CollaborationFeedItem;
   pendingRequests: string[];
   onOpenJoin?: (act: CollaborationFeedItem) => void;
   isJoined?: boolean;
+  variant?: "collaboration" | "landing";
 }
 
 const formatDate = (dateString?: string) => {
 if (!dateString) return "Today";
 const date = new Date(dateString);
-return date.toLocaleDateString("en-US", {
+return date.toLocaleDateString("en-IN", {
     month: "short",
     day: "numeric",
-    year: "numeric",
+    year: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
 });
@@ -50,15 +52,17 @@ return date.toLocaleDateString("en-US", {
 const formatDistance = (meters?: number | null) => {
 if (meters === undefined || meters === null) return "0.0 km";
 const km = meters / 1000;
-return `${km.toFixed(1)} km away`;
+return `${km.toFixed(1)} km`;
 };
 
 export function ActivityCard({
   activity,
   pendingRequests,
+  variant="collaboration",
   onOpenJoin,
   isJoined = false,
 }: ActivityCardProps) {
+  const router = useRouter()
   const [isExpanded, setIsExpanded] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -67,6 +71,8 @@ export function ActivityCard({
   const CategoryIcon = CATEGORIES.find((c) => c.id === activity.category)?.icon ?? Compass;
 
   const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/dashboard/collaborations/${activity.id}` : "";
+
+  const isMobile = useIsMobile();
 
   const handleCopyLink = async () => {
     try {
@@ -116,7 +122,7 @@ export function ActivityCard({
         </div>
       </div>
 
-      {/* Title — always fully visible, no clamp */}
+      {/* Title always fully visible, no clamp */}
       <h3 className="font-headline-md text-headline-md text-[var(--on-surface)] leading-tight break-words [overflow-wrap:anywhere]">
         {activity.title}
       </h3>
@@ -204,21 +210,21 @@ export function ActivityCard({
             <Calendar className="w-4 h-4 shrink-0" />
             <span className="font-semibold">{formatDate(activity.scheduledAt)}</span>
           </div>
-          <div className="flex items-center gap-1 text-xs">
+          {variant !== "landing" && (<div className="flex items-center gap-1 text-xs">
             <Compass className="w-4 h-4 shrink-0" />
-            <span className="font-semibold">{formatDistance(activity.distanceMeters)}</span>
-          </div>
+            <span className="font-semibold">{formatDistance(activity.distanceMeters)} {!isMobile && "away"}</span>
+          </div>)}
         </div>
         <div className="flex items-center gap-1 text-[var(--primary)]">
           <Users className="w-4.5 h-4.5 shrink-0" />
           <span className="text-label-md font-bold">
-            {activity.currentMembers || 1} / {activity.maxMembers || 5} Members
+            {activity.currentMembers || 1} / {activity.maxMembers || 5} {!isMobile && "Members"}
           </span>
         </div>
       </div>
 
       {/* CTA Trigger — pinned to bottom */}
-      <button
+      {variant === "collaboration" ? (<button
         disabled={isJoined || isPending || activity.id === "preview"}
         onClick={() => onOpenJoin?.(activity)}
         className={`mt-auto w-full py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] shadow-sm text-sm cursor-pointer disabled:opacity-50 ${
@@ -231,7 +237,14 @@ export function ActivityCard({
         
       >
         {ctaText}
+      </button>):(
+        <button
+        onClick={() => router.push(`/dashboard/collaborations/${activity.id}`)}
+        className={`mt-auto w-full py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] shadow-sm text-sm cursor-pointer disabled:opacity-50 bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 `}
+      >
+        View Collaboration
       </button>
+      )}
 
       {/* Share Collaboration Dialog */}
      <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>

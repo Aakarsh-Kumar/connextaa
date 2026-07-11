@@ -26,9 +26,7 @@ import {
   Bell,
   BellOff,
   Check,
-  AlertCircle,
-  Lock,
-  Shield,
+  AlertCircle
 } from "lucide-react";
 import { isValidUsername } from "@/constants/validators";
 import { useRef, useCallback } from "react";
@@ -47,8 +45,47 @@ export default function OnboardingPage() {
   const [bio, setBio] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(""); 
   const initializedRef = useRef(false);
+  const [usernameStatus, setUsernameStatus] = useState<"idle" | "checking" | "available" | "taken" | "invalid">("idle");
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+    const value = username.trim();
+
+    if (!value) {
+      setUsernameStatus("idle");
+      return;
+    }
+
+    const validation = isValidUsername(value);
+
+    if (!validation.success) {
+      setUsernameStatus("invalid");
+      return;
+    }
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = setTimeout(async () => {
+      try {
+        setUsernameStatus("checking");
+
+        const res = await authApi.checkUsername(value);
+        console.log(res.success);
+        setUsernameStatus(res.success ? "available" : "taken");
+      } catch {
+        setUsernameStatus("idle");
+      }
+    }, 600);
+
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, [username]);
 
   // Permissions state
   const [locationGranted, setLocationGranted] = useState(false);
@@ -56,14 +93,14 @@ export default function OnboardingPage() {
 
   // Prepopulate username on mount/auth load
   useEffect(() => {
-    if (!initializedRef.current && user?.name) {
+    if (!initializedRef.current && user?.username) {
       initializedRef.current = true;
 
       setUsername(
-        user.name.toLowerCase().replace(/[^a-z0-9]/g, "")
+        user.username
       );
     }
-  }, [user?.name]);
+  }, [user?.username]);
 
   useEffect(() => {
     if (user?.onboardingCompleted) {
@@ -164,9 +201,9 @@ export default function OnboardingPage() {
   };
 
   const handleNextToPermissions = async () => {
-    const res = await isValidUsername(username);
+    const res = isValidUsername(username);
     if (!res.success) {
-      toast.error(res.message);
+      toast.error(res.message as string);
       return;
     }
     setStep("permissions");
@@ -181,9 +218,9 @@ export default function OnboardingPage() {
   };
 
   const handleSubmit = async () => {
-    const res = await isValidUsername(username);
+    const res = isValidUsername(username);
     if (!res.success) {
-      toast.error(res.message);
+      toast.error(res.message as string);
       return;
     }
     if (selectedCategories.length === 0) {
@@ -215,9 +252,6 @@ export default function OnboardingPage() {
       } else {
         toast.error(result.message || "Failed to complete onboarding");
       }
-    } catch (error: any) {
-      console.error("Onboarding submission error:", error);
-      toast.error(error.response?.data?.message || "Onboarding failed. Please check your details.");
     } finally {
       setSubmitting(false);
     }
@@ -437,9 +471,37 @@ export default function OnboardingPage() {
                           onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, ""))}
                         />
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        Letters, numbers, and underscores only. Min 3 characters.
-                      </p>
+                      <div className="mt-2 text-xs min-h-[20px]">
+                        {usernameStatus === "checking" && (
+                          <p className="text-muted-foreground">
+                            Checking username...
+                          </p>
+                        )}
+
+                        {usernameStatus === "available" && (
+                          <p className="text-green-600">
+                            ✓ Username available
+                          </p>
+                        )}
+
+                        {usernameStatus === "taken" && (
+                          <p className="text-red-500">
+                            Username already taken
+                          </p>
+                        )}
+
+                        {usernameStatus === "invalid" && (
+                          <p className="text-red-500">
+                            {isValidUsername(username).message}
+                          </p>
+                        )}
+
+                        {usernameStatus === "idle" && (
+                          <p className="text-muted-foreground">
+                            Letters, numbers and underscores only.
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     {/* Bio Input */}
@@ -476,7 +538,12 @@ export default function OnboardingPage() {
                     </button>
                     <button
                       onClick={handleNextToPermissions}
-                      disabled={!username.trim()}
+                      disabled={
+                        !username.trim() ||
+                        usernameStatus === "checking" ||
+                        usernameStatus === "taken" ||
+                        usernameStatus === "invalid"
+                      }
                       className="bg-primary hover:bg-primary/95 text-white font-semibold px-8 py-3.5 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 cursor-pointer"
                     >
                       Continue to Permissions

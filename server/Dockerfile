@@ -1,42 +1,21 @@
-# syntax=docker/dockerfile:1
-
-ARG NODE_VERSION=24.16.0
-
-# =========================
-# Base
-# =========================
-FROM node:${NODE_VERSION} AS base
+# ==========================
+# Stage 1 - Build
+# ==========================
+FROM node:22-bookworm-slim AS builder
 
 WORKDIR /app
 
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y \
-    build-essential \
-    python-is-python3 \
-    pkg-config \
-    node-gyp \
-    ca-certificates \
-    curl && \
-    rm -rf /var/lib/apt/lists/*
-
-# =========================
-# Dependencies
-# =========================
-FROM base AS deps
-
+# Copy package files
 COPY package*.json ./
 
+# Install all dependencies
 RUN npm ci
 
-# =========================
-# Build
-# =========================
-FROM deps AS build
-
+# Copy source code
 COPY . .
 
 # Generate Prisma Client
-RUN npx prisma generate --schema=prisma/v1.schema.prisma
+RUN npm run db:generate
 
 # Compile TypeScript
 RUN npm run build
@@ -44,28 +23,36 @@ RUN npm run build
 # Remove dev dependencies
 RUN npm prune --omit=dev
 
-# =========================
-# Production
-# =========================
-FROM node:${NODE_VERSION}-slim
+# ==========================
+# Stage 2 - Production
+# ==========================
+FROM node:22-bookworm-slim
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y \
-    dumb-init \
-    ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+# Create non-root user
+RUN groupadd -r nodejs && useradd -r -g nodejs nodeuser
 
-COPY --from=build /app/package*.json ./
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/prisma ./prisma
+# Copy production files
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+
+# Change ownership
+RUN chown -R nodeuser:nodejs /app
+
+USER nodeuser
 
 EXPOSE 8080
 
-ENTRYPOINT ["dumb-init", "--"]
+# Health Check
+HEALTHCHECK --interval=30s \
+            --timeout=5s \
+            --start-period=20s \
+            --retries=3 \
+CMD node -e "fetch('http://127.0.0.1:8080/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
-CMD ["node", "dist/server.js"]
+CMD ["npm", "run", "start:prod"]

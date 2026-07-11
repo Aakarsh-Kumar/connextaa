@@ -2,24 +2,22 @@
 
 import * as React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Globe, AtSign } from "lucide-react";
+import { Globe, AtSign, Mail } from "lucide-react";
 import Image from "next/image";
 import Logo from "@/../public/logo.png";
 
 const footerLinks = {
   Product: [
-    { label: "Features", href: "#features" },
-    { label: "Categories", href: "#categories" },
-    { label: "Safety", href: "#safety" },
+    { label: "Features", href: "/#features" },
+    { label: "Categories", href: "/#categories" },
+    { label: "Safety", href: "/#safety" },
   ],
-  Company: [
-    { label: "About Us", href: "#" },
-    { label: "Community Guidelines", href: "#" },
-    { label: "Contact Support", href: "#" },
+  Founders: [
+    { label: "About Us", href: "/about-us" }
   ],
   Legal: [
-    { label: "Privacy Policy", href: "#" },
-    { label: "Terms of Service", href: "#" },
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Terms of Service", href: "/terms-of-service" },
   ],
 };
 
@@ -78,12 +76,12 @@ export default function Footer() {
             © 2026 Connectify. Built for neighbors.
           </p>
           <div className="flex gap-6">
-            <a href="#" className="text-on-surface-variant hover:text-primary transition-colors">
-              <Globe className="w-5 h-5" />
+            <a href="mailto:connectify.core@gmail.com" className="text-on-surface-variant hover:text-primary transition-colors">
+              <Mail className="w-5 h-5" />
             </a>
-            <a href="#" className="text-on-surface-variant hover:text-primary transition-colors">
+            {/* <a href="#" className="text-on-surface-variant hover:text-primary transition-colors">
               <AtSign className="w-5 h-5" />
-            </a>
+            </a> */}
           </div>
         </div>
       </div>

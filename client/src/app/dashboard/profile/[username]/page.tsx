@@ -91,29 +91,6 @@ export default function PublicProfilePage() {
         fetchProfile();
     }, [username,router]);
 
-    // const fetchCollabs = useCallback(async (cursor?: string) => {
-    //     if (!username) return;
-    //     try {
-    //         const data = await profileApi.getUserCollaborations(
-    //             username,
-    //             cursor,
-    //             coords?.lat,
-    //             coords?.lng
-    //         );
-    //         if (cursor) {
-    //             setCollabs((prev) => [...prev, ...(data.data ?? [])]);
-    //         } else {
-    //             setCollabs(data.data ?? []);
-    //         }
-    //         setNextCursor((data as any).nextCursor ?? null);
-    //     } catch {
-    //         // silently fail — collabs are not critical
-    //     } finally {
-    //         setCollabsLoading(false);
-    //         setLoadingMore(false);
-    //     }
-    // }, [username, coords]);
-
     useEffect(() => {
         if (!username) return;
 
@@ -419,7 +396,7 @@ export default function PublicProfilePage() {
 
         {/* ── Join Request Bottom Sheet ── */}
         <Sheet open={isJoinSheetOpen} onOpenChange={setIsJoinSheetOpen}>
-            <SheetContent side="bottom" className="p-6 pb-8 rounded-t-3xl border-t border-[var(--border)] max-w-lg mx-auto bg-[var(--card)]">
+            <SheetContent side="bottom" className="p-6 pb-20 md:pb-8 rounded-t-3xl border-t border-[var(--border)] max-w-lg mx-auto bg-[var(--card)] max-h-[88dvh] overflow-y-auto">
             <SheetHeader className="space-y-1">
                 <SheetTitle className="text-xl font-bold font-headline-md text-[var(--foreground)]">
                 Join Activity

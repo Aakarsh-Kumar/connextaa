@@ -55,6 +55,16 @@ export default function DashboardPage() {
   });
 
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const DISTANCE_OPTIONS = [
     { label: "2 km", value: 2 },
     { label: "5 km", value: 5 },
@@ -63,7 +73,7 @@ export default function DashboardPage() {
     { label: "25km+", value: 9999 },
   ];
 
-  const [radius, setRadius] = useState(10);
+  const [radius, setRadius] = useState(9999);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
 
   const {
@@ -73,7 +83,7 @@ export default function DashboardPage() {
     isFetchingNextPage,
     isLoading: loading,
   } = useInfiniteQuery({
-    queryKey: ["collaborations", coords.lat, coords.lng, radius, selectedCategory],
+    queryKey: ["collaborations", coords.lat, coords.lng, radius, selectedCategory, debouncedSearch],
     queryFn: ({ pageParam }) =>
       collaborationApi.getCollaborations({
         cursor: pageParam as string | undefined,
@@ -82,6 +92,7 @@ export default function DashboardPage() {
         lat: coords.lat,
         lng: coords.lng,
         radius: radius === 9999 ? undefined : radius,
+        search: debouncedSearch || undefined,
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
@@ -201,16 +212,6 @@ export default function DashboardPage() {
     }
   };
 
-  // Filter activities locally by search input
-  const filteredFeed = feed.filter((activity) => {
-    if (!search.trim()) return true;
-    const query = search.toLowerCase();
-    return (
-      activity.title?.toLowerCase().includes(query) ||
-      activity.description?.toLowerCase().includes(query)
-    );
-  });
-
   // Calculate recommended activities matching user profile categories
   // const recommendedActivities = feed.filter((activity) =>
   //   activity.category ? userCategories.includes(activity.category) : false
@@ -261,11 +262,11 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-3 mt-1">
                     <span className="flex items-center gap-1 text-xs text-[var(--outline)]">
                       <Calendar className="w-3 h-3" />
-                      {new Date(item.completedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                      {7-(new Date().getDate()- new Date(item.completedAt).getDate())} days left
                     </span>
                     <span className="flex items-center gap-1 text-xs text-[var(--secondary)] font-semibold">
                       <Users className="w-3 h-3" />
-                      {item.remainingRatings} remaining
+                      {item.remainingRatings} {!isMobile&&"remaining"}
                     </span>
                   </div>
                 </div>
@@ -291,7 +292,7 @@ export default function DashboardPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--outline)] group-focus-within:text-[var(--primary)] transition-colors" />
             <input
               className="w-full pl-12 pr-4 py-4 bg-[var(--surface-container-low)] border-none rounded-xl focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all text-body-md text-[var(--foreground)] placeholder:text-[var(--outline)]"
-              placeholder="What would you like to do today?"
+              placeholder="Search by activity or location..."
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -381,14 +382,14 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          {loading ? (
+          {!feedData ? (
             <div className="grid grid-cols-1 gap-6">
               <SkeletonCard />
               <SkeletonCard />
             </div>
-          ) : filteredFeed.length > 0 ? (
+          ) : feed.length > 0 ? (
             <div className="flex flex-col gap-6 max-w-5xl mx-auto w-full">
-              {filteredFeed.map((activity) => (
+              {feed.map((activity) => (
                 <ActivityCard
                   key={activity.id}
                   activity={activity}
@@ -442,7 +443,7 @@ export default function DashboardPage() {
 
       {/* Join Request Bottom Sheet Drawer */}
       <Sheet open={isJoinSheetOpen} onOpenChange={setIsJoinSheetOpen}>
-        <SheetContent side="bottom" className="p-6 pb-8 rounded-t-3xl border-t border-[var(--border)] max-w-lg mx-auto bg-[var(--card)]">
+        <SheetContent side="bottom" className="p-6 pb-20 md:pb-8 rounded-t-3xl border-t border-[var(--border)] max-w-lg mx-auto bg-[var(--card)] max-h-[88dvh] overflow-y-auto">
           <SheetHeader className="space-y-1">
             <SheetTitle className="text-xl font-bold font-headline-md text-[var(--foreground)]">
               Join Activity

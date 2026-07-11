@@ -24,6 +24,7 @@ export const collaborationApi = {
     lat?: number;
     lng?: number;
     radius?: number;
+    search?: string;
   }): Promise<CollaborationFeedResponse & { nextCursor?: string | null }> => {
     const response = await api.get<CollaborationFeedResponse & { nextCursor?: string | null }>("/collaborations", {
       params,
@@ -47,6 +48,13 @@ export const collaborationApi = {
   ): Promise<SuccessResponse> => {
     const response = await api.post<SuccessResponse>(
       `/collaborations/${id}/leave`
+    );
+    return response.data;
+  },
+
+  removeFromCollaboration: async(id:string, memberId:string): Promise<SuccessResponse>=>{
+    const response = await api.delete<SuccessResponse>(
+      `/collaborations/${id}/member/${memberId}`
     );
     return response.data;
   },

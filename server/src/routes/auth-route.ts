@@ -17,11 +17,11 @@ const router = Router();
  * 4. googleAuthController   — issues JWT, creates/finds user
  */
 router.post(
-    '/google',
-    validate(schemas.GoogleAuthRequest),
-    verifyGoogleAuthToken,
-    validateResponse(schemas.AuthResponse),
-    googleAuthController,
+  '/google',
+  validate(schemas.GoogleAuthRequest),
+  verifyGoogleAuthToken,
+  validateResponse(schemas.AuthResponse),
+  googleAuthController,
 );
 
 /**
@@ -31,12 +31,17 @@ router.post(
  * 3. userAuth               — returns current user data
  */
 router.get(
-    '/me',
-    isAuthenticated,
-    validateResponse(schemas.AuthMeResponse),
-    userAuth,
+  '/me',
+  isAuthenticated,
+  validateResponse(schemas.AuthMeResponse),
+  userAuth,
 );
 
-router.post('/logout', isAuthenticated, validateResponse(schemas.SuccessResponse), logoutAuthController)
+router.post(
+  '/logout',
+  isAuthenticated,
+  validateResponse(schemas.SuccessResponse),
+  logoutAuthController,
+);
 
 export default router;

@@ -10,14 +10,14 @@ import TrendingSection from "@/components/landing/TrendingSection";
 export default function Home() {
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
       <HeroSection />
       <CategoriesSection />
       <CollaborationStepSection />
       <TrendingSection />
       <SafetySection />
       <CtaSection />
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }
