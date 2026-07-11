@@ -7,8 +7,7 @@ import { schemas } from '../utils/zod';
 
 const router = Router();
 
-router.get(
-    '/rooms',
+router.get('/rooms',
     isAuthenticated,
     isOnboarded,
     validateResponse(schemas.ChatRoomsResponse),

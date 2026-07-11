@@ -7,8 +7,7 @@ import { schemas } from '../utils/zod';
 
 const router = Router();
 
-router.post(
-    '/',
+router.post('/',
     isAuthenticated,
     validate(schemas.OnboardingRequest),
     validateOnboarding,

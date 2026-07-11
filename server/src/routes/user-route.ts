@@ -7,39 +7,35 @@ import { validate, validateResponse } from '../middlewares/validate';
 import { schemas } from '../utils/zod';
 const router = Router();
 
-router.get(
-  '/me',
+router.get('/me',
   isAuthenticated,
   validateResponse(schemas.ProfileResponse),
   meProfileController,
 );
 
-router.patch(
-  '/me',
+router.patch('/me',
   isAuthenticated,
   validate(schemas.UpdateProfileRequest),
   validateResponse(schemas.ProfileResponse),
   updateMeProfileController,
 );
 
-router.get(
-  '/:username/collaborations',
+router.get('/:username',
+  validateResponse(schemas.ProfileResponse),
+  publicProfileController,
+);
+
+router.get('/:username/collaborations',
   optionalAuth,
   validateResponse(schemas.CollaborationFeedResponse),
   userCollaborationsController,
 )
 
-router.get(
-  '/check-username',
+router.get('/check-username',
   isAuthenticated,
   validateResponse(schemas.SuccessResponse),
   usernameValidityController,
 )
 
-router.get(
-  '/:username',
-  validateResponse(schemas.ProfileResponse),
-  publicProfileController,
-);
 
 export default router;

@@ -12,8 +12,14 @@ import { getAllCollaborationsController } from '../controllers/get-collaboration
 
 const router = Router();
 
-router.post(
-    '/',
+router.get('/',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.CollaborationFeedResponse),
+    getAllCollaborationsController,
+)
+
+router.post('/',
     isAuthenticated,
     isOnboarded,
     validate(schemas.CreateCollaborationRequest),
@@ -21,70 +27,6 @@ router.post(
     validateResponse(schemas.CreateCollaborationResponse),
     createCollaborationsController,
 )
-
-router.get(
-    '/',
-    isAuthenticated,
-    isOnboarded,
-    validateResponse(schemas.CollaborationFeedResponse),
-    getAllCollaborationsController,
-)
-
-router.get(
-    '/requests',
-    isAuthenticated,
-    isOnboarded,
-    validateResponse(schemas.PendingJoinRequestsResponse),
-    getRequestsController,
-)
-
-
-router.get(
-    '/:id',
-    isAuthenticated,
-    isOnboarded,
-    validateResponse(schemas.CollaborationResponse),
-    getCollaborationDetailsController
-)
-
-router.post(
-    '/:id/join',
-    isAuthenticated,
-    isOnboarded,
-    validate(schemas.JoinRequest),
-    validateResponse(schemas.SuccessResponse),
-    createJoinRequestController,
-)
-
-router.post(
-    '/requests/:requestId/approve',
-    isAuthenticated,
-    isOnboarded,
-    validateResponse(schemas.SuccessResponse),
-    approveJoinRequestController,
-)
-
-router.post(
-    '/requests/:requestId/reject',
-    isAuthenticated,
-    isOnboarded,
-    validateResponse(schemas.SuccessResponse),
-    rejectJoinRequestController,
-)
-
-router.post('/:id/leave',
-    isAuthenticated,
-    isOnboarded,
-    validateResponse(schemas.SuccessResponse),
-    leaveRequestController,
-)
-
-router.delete(
-    "/:id/member/:memberId",
-    isAuthenticated,
-    isOnboarded,
-    removeMemberController
-);
 
 router.get('/:id',
     isAuthenticated,
@@ -102,6 +44,13 @@ router.patch('/:id',
     updateCollaborationController,
 );
 
+router.delete('/:id',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.SuccessResponse),
+    deleteCollaborationController,
+);
+
 router.patch('/:id/complete',
     isAuthenticated,
     isOnboarded,
@@ -109,11 +58,46 @@ router.patch('/:id/complete',
     completeCollaborationController,
 );
 
-router.delete('/:id',
+router.post('/:id/join',
+    isAuthenticated,
+    isOnboarded,
+    validate(schemas.JoinRequest),
+    validateResponse(schemas.SuccessResponse),
+    createJoinRequestController,
+)
+
+router.post('/:id/leave',
     isAuthenticated,
     isOnboarded,
     validateResponse(schemas.SuccessResponse),
-    deleteCollaborationController,
+    leaveRequestController,
+)
+
+router.delete("/:id/member/:memberId",
+    isAuthenticated,
+    isOnboarded,
+    removeMemberController
 );
+
+router.get('/requests',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.PendingJoinRequestsResponse),
+    getRequestsController,
+)
+
+router.post('/requests/:requestId/approve',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.SuccessResponse),
+    approveJoinRequestController,
+)
+
+router.post('/requests/:requestId/reject',
+    isAuthenticated,
+    isOnboarded,
+    validateResponse(schemas.SuccessResponse),
+    rejectJoinRequestController,
+)
 
 export default router;

@@ -10,6 +10,12 @@ import { Router } from 'express';
 
 const router = Router();
 
-router.post('/device-token',isAuthenticated,validate(schemas.DeviceTokenRequest),validateResponse(schemas.DeviceTokenRequest),isOnboarded,notificationDeviceToken);
+router.post('/device-token',
+    isAuthenticated,
+    validate(schemas.DeviceTokenRequest),
+    validateResponse(schemas.DeviceTokenRequest),
+    isOnboarded,
+    notificationDeviceToken
+);
 
 export default router;

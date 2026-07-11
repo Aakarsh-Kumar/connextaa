@@ -722,36 +722,6 @@ const endpoints = makeApi([
   },
   {
     method: 'get',
-    path: '/collaborations/:id/requests',
-    alias: 'getCollaborationsIdrequests',
-    requestFormat: 'json',
-    parameters: [
-      {
-        name: 'id',
-        type: 'Path',
-        schema: z.string(),
-      },
-    ],
-    response: z
-      .object({
-        success: z.boolean(),
-        data: z.array(
-          z
-            .object({
-              requestId: z.string(),
-              joinMessage: z.string(),
-              status: JoinStatus,
-              user: User,
-            })
-            .partial()
-            .passthrough(),
-        ),
-      })
-      .partial()
-      .passthrough(),
-  },
-  {
-    method: 'get',
     path: '/collaborations/requests',
     alias: 'getCollaborationsrequests',
     requestFormat: 'json',
@@ -991,6 +961,32 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `User Not Found`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: 'get',
+    path: '/users/check-username',
+    alias: 'getUserscheckUsername',
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'username',
+        type: 'Query',
+        schema: z.string(),
+      },
+    ],
+    response: SuccessResponse,
+    errors: [
+      {
+        status: 400,
+        description: `Validation Error`,
+        schema: ErrorResponse,
+      },
+      {
+        status: 401,
+        description: `Unauthorized`,
         schema: ErrorResponse,
       },
     ],
