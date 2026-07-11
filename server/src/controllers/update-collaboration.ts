@@ -257,6 +257,7 @@ const completeCollaborationController = async (req: Request, res: Response) => {
         toLocationName: true,
         toLat: true,
         toLng: true,
+        deletedAt: true,
         creator: {
           select: {
             id: true,
@@ -287,16 +288,30 @@ const completeCollaborationController = async (req: Request, res: Response) => {
     }
 
     // 1. Explicit Status Validation
-    if (
-      collaboration.status !== CollaborationStatus.OPEN &&
-      collaboration.status !== CollaborationStatus.FULL
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: 'Only active collaborations can be completed.',
-      });
-    }
+    switch (collaboration.status) {
+      case CollaborationStatus.COMPLETED:
+        return res.status(400).json({
+          success: false,
+          message: "Collaboration is already completed",
+        });
 
+      case CollaborationStatus.CANCELLED:
+        return res.status(400).json({
+          success: false,
+          message: "Cancelled collaborations cannot be completed",
+        });
+
+      case CollaborationStatus.OPEN:
+      case CollaborationStatus.FULL:
+        break;
+    }
+    
+    if (collaboration.deletedAt) {
+    return res.status(400).json({
+        success:false,
+        message:"Collaboration has been deleted."
+    });
+}
     // 2. Timing Validation
     const now = new Date();
     const canCompleteAt = new Date(collaboration.scheduledAt);
@@ -317,7 +332,7 @@ const completeCollaborationController = async (req: Request, res: Response) => {
       },
     });
 
-    if (approvedMembersCount < 2) {
+    if (approvedMembersCount <= 1) {
       return res.status(400).json({
         success: false,
         message:
@@ -330,6 +345,7 @@ const completeCollaborationController = async (req: Request, res: Response) => {
       where: { id },
       data: {
         status: CollaborationStatus.COMPLETED,
+        completedAt: new Date(),
       },
       include: {
         creator: {
@@ -360,10 +376,17 @@ const completeCollaborationController = async (req: Request, res: Response) => {
     });
 
     // TODO:
-    // When collaboration is completed:
-    // - create notifications (COLLABORATION_COMPLETED) for all approved members
-    // - enable participant ratings
-    // - schedule chat deletion (7 days)
+    // Ratings are available for 7 days after completedAt.
+    // Rating availability is computed dynamically.
+    // No database state is required.
+
+    // TODO:
+    // Create COLLABORATION_COMPLETED notifications
+    // for all approved members except the creator.
+
+    // Chat cleanup is handled by the hourly cron.
+    // Delete chat room, members and messages
+    // after completedAt + 7 days.
 
     // Format members to match CollaborationResponse structure
     const formattedMembers = updated.members.map((m: any) => ({

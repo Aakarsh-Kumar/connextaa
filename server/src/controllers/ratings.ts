@@ -11,10 +11,14 @@ const getPendingRatingsController = async (req: Request, res: Response) => {
     }
 
     // Find all collaborations where current user is APPROVED and collaboration status is COMPLETED
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const collaborations = await prisma.collaboration.findMany({
       where: {
         status: CollaborationStatus.COMPLETED,
         deletedAt: null,
+        completedAt: {
+          gte: sevenDaysAgo,
+        },
         members: {
           some: {
             userId,
@@ -59,7 +63,7 @@ const getPendingRatingsController = async (req: Request, res: Response) => {
           collaborationId: collab.id,
           chatRoomId: collab.chatRoom?.id || '',
           title: collab.title,
-          completedAt: collab.updatedAt.toISOString(),
+          completedAt: collab.completedAt ? collab.completedAt.toISOString() : collab.updatedAt.toISOString(),
           remainingRatings: expectedRatingsCount - ratingsGivenCount,
         });
       }
@@ -88,6 +92,7 @@ const getRatingQueueController = async (req: Request, res: Response) => {
       where: { id: collaborationId, deletedAt: null },
       select: {
         status: true,
+        completedAt: true,
         members: {
           where: {
             joinStatus: JoinStatus.APPROVED,
@@ -112,6 +117,17 @@ const getRatingQueueController = async (req: Request, res: Response) => {
 
     if (collaboration.status !== CollaborationStatus.COMPLETED) {
       return res.status(400).json({ success: false, message: 'Collaboration is not completed' });
+    }
+
+    // Check if the 7-day rating window has expired
+    const now = new Date();
+    if (!collaboration.completedAt) {
+      return res.status(400).json({ success: false, message: 'Rating is not available for this collaboration' });
+    }
+    const ratingDeadline = new Date(collaboration.completedAt);
+    ratingDeadline.setDate(ratingDeadline.getDate() + 7);
+    if (now > ratingDeadline) {
+      return res.status(400).json({ success: false, message: 'The 7-day rating window has expired for this collaboration' });
     }
 
     // Verify current user is an approved participant
@@ -178,6 +194,7 @@ const submitRatingController = async (req: Request, res: Response) => {
       where: { id: collaborationId, deletedAt: null },
       select: {
         status: true,
+        completedAt: true,
         members: {
           where: {
             joinStatus: JoinStatus.APPROVED,
@@ -196,6 +213,17 @@ const submitRatingController = async (req: Request, res: Response) => {
 
     if (collaboration.status !== CollaborationStatus.COMPLETED) {
       return res.status(400).json({ success: false, message: 'Only completed collaborations can be rated' });
+    }
+
+    // Check if the 7-day rating window has expired
+    const now = new Date();
+    if (!collaboration.completedAt) {
+      return res.status(400).json({ success: false, message: 'Rating is not available for this collaboration' });
+    }
+    const ratingDeadline = new Date(collaboration.completedAt);
+    ratingDeadline.setDate(ratingDeadline.getDate() + 7);
+    if (now > ratingDeadline) {
+      return res.status(400).json({ success: false, message: 'The 7-day rating window has expired for this collaboration' });
     }
 
     // Both reviewer and reviewee must be approved members (count should be 2)

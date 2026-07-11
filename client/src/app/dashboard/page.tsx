@@ -261,7 +261,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-3 mt-1">
                     <span className="flex items-center gap-1 text-xs text-[var(--outline)]">
                       <Calendar className="w-3 h-3" />
-                      {new Date(item.completedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                      {7-(new Date().getDate()- new Date(item.completedAt).getDate())} days left
                     </span>
                     <span className="flex items-center gap-1 text-xs text-[var(--secondary)] font-semibold">
                       <Users className="w-3 h-3" />

@@ -4,12 +4,14 @@ import {
   ShieldCheck,
   Sparkles,
   TrendingUp,
-  Globe,
   Linkedin,
   Github,
-  Heart,
+  User,
 } from "lucide-react";
 import Link from "next/link";
+import AakarshImage from "../../../../public/developers/aakarsh.jpg"
+import AarohiImage from "../../../../public/developers/aarohi.jpg"
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "About Us | Connectify",
@@ -53,6 +55,7 @@ const developers = [
   {
     initials: "AK",
     name: "Aakarsh Kumar",
+    pic: AakarshImage,
     role: "Developer",
     tagline: '"Normal is Boring."',
     bio: "Aakarsh enjoys building thoughtful products that solve real-world problems with clean engineering and intuitive user experiences.",
@@ -66,6 +69,7 @@ const developers = [
   {
     initials: "AS",
     name: "Aarohi Sahu",
+    pic: AarohiImage,
     role: "Developer",
     tagline: '"Building Cool Stuff."',
     bio: "Aarohi is passionate about designing and developing products that are simple to use, visually appealing, and impactful for everyday users.",
@@ -154,11 +158,9 @@ export default function AboutUsPage() {
               >
                 {/* Avatar + Name */}
                 <div className="flex items-center gap-5 mb-6">
-                  <div
-                    className={`w-16 h-16 rounded-full ${dev.color} flex items-center justify-center text-white text-xl font-bold shrink-0`}
-                  >
-                    {dev.initials}
-                  </div>
+                  <Image
+                    className={`w-16 h-16 rounded-full ${dev.color} flex items-center justify-center text-white text-xl font-bold shrink-0`} src={dev.pic} alt={dev.initials}
+                  /> 
                   <div>
                     <h3 className="font-headline-md text-headline-md text-on-surface leading-tight">
                       {dev.name}
@@ -273,7 +275,7 @@ export default function AboutUsPage() {
               </div>
 
               <div className="mt-8 flex items-center gap-3">
-                <Heart className="w-5 h-5 text-primary" strokeWidth={1.75} />
+                <User className="w-5 h-5 text-primary" strokeWidth={1.75} />
                 <p className="font-headline-md text-headline-md text-on-surface">
                   Aakarsh &amp; Aarohi
                 </p>
