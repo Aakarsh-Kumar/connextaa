@@ -381,7 +381,7 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          {loading ? (
+          {!feedData ? (
             <div className="grid grid-cols-1 gap-6">
               <SkeletonCard />
               <SkeletonCard />
