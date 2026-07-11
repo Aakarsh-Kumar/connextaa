@@ -13,11 +13,11 @@ const footerLinks = {
     { label: "Safety", href: "/#safety" },
   ],
   Founders: [
-    { label: "About Us", href: "/about-us" }
+    { label: "About Us", href: "/about" }
   ],
   Legal: [
-    { label: "Privacy Policy", href: "/privacy-policy" },
-    { label: "Terms of Service", href: "/terms-of-service" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
   ],
 };
 
