@@ -1,4 +1,5 @@
 import notificationDeviceToken from '../controllers/notification-device-token';
+import getNotificationsController from '../controllers/get-notification'
 
 import { isAuthenticated } from '../middlewares/auth';
 import { validate, validateResponse } from '../middlewares/validate';
@@ -18,4 +19,5 @@ router.post(
   notificationDeviceToken,
 );
 
+router.get('/',isAuthenticated,isOnboarded,validateResponse(schemas.NotificationsResponse),getNotificationsController);
 export default router;
