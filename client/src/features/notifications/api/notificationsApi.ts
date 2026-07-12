@@ -11,37 +11,37 @@ export const notificationsApi = {
     cursor?: string;
     limit?: number;
   }): Promise<NotificationsResponse> => {
-    // const response = await api.get<NotificationsResponse>("/notifications", {
-    //   params: {
-    //     ...(params?.cursor ? { cursor: params.cursor } : {}),
-    //     limit: params?.limit ?? 20,
-    //   },
-    // });
-    // return response.data;
-    return {
-      "success": true,
-      'data': [
-    {
-      "id": "<uuid>",
-      "type": "JOIN_REQUEST",
-      "title": "<string>",
-      "body": "<string>",
-      "referenceId": "<string>",
-      "isRead": true,
-      "createdAt": "<dateTime>"
-    },
-    {
-      "id": "<uuid>",
-      "type": "NEW_MESSAGE",
-      "title": "<string>",
-      "body": "<string>",
-      "referenceId": "<string>",
-      "isRead": false,
-      "createdAt": "<dateTime>"
-    }
-  ],
-  "nextCursor": "<string>"
-}
+    const response = await api.get<NotificationsResponse>("/notifications", {
+      params: {
+        ...(params?.cursor ? { cursor: params.cursor } : {}),
+        limit: params?.limit ?? 20,
+      },
+    });
+    return response.data;
+//     return {
+//       "success": true,
+//       'data': [
+//     {
+//       "id": "<uuid>",
+//       "type": "JOIN_REQUEST",
+//       "title": "<string>",
+//       "body": "<string>",
+//       "referenceId": "<string>",
+//       "isRead": true,
+//       "createdAt": "<dateTime>"
+//     },
+//     {
+//       "id": "<uuid>",
+//       "type": "NEW_MESSAGE",
+//       "title": "<string>",
+//       "body": "<string>",
+//       "referenceId": "<string>",
+//       "isRead": false,
+//       "createdAt": "<dateTime>"
+//     }
+//   ],
+//   "nextCursor": "<string>"
+// }
   },
 
   /**
