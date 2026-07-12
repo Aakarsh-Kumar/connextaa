@@ -52,10 +52,8 @@ export function PwaProvider({ children }: { children: ReactNode }) {
 
   // Capture the one-shot beforeinstallprompt event as early as possible.
   useEffect(() => {
-  console.log("PWA Provider Mounted");
 
   const handler = (e: Event) => {
-    console.log("beforeinstallprompt FIRED");
     e.preventDefault();
     setInstallPrompt(e as BeforeInstallPromptEvent);
   };
@@ -68,7 +66,6 @@ export function PwaProvider({ children }: { children: ReactNode }) {
 }, []);
 
 useEffect(() => {
-  console.log("installPrompt", installPrompt);
 }, [installPrompt]);
 
   // Detect standalone display mode (app already installed).

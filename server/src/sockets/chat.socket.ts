@@ -4,7 +4,6 @@ import logger from '../utils/logger';
 
 export function registerChatSockets(io: Server, socket: Socket) {
   const user = (socket as any).user;
-  console.log(user);
   if (!user) return;
 
   socket.on('join_room', async ({ roomId }) => {

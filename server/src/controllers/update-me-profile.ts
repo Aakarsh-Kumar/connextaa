@@ -137,7 +137,6 @@ const updateMeProfileController = async (req: Request, res: Response) => {
 
 const usernameValidityController = async(req: Request, res: Response) =>{
     const {username} = req.query;
-    console.log(username);
     const userId = req.user?.id as string;
     if (!username || !userId) {
         res.status(400).json({

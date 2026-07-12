@@ -73,7 +73,6 @@ export default function OnboardingPage() {
         setUsernameStatus("checking");
 
         const res = await authApi.checkUsername(value);
-        console.log(res.success);
         setUsernameStatus(res.success ? "available" : "taken");
       } catch {
         setUsernameStatus("idle");

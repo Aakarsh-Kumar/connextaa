@@ -109,7 +109,6 @@ const createJoinRequestController = async (
     }
 
     const { message } = req.body;
-    console.log(message);
 
     await prisma.$transaction(async (tx: Prisma.TransactionClient) =>{
         const collaboration =
