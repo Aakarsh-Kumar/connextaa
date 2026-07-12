@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
-import { CollaborationStatus, JoinStatus , MemberRole} from "@prisma/client";
+import { CollaborationStatus, JoinStatus , MemberRole, Prisma} from "@prisma/client";
 import prisma from "../models";
 import logger from "../utils/logger";
+import createNotification from "../utils/createNotification";
+import { NotificationType } from "@prisma/client";
 
 const getRequestsController = async (req: Request, res: Response) => {
     try {
@@ -109,100 +111,104 @@ const createJoinRequestController = async (
     const { message } = req.body;
     console.log(message);
 
-    const collaboration =
-      await prisma.collaboration.findFirst({
-        where: {
-          id: collaborationId,
-          deletedAt: null,
-        },
-        select: {
-          id: true,
-          creatorId: true,
-          status: true,
-        },  
-      });
-
-    if (!collaboration) {
-      return res.status(404).json({
-        success: false,
-        message: "Collaboration not found",
-      });
-    }
-
-    if (collaboration.creatorId === userId) {
-      return res.status(400).json({
-        success: false,
-        message: "You cannot join your own collaboration",
-      });
-    }
-
-    if (collaboration.status !== CollaborationStatus.OPEN) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Collaboration is no longer accepting members",
-      });
-    }
-
-    const existingMember =
-      await prisma.collaborationMember.findUnique({
-        where: {
-          collaborationId_userId: {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) =>{
+        const collaboration =
+        await tx.collaboration.findFirst({
+          where: {
+            id: collaborationId,
+            deletedAt: null,
+          },
+          select: {
+            id: true,
+            creatorId: true,
+            status: true,
+          },  
+        });
+      
+      if (!collaboration) {
+        return res.status(404).json({
+          success: false,
+          message: "Collaboration not found",
+        });
+      }
+    
+      if (collaboration.creatorId === userId) {
+        return res.status(400).json({
+          success: false,
+          message: "You cannot join your own collaboration",
+        });
+      }
+    
+      if (collaboration.status !== CollaborationStatus.OPEN) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Collaboration is no longer accepting members",
+        });
+      }
+    
+      const existingMember =
+        await tx.collaborationMember.findUnique({
+          where: {
+            collaborationId_userId: {
+              collaborationId,
+              userId,
+            },
+          },
+        });
+      
+      if (existingMember) {
+        if (existingMember.joinStatus === JoinStatus.PENDING) {
+          return res.status(409).json({
+            success: false,
+            message: "Join request already submitted",
+          });
+        }
+      
+        if (existingMember.joinStatus === JoinStatus.APPROVED) {
+          return res.status(409).json({
+            success: false,
+            message: "You are already a member",
+          });
+        }
+      
+        await tx.collaborationMember.update({
+          where: {
+            id: existingMember.id,
+          },
+          data: {
+            joinStatus: JoinStatus.PENDING,
+            joinMessage: message ?? null,
+            joinedAt: new Date(),
+          },
+        });
+      } else {
+        await tx.collaborationMember.create({
+          data: {
             collaborationId,
             userId,
+            role: MemberRole.MEMBER,
+            joinStatus: JoinStatus.PENDING,
+            joinMessage: message ?? null,
           },
-        },
-      });
-
-    if (existingMember) {
-      if (existingMember.joinStatus === JoinStatus.PENDING) {
-        return res.status(409).json({
-          success: false,
-          message: "Join request already submitted",
         });
       }
-
-      if (existingMember.joinStatus === JoinStatus.APPROVED) {
-        return res.status(409).json({
-          success: false,
-          message: "You are already a member",
-        });
-      }
-
-      await prisma.collaborationMember.update({
-        where: {
-          id: existingMember.id,
-        },
-        data: {
-          joinStatus: JoinStatus.PENDING,
-          joinMessage: message ?? null,
-          joinedAt: new Date(),
-        },
-      });
-    } else {
-      await prisma.collaborationMember.create({
-        data: {
-          collaborationId,
-          userId,
-          role: MemberRole.MEMBER,
-          joinStatus: JoinStatus.PENDING,
-          joinMessage: message ?? null,
-        },
-      });
-    }
-
+      //notification jadu to be done here(convert into transaction(bcoz 2 database is being called extraction for consistency when operations are done in 2 or tables))
+      await createNotification(tx, collaboration.creatorId, NotificationType.JOIN_REQUEST, "Join Request received", `Someone Wants to join your collaboration.`,false,null)
+    })
+    
     return res.status(201).json({
       success: true,
       message: "Join request submitted successfully",
     });
-    //notification jadu to be done here(convert into transaction(bcoz 2 database is being called extraction for consistency when operations are done in 2 or tables))
+    
   } catch (error) {
     logger.error("createJoinRequestController error", {
       error,
       userId: req.user?.id,
       collaborationId: req.params.id,
     });
-
+    
     return res.status(500).json({
       success: false,
       message: "Internal server error",
