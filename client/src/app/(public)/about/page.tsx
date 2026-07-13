@@ -17,6 +17,20 @@ export const metadata: Metadata = {
   title: "About Us | Connectify",
   description:
     "Learn about the story, mission, and team behind Connectify, the platform helping people connect for real-world collaborations.",
+  alternates: {
+    canonical: "/about",
+  },
+  openGraph: {
+    title: "About Us | Connectify",
+    description:
+      "Learn about the story, mission, and team behind Connectify, the platform helping people connect for real-world collaborations.",
+    url: "https://connectify.aakarsh.xyz/about",
+  },
+  twitter: {
+    title: "About Us | Connectify",
+    description:
+      "Learn about the story, mission, and team behind Connectify, the platform helping people connect for real-world collaborations.",
+  },
 };
 
 const values = [

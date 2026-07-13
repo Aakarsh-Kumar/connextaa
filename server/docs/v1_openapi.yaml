@@ -520,7 +520,8 @@ components:
           nullable: true
 
         rating:
-          type: integer
+          type: number
+          format: float
           nullable: true
 
         creator:

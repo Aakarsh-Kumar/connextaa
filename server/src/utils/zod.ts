@@ -40,7 +40,7 @@ const CollaborationFeedItem = z
     currentMembers: z.number().int(),
     maxMembers: z.number().int(),
     distanceMeters: z.number().nullable(),
-    rating: z.number().int().nullable(),
+    rating: z.number().nullable(),
     creator: User,
     fromLocation: Location,
     toLocation: Location,

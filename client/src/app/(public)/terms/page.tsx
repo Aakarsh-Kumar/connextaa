@@ -17,6 +17,20 @@ export const metadata: Metadata = {
   title: "Terms of Service | Connectify",
   description:
     "Connectify Terms of Service covering account use, collaborations, safety, and liability.",
+  alternates: {
+    canonical: "/terms",
+  },
+  openGraph: {
+    title: "Terms of Service | Connectify",
+    description:
+      "Connectify Terms of Service covering account use, collaborations, safety, and liability.",
+    url: "https://connectify.aakarsh.xyz/terms",
+  },
+  twitter: {
+    title: "Terms of Service | Connectify",
+    description:
+      "Connectify Terms of Service covering account use, collaborations, safety, and liability.",
+  },
 };
 
 const prohibitedActions = [

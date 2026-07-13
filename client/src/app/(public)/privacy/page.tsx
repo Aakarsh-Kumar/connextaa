@@ -5,6 +5,20 @@ export const metadata: Metadata = {
   title: "Privacy Policy | Connectify",
   description:
     "Learn how Connectify collects, uses, and protects your personal information when you use our collaboration platform.",
+  alternates: {
+    canonical: "/privacy",
+  },
+  openGraph: {
+    title: "Privacy Policy | Connectify",
+    description:
+      "Learn how Connectify collects, uses, and protects your personal information when you use our collaboration platform.",
+    url: "https://connectify.aakarsh.xyz/privacy",
+  },
+  twitter: {
+    title: "Privacy Policy | Connectify",
+    description:
+      "Learn how Connectify collects, uses, and protects your personal information when you use our collaboration platform.",
+  },
 };
 
 const sections = [
