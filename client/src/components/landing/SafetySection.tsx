@@ -38,7 +38,7 @@ export default function SafetySection() {
             Your Safety is Primary
           </h2>
           <p className="text-on-surface-variant font-body-md text-body-md max-w-2xl mx-auto">
-            We&rsquo;ve built Connectify on a foundation of trust, so you can focus on making great connections.
+            We&rsquo;ve built Connextaa on a foundation of trust, so you can focus on making great connections.
           </p>
         </div>
 

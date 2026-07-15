@@ -1,0 +1,34 @@
+# Connextaa
+
+> Connextaa is a social collaboration platform that helps you discover nearby people for real-world activities — study sessions, trips, sports, events, carpooling, and more.
+
+Connextaa connects people based on shared activities and proximity, not just social graphs. Users create and join collaborations, communicate in temporary group chats, and rate each other after meetings.
+
+## Homepage
+
+- Homepage: https://www.connextaa.in
+
+## Public Pages
+
+- About: https://www.connextaa.in/about
+- Privacy Policy: https://www.connextaa.in/privacy
+- Terms of Service: https://www.connextaa.in/terms
+
+## Key Features
+
+- Location-based collaboration discovery
+- Activity categories: Study, Sports, Travel, Carpool, Events, and more
+- Temporary group chats for collaboration members
+- Trust and safety through community ratings
+- Google OAuth sign-in
+- Progressive Web App (PWA) support
+
+## Founders
+
+- Aakarsh Kumar — https://github.com/Aakarsh-Kumar
+- Aarohi Sahu — https://github.com/aarohi-dev
+
+## Contact
+
+- LinkedIn (Aakarsh): https://www.linkedin.com/in/aakarsh-kumar25
+- LinkedIn (Aarohi): https://www.linkedin.com/in/aarohi-sahu-5a0013327

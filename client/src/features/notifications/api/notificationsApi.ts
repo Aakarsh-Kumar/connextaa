@@ -18,30 +18,6 @@ export const notificationsApi = {
       },
     });
     return response.data;
-//     return {
-//       "success": true,
-//       'data': [
-//     {
-//       "id": "<uuid>",
-//       "type": "JOIN_REQUEST",
-//       "title": "<string>",
-//       "body": "<string>",
-//       "referenceId": "<string>",
-//       "isRead": true,
-//       "createdAt": "<dateTime>"
-//     },
-//     {
-//       "id": "<uuid>",
-//       "type": "NEW_MESSAGE",
-//       "title": "<string>",
-//       "body": "<string>",
-//       "referenceId": "<string>",
-//       "isRead": false,
-//       "createdAt": "<dateTime>"
-//     }
-//   ],
-//   "nextCursor": "<string>"
-// }
   },
 
   /**

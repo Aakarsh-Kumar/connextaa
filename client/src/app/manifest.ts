@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "Connectify",
-    short_name: "Connectify",
+    name: "Connextaa",
+    short_name: "Connextaa",
     description:
       "Discover nearby activities, collaborate with people around you, and build meaningful real-world connections.",
 
@@ -27,6 +27,7 @@ export default function manifest(): MetadataRoute.Manifest {
         src: "/logo192x192.png",
         sizes: "192x192",
         type: "image/png",
+        purpose: "any",
       },
       {
         src: "/logo512x512.png",

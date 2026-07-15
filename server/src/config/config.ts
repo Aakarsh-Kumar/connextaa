@@ -3,7 +3,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const cleanEnvVar = (val: string | undefined, fallback: string = ''): string => {
+const cleanEnvVar = (
+  val: string | undefined,
+  fallback: string = '',
+): string => {
   if (!val) return fallback;
   return val.replace(/^["']|["']$/g, ''); // strip leading/trailing quotes
 };
@@ -22,7 +25,7 @@ export const config = {
   jwt: {
     secret: cleanEnvVar(process.env.JWT_SECRET),
     expiration: cleanEnvVar(process.env.JWT_EXPIRATION, '1d'),
-    issuer: 'Connectify',
+    issuer: 'Connextaa',
   },
   googleClientId: cleanEnvVar(process.env.GOOGLE_CLIENT_ID),
 };

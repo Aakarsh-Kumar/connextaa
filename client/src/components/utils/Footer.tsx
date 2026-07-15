@@ -33,14 +33,14 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-6">
               <Image
-                alt="Connectify Logo"
+                alt="Connextaa Logo"
                 src={Logo}
                 className=" object-contain"
                 width={140}
                 height={32}
               />
               {/* <span className="font-headline-md text-headline-md font-bold text-popover">
-                Connectify
+                Connextaa
               </span> */}
             </div>
             <p className="text-on-surface-variant font-body-md text-body-md max-w-xs">
@@ -73,10 +73,10 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-outline-variant/10">
           <p className="font-label-md text-label-md text-on-surface-variant">
-            © 2026 Connectify. Built for neighbors.
+            © 2026 Connextaa. Built for neighbors.
           </p>
           <div className="flex gap-6">
-            <a href="mailto:connectify.core@gmail.com" className="text-on-surface-variant hover:text-primary transition-colors">
+            <a href="mailto:connextaa@gmail.com" className="text-on-surface-variant hover:text-primary transition-colors">
               <Mail className="w-5 h-5" />
             </a>
             {/* <a href="#" className="text-on-surface-variant hover:text-primary transition-colors">

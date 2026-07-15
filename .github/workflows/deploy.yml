@@ -32,7 +32,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/connectify-api
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/connextaa
           tags: |
             type=raw,value=latest
             type=sha
@@ -56,7 +56,7 @@ jobs:
           key: ${{ secrets.VM_SSH_KEY }}
           port: ${{ secrets.VM_PORT }}
           script: |
-            cd /opt/apps/connectify
+            cd /opt/apps/connextaa
 
             docker compose pull
 

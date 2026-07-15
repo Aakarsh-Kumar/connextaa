@@ -1589,6 +1589,7 @@ export interface components {
             currentMembers: number;
             maxMembers: number;
             distanceMeters: number | null;
+            /** Format: float */
             rating: number | null;
             creator: components["schemas"]["User"];
             fromLocation: components["schemas"]["Location"];

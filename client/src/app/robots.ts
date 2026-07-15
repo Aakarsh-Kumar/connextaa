@@ -2,20 +2,19 @@ import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [
-      {
-        userAgent: "*",
-        allow: "/",
-      },
-      {
-        userAgent: "*",
-        disallow: [
-          "/dashboard",
-          "/onboarding",
-        ],
-      },
-    ],
-    sitemap: "https://connectify.aakarsh.xyz/sitemap.xml",
-    host: "https://connectify.aakarsh.xyz",
+    rules: {
+      userAgent: "*",
+      allow: "/",
+      disallow: [
+        "/dashboard",
+        "/chat",
+        "/settings",
+        "/create",
+        "/onboarding",
+        "/api",
+      ],
+    },
+    sitemap: "https://www.connextaa.in",
+    host: "https://www.connextaa.in",
   };
 }

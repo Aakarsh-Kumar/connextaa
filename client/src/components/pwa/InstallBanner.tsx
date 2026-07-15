@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Download, Smartphone, X } from "lucide-react";
 import { usePwa } from "@/providers/PwaProvider";
 
-const SESSION_KEY = "connectify-install-banner-dismissed";
+const SESSION_KEY = "connextaa-install-banner-dismissed";
 
 export function InstallBanner() {
   const { canInstall, installing, triggerInstall, isInstalled } = usePwa();
@@ -56,11 +56,11 @@ export function InstallBanner() {
 
         <div className="flex-1">
           <h3 className="text-base font-semibold text-foreground">
-            Install Connectify
+            Install Connextaa
           </h3>
 
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            Install Connectify for faster access, better performance and
+            Install Connextaa for faster access, better performance and
             improved notification support.
           </p>
 
