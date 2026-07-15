@@ -72,7 +72,7 @@ const developers = [
     pic: AakarshImage,
     role: "Developer",
     tagline: '"Normal is Boring."',
-    bio: "Aakarsh enjoys building thoughtful products that solve real-world problems with clean engineering and intuitive user experiences.",
+    bio: "Aakarsh loves taking messy ideas, asking better questions, and turning them into something real.",
     color: "bg-popover",
     links: {
     //   portfolio: "https://aakarsh.is-a.dev",
@@ -85,8 +85,8 @@ const developers = [
     name: "Aarohi Sahu",
     pic: AarohiImage,
     role: "Developer",
-    tagline: '"Building Cool Stuff."',
-    bio: "Aarohi is passionate about designing and developing products that are simple to use, visually appealing, and impactful for everyday users.",
+    tagline: '"Too curious to stay ordinary."',
+    bio: "Aarohi enjoys turning ideas into experiences that feel effortless. Whether it's designing, building, or refining, I'm always chasing work that's thoughtful, useful, and a little different.",
     color: "bg-secondary-container",
     links: {
       linkedin: "https://www.linkedin.com/in/aarohi-sahu-5a0013327",
