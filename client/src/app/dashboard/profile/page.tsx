@@ -142,7 +142,16 @@ export default function ProfilePage() {
     setEditCollabTitle(collab.title);
     setEditCollabDesc(collab.description);
     setEditCollabMaxMembers(collab.maxMembers || 5);
-    setEditCollabDate(collab.scheduledAt ? new Date(collab.scheduledAt).toISOString().slice(0, 16) : "");
+    if (collab.scheduledAt) {
+    const date = new Date(collab.scheduledAt);
+
+    // Convert to local time
+    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+
+    setEditCollabDate(local.toISOString().slice(0, 16));
+  } else {
+    setEditCollabDate("");
+  }
     setEditCollabCurrentApproved(collab.currentMembers || 1);
     setIsEditCollabOpen(true);
   };
