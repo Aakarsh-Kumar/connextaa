@@ -228,7 +228,7 @@ export default function PrivacyPolicyPage() {
             Connextaa collects, uses, and protects your information.
           </p>
           <p className="mt-6 font-label-md text-label-md text-on-surface-variant/60">
-            Last Updated: July 10, 2026
+            Last Updated: July 16, 2026
           </p>
         </div>
       </section>

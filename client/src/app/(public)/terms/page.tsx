@@ -351,7 +351,7 @@ export default function TermsOfServicePage() {
             carefully before creating an account or using our services.
           </p>
           <p className="mt-6 font-label-md text-label-md text-on-surface-variant/60">
-            Last Updated: July 10, 2026
+            Last Updated: July 16, 2026
           </p>
         </div>
       </section>
