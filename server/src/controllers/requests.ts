@@ -333,8 +333,9 @@ const approveJoinRequestController = async (
           },
         });
       }
+      await createNotification(tx,joinRequest.userId,NotificationType.JOIN_APPROVED,"Join Request Approved","Yay! Your request to join a collaboration has been approved",false,collaboration.chatRoom?.id || null)
     });
-
+    
     return res.status(200).json({
       success: true,
       message: "Request approved successfully",
@@ -379,6 +380,7 @@ const rejectJoinRequestController = async (
             creatorId: true,
             status: true,
             deletedAt: true,
+            title: true,
           },
         },
       },
@@ -420,15 +422,18 @@ const rejectJoinRequestController = async (
       });
     }
 
-    await prisma.collaborationMember.update({
-      where: {
-        id: requestId,
-      },
-      data: {
-        joinStatus: JoinStatus.REJECTED,
-      },
+    await prisma.$transaction(async(tx)=>{
+      await tx.collaborationMember.update({
+        where: {
+          id: requestId,
+        },
+        data: {
+          joinStatus: JoinStatus.REJECTED,
+        },
+      });
+      await createNotification(tx,joinRequest.userId,NotificationType.JOIN_REJECTED,"Request Rejected",`Join request for ${joinRequest.collaboration.title} has been rejected.`,false,null);
     });
-
+    
     return res.status(200).json({
       success: true,
       message: "Request rejected successfully",
@@ -725,3 +730,5 @@ const removeMemberController = async (
 };
 
 export { getRequestsController, createJoinRequestController, approveJoinRequestController, rejectJoinRequestController, leaveRequestController, removeMemberController };
+
+

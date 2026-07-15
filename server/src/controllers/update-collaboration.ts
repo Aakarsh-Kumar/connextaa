@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import logger from '../utils/logger';
 import prisma from '../models';
-import { JoinStatus, CollaborationStatus } from '@prisma/client';
+import { JoinStatus, CollaborationStatus, NotificationType } from '@prisma/client';
+import createNotification from '../utils/createNotification';
 
 const updateCollaborationController = async (req: Request, res: Response) => {
   try {
@@ -179,7 +180,15 @@ const deleteCollaborationController = async (req: Request, res: Response) => {
 
     const collaboration = await prisma.collaboration.findUnique({
       where: { id },
-      select: { creatorId: true, status: true },
+      select: { creatorId: true, status: true, title: true },
+    });
+
+   // Get current approved members count
+    const approvedMembers = await prisma.collaborationMember.findMany({
+      where: {
+        collaborationId: id,
+        joinStatus: JoinStatus.APPROVED,
+      },
     });
 
     if (!collaboration) {
@@ -207,14 +216,31 @@ const deleteCollaborationController = async (req: Request, res: Response) => {
       });
     }
 
+
     // Soft-delete: update status to CANCELLED and set deletedAt
-    await prisma.collaboration.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
-        status: CollaborationStatus.CANCELLED,
-      },
-    });
+    await prisma.$transaction(async(tx)=>{
+      await tx.collaboration.update({
+        where: { id },
+        data: {
+          deletedAt: new Date(),
+          status: CollaborationStatus.CANCELLED,
+        },
+      });
+      await Promise.all(
+        approvedMembers.map((member) =>
+          createNotification(
+            tx,
+            member.id,
+            NotificationType.COLLABORATION_COMPLETED,
+            "Collaboration Cancelled",
+            `Collaboration "${collaboration.title}" has been cancelled.`,
+            false,
+            null
+          )
+        )
+      );
+    })
+    
 
     // TODO:
     // When collaboration is cancelled (deleted):
@@ -269,6 +295,11 @@ const completeCollaborationController = async (req: Request, res: Response) => {
             bio: true,
           },
         },
+        chatRoom: {
+          select:{
+            id: true,
+          }
+        }
       },
     });
 
@@ -341,88 +372,105 @@ const completeCollaborationController = async (req: Request, res: Response) => {
     }
 
     // Update status to COMPLETED
-    const updated = await prisma.collaboration.update({
-      where: { id },
-      data: {
-        status: CollaborationStatus.COMPLETED,
-        completedAt: new Date(),
-      },
-      include: {
-        creator: {
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            onboardingCompleted: true,
-            username: true,
-            avatarUrl: true,
-            bio: true,
-          },
+    await prisma.$transaction(async(tx)=>{
+      const updated = await tx.collaboration.update({
+        where: { id },
+        data: {
+          status: CollaborationStatus.COMPLETED,
+          completedAt: new Date(),
         },
-        members: {
-          where: { joinStatus: JoinStatus.APPROVED },
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                username: true,
-                avatarUrl: true,
+        include: {
+          creator: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              onboardingCompleted: true,
+              username: true,
+              avatarUrl: true,
+              bio: true,
+            },
+          },
+          members: {
+            where: { joinStatus: JoinStatus.APPROVED },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  username: true,
+                  avatarUrl: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      });
 
-    // TODO:
-    // Ratings are available for 7 days after completedAt.
-    // Rating availability is computed dynamically.
-    // No database state is required.
+      // TODO:
+      // Ratings are available for 7 days after completedAt.
+      // Rating availability is computed dynamically.
+      // No database state is required.
 
-    // TODO:
-    // Create COLLABORATION_COMPLETED notifications
-    // for all approved members except the creator.
+      // TODO:
+      // Create COLLABORATION_COMPLETED notifications
+      // for all approved members except the creator.
 
-    // Chat cleanup is handled by the hourly cron.
-    // Delete chat room, members and messages
-    // after completedAt + 7 days.
+      // Chat cleanup is handled by the hourly cron.
+      // Delete chat room, members and messages
+      // after completedAt + 7 days.
 
-    // Format members to match CollaborationResponse structure
-    const formattedMembers = updated.members.map((m: any) => ({
-      id: m.user.id,
-      name: m.user.name,
-      username: m.user.username,
-      avatarUrl: m.user.avatarUrl,
-    }));
+      // Format members to match CollaborationResponse structure
+      const formattedMembers = updated.members.map((m: any) => ({
+        id: m.user.id,
+        name: m.user.name,
+        username: m.user.username,
+        avatarUrl: m.user.avatarUrl,
+      }));
 
-    return res.status(200).json({
-      success: true,
-      collaboration: {
-        id: updated.id,
-        title: updated.title,
-        description: updated.description,
-        fromLocation: {
-          name: updated.fromLocationName,
-          lat: updated.fromLat,
-          lng: updated.fromLng,
-        },
-        toLocation: {
-          name: updated.toLocationName,
-          lat: updated.toLat,
-          lng: updated.toLng,
-        },
-        scheduledAt: updated.scheduledAt.toISOString(),
-        maxMembers: updated.maxMembers,
-        status: updated.status,
-        creator: updated.creator,
-        category: updated.category,
-      },
-      members: formattedMembers,
-      currentMembers: approvedMembersCount,
-      isCreator: true,
-      myJoinStatus: JoinStatus.APPROVED,
-    });
+      await Promise.all(
+        formattedMembers.map((member) =>
+          createNotification(
+            tx,
+            member.id,
+            NotificationType.COLLABORATION_COMPLETED,
+            "Collaboration Completed",
+            `Yo! Your collaboration "${collaboration.title}" has been completed.`,
+            false,
+            collaboration.chatRoom?.id || null
+          )
+        )
+    );
+
+      return res.status(200).json({
+       success: true,
+       collaboration: {
+         id: updated.id,
+         title: updated.title,
+         description: updated.description,
+         fromLocation: {
+           name: updated.fromLocationName,
+           lat: updated.fromLat,
+           lng: updated.fromLng,
+         },
+         toLocation: {
+           name: updated.toLocationName,
+           lat: updated.toLat,
+           lng: updated.toLng,
+         },
+         scheduledAt: updated.scheduledAt.toISOString(),
+         maxMembers: updated.maxMembers,
+         status: updated.status,
+         creator: updated.creator,
+         category: updated.category,
+       },
+       members: formattedMembers,
+       currentMembers: approvedMembersCount,
+       isCreator: true,
+       myJoinStatus: JoinStatus.APPROVED,
+      });
+    })
+    
   } catch (error) {
     logger.error('Error completing collaboration', { error });
     return res
