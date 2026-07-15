@@ -105,7 +105,7 @@
   "exclude": [
     "node_modules",
     "dist",
-    "mongo_setup.js".
+    "mongo_setup.js",
     "prisma.config.ts"
   ]
 }
