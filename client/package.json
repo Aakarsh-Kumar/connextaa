@@ -10,6 +10,7 @@
     "gen": "openapi-typescript ../server/docs/v1_openapi.yaml -o ./src/types/api.ts"
   },
   "dependencies": {
+    "@next/third-parties": "^16.2.10",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-separator": "^1.1.8",

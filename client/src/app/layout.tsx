@@ -8,6 +8,7 @@ import { SocketProvider } from "@/providers/SocketProvider";
 import { PermissionProvider } from "@/providers/PermissionProvider";
 import { PwaProvider } from "@/providers/PwaProvider";
 import { Toaster } from "react-hot-toast";
+import { GoogleAnalytics } from "@next/third-parties/google"; // 1. Import the component
 
 const inter = Inter({
   subsets: ["latin"],
@@ -153,6 +154,9 @@ export default function RootLayout({
             </AuthProvider>
           </QueryProvider>
         </GoogleOAuthProvider>
+        
+        {/* 2. Add the component right before the closing body tag */}
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID ?? ""} />
       </body>
     </html>
   );
