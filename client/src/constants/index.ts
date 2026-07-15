@@ -122,9 +122,9 @@ export const NOTIFICATION_CONFIG: Record<NotificationType, NotificationConfig> =
     iconColor: "text-emerald-600",
     cardBg: "bg-emerald-50/40",
     cardBorder: "border-emerald-200/60",
-    actionLabel: "View Collaboration",
+    actionLabel: "View Chat",
     getRedirectPath: (referenceId) =>
-      `/dashboard/collaborations/${referenceId}`,
+      `/dashboard/chats/chat/${referenceId}`,
   },
   JOIN_REJECTED: {
     icon: XCircle,
