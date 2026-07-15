@@ -44,7 +44,7 @@ export default function Footer() {
               </span> */}
             </div>
             <p className="text-on-surface-variant font-body-md text-body-md max-w-xs">
-              Building bridges between neighbors for a more collaborative world.
+              Building bridges between those around you.
             </p>
           </div>
 
@@ -73,7 +73,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-outline-variant/10">
           <p className="font-label-md text-label-md text-on-surface-variant">
-            © 2026 Connextaa. Built for neighbors.
+            © 2026 Connextaa. Built for people nearby.
           </p>
           <div className="flex gap-6">
             <a href="mailto:connextaa@gmail.com" className="text-on-surface-variant hover:text-primary transition-colors">
