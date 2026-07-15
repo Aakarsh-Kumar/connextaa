@@ -230,8 +230,8 @@ const deleteCollaborationController = async (req: Request, res: Response) => {
         approvedMembers.map((member) =>
           createNotification(
             tx,
-            member.id,
-            NotificationType.COLLABORATION_COMPLETED,
+            member.userId,
+            NotificationType.COLLABORATION_CANCELLED,
             "Collaboration Cancelled",
             `Collaboration "${collaboration.title}" has been cancelled.`,
             false,

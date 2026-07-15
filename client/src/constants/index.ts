@@ -163,7 +163,7 @@ export const NOTIFICATION_CONFIG: Record<NotificationType, NotificationConfig> =
     cardBorder: "border-orange-200/50",
     actionLabel: "Rate Participants",
     getRedirectPath: (referenceId) =>
-      `/dashboard/collaborations/${referenceId}`,
+      `/dashboard/chats/chat/${referenceId}`,
   },
   COLLABORATION_CANCELLED: {
     icon: Ban,
@@ -173,6 +173,6 @@ export const NOTIFICATION_CONFIG: Record<NotificationType, NotificationConfig> =
     cardBorder: "border-slate-200/50",
     actionLabel: "View Details",
     getRedirectPath: (referenceId) =>
-      `/dashboard/collaborations/${referenceId}`,
+      `/dashboard`,
   },
 };
