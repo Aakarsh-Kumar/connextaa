@@ -11,7 +11,7 @@ export const setAuthCookie = (
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         domain: process.env.NODE_ENV === "production"
-            ? ".aakarsh.xyz"
+            ? ".connextaa.in"
             : undefined,
         maxAge: ms(config.jwt.expiration as ms.StringValue)
     });
@@ -22,7 +22,7 @@ export const clearAuthCookie = (res: Response) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         domain: process.env.NODE_ENV === "production"
-            ? ".aakarsh.xyz"
+            ? ".connextaa.in"
             : undefined,
         sameSite: "lax",
     });
