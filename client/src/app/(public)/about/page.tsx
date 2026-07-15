@@ -288,12 +288,12 @@ export default function AboutUsPage() {
                 </p>
               </div>
 
-              <div className="mt-8 flex items-center gap-3">
+              {/* <div className="mt-8 flex items-center gap-3">
                 <User className="w-5 h-5 text-primary" strokeWidth={1.75} />
                 <p className="font-headline-md text-headline-md text-on-surface">
                   Aakarsh &amp; Aarohi
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
