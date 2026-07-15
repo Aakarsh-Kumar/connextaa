@@ -15,7 +15,7 @@ RUN npm ci
 COPY . .
 
 # Generate Prisma Client
-RUN npm run db:generate
+RUN npm run prisma:generate
 
 # Compile TypeScript
 RUN npm run build
@@ -50,9 +50,9 @@ EXPOSE 8080
 
 # Health Check
 HEALTHCHECK --interval=30s \
-            --timeout=5s \
-            --start-period=20s \
-            --retries=3 \
-CMD node -e "fetch('http://127.0.0.1:8080/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+    --timeout=5s \
+    --start-period=20s \
+    --retries=3 \
+    CMD node -e "fetch('http://127.0.0.1:8080/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
-CMD ["npm", "run", "start:prod"]
+CMD ["sh", "-c", "npm run prisma:deploy && npm run start:prod"]

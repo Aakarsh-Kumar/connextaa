@@ -1,15 +1,201 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "cockroachdb"
 }
 
-//////////////////////////////////////////////////
-// ENUMS
-//////////////////////////////////////////////////
+model User {
+  id                    String                @id @default(uuid())
+  googleId              String                @unique @map("google_id")
+  email                 String                @unique
+  name                  String
+  username              String                @unique
+  avatarUrl             String?               @map("avatar_url")
+  bio                   String?
+  onboardingCompleted   Boolean               @default(false) @map("onboarding_completed")
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+  chatMembers           ChatMember[]
+  collaborationMembers  CollaborationMember[]
+  createdCollaborations Collaboration[]       @relation("CreatedCollaborations")
+  deviceTokens          DeviceToken[]
+  sentMessages          Message[]
+  notifications         Notification[]
+  ratingsReceived       Rating[]              @relation("ReviewedRatings")
+  ratingsGiven          Rating[]              @relation("ReviewerRatings")
+  categories            UserCategory[]
+
+  @@map("users")
+}
+
+model UserCategory {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  category  Category
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category])
+  @@index([userId])
+  @@map("user_categories")
+}
+
+model Collaboration {
+  id               String                    @id @default(uuid())
+  creatorId        String                    @map("creator_id")
+  category         Category
+  title            String
+  description      String
+  /// ///////////////////////////////////////////////
+  /// ///////////////////////////////////////////////
+  fromLocationName String                    @map("from_location_name")
+  fromLat          Float?                    @map("from_lat")
+  fromLng          Float?                    @map("from_lng")
+  fromPoint        Unsupported("geography")? @map("from_point")
+  /// ///////////////////////////////////////////////
+  /// ///////////////////////////////////////////////
+  toLocationName   String                    @map("to_location_name")
+  toLat            Float?                    @map("to_lat")
+  toLng            Float?                    @map("to_lng")
+  toPoint          Unsupported("geography")? @map("to_point")
+  /// ///////////////////////////////////////////////
+  /// ///////////////////////////////////////////////
+  scheduledAt      DateTime                  @map("scheduled_at")
+  maxMembers       Int                       @map("max_members")
+  status           CollaborationStatus       @default(OPEN)
+  completedAt      DateTime?                 @map("completed_at")
+  deletedAt        DateTime?                 @map("deleted_at")
+  createdAt        DateTime                  @default(now()) @map("created_at")
+  updatedAt        DateTime                  @updatedAt @map("updated_at")
+  chatRoom         ChatRoom?
+  members          CollaborationMember[]
+  creator          User                      @relation("CreatedCollaborations", fields: [creatorId], references: [id])
+  ratings          Rating[]
+
+  @@index([title])
+  @@index([fromLocationName])
+  @@index([toLocationName])
+  @@index([creatorId])
+  @@index([category])
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([category, status])
+  @@index([deletedAt])
+  @@map("collaborations")
+}
+
+model CollaborationMember {
+  id              String        @id @default(uuid())
+  collaborationId String        @map("collaboration_id")
+  userId          String        @map("user_id")
+  role            MemberRole
+  joinStatus      JoinStatus    @map("join_status")
+  joinMessage     String?       @map("join_message")
+  joinedAt        DateTime      @default(now()) @map("joined_at")
+  collaboration   Collaboration @relation(fields: [collaborationId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([collaborationId, userId])
+  @@index([userId])
+  @@index([collaborationId])
+  @@index([joinStatus])
+  @@map("collaboration_members")
+}
+
+model ChatRoom {
+  id              String        @id @default(uuid())
+  collaborationId String        @unique @map("collaboration_id")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  members         ChatMember[]
+  collaboration   Collaboration @relation(fields: [collaborationId], references: [id], onDelete: Cascade)
+  messages        Message[]
+
+  @@map("chat_rooms")
+}
+
+model ChatMember {
+  id       String   @id @default(uuid())
+  roomId   String   @map("room_id")
+  userId   String   @map("user_id")
+  joinedAt DateTime @default(now()) @map("joined_at")
+  room     ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, userId])
+  @@index([roomId])
+  @@index([userId])
+  @@map("chat_members")
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  roomId    String   @map("room_id")
+  senderId  String   @map("sender_id")
+  message   String
+  createdAt DateTime @default(now()) @map("created_at")
+  room      ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([roomId, createdAt])
+  @@map("messages")
+}
+
+model Rating {
+  id                  String        @id @default(uuid())
+  collaborationId     String        @map("collaboration_id")
+  reviewerId          String        @map("reviewer_id")
+  reviewedUserId      String        @map("reviewed_user_id")
+  showUpRating        Int           @map("show_up_rating")
+  friendlyRating      Int           @map("friendly_rating")
+  safeRating          Int           @map("safe_rating")
+  collaborativeRating Int           @map("collaborative_rating")
+  comment             String?
+  createdAt           DateTime      @default(now()) @map("created_at")
+  collaboration       Collaboration @relation(fields: [collaborationId], references: [id], onDelete: Cascade)
+  reviewedUser        User          @relation("ReviewedRatings", fields: [reviewedUserId], references: [id], onDelete: Cascade)
+  reviewer            User          @relation("ReviewerRatings", fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@unique([collaborationId, reviewerId, reviewedUserId])
+  @@index([reviewedUserId])
+  @@map("ratings")
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  userId      String           @map("user_id")
+  type        NotificationType
+  title       String
+  body        String
+  isRead      Boolean          @default(false) @map("is_read")
+  referenceId String?
+  createdAt   DateTime         @default(now()) @map("created_at")
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+model DeviceToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  platform  String
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("device_tokens")
+}
+
+model migration_internal_statements {
+  statement_order BigInt @id
+  statement_id    String @unique @db.Uuid
+  data            Json?
+
+  @@map("_migration_internal_statements")
+}
 
 enum Category {
   CARPOOLING
@@ -44,334 +230,12 @@ enum NotificationType {
   JOIN_REQUEST
   JOIN_APPROVED
   JOIN_REJECTED
-
   CHAT_CREATED
   NEW_MESSAGE
-
   COLLABORATION_COMPLETED
   COLLABORATION_CANCELLED
 }
 
-//////////////////////////////////////////////////
-// USER
-//////////////////////////////////////////////////
-
-model User {
-  id       String @id @default(uuid())
-  googleId String @unique @map("google_id")
-  email    String @unique
-
-  name      String
-  username  String  @unique
-  avatarUrl String? @map("avatar_url")
-  bio       String?
-
-  onboardingCompleted Boolean @default(false) @map("onboarding_completed")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  //////////////////////////////////////////////////
-  // RELATIONS
-  //////////////////////////////////////////////////
-
-  categories UserCategory[]
-
-  createdCollaborations Collaboration[] @relation("CreatedCollaborations")
-
-  collaborationMembers CollaborationMember[]
-
-  sentMessages Message[]
-
-  notifications Notification[]
-
-  ratingsGiven Rating[] @relation("ReviewerRatings")
-
-  ratingsReceived Rating[] @relation("ReviewedRatings")
-
-  chatMembers ChatMember[]
-
-  deviceTokens DeviceToken[]
-
-  @@map("users")
-}
-
-//////////////////////////////////////////////////
-// USER CATEGORY
-//////////////////////////////////////////////////
-
-model UserCategory {
-  id String @id @default(uuid())
-
-  userId String @map("user_id")
-
-  category Category
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, category])
-  @@index([userId])
-  @@map("user_categories")
-}
-
-//////////////////////////////////////////////////
-// COLLABORATION
-//////////////////////////////////////////////////
-
-model Collaboration {
-  id String @id @default(uuid())
-
-  creatorId String @map("creator_id")
-
-  category Category
-
-  title       String
-  description String
-
-  //////////////////////////////////////////////////
-  // SOURCE LOCATION
-  //////////////////////////////////////////////////
-
-  fromLocationName String @map("from_location_name")
-
-  fromLat Float? @map("from_lat")
-  fromLng Float? @map("from_lng")
-
-  fromPoint Unsupported("geography(Point,4326)")? @map("from_point")
-
-  //////////////////////////////////////////////////
-  // DESTINATION LOCATION
-  //////////////////////////////////////////////////
-
-  toLocationName String @map("to_location_name")
-
-  toLat Float? @map("to_lat")
-  toLng Float? @map("to_lng")
-
-  toPoint Unsupported("geography(Point,4326)")? @map("to_point")
-
-  //////////////////////////////////////////////////
-  // EVENT DETAILS
-  //////////////////////////////////////////////////
-
-  scheduledAt DateTime @map("scheduled_at")
-
-  maxMembers Int @map("max_members")
-
-  status CollaborationStatus @default(OPEN)
-
-  completedAt DateTime? @map("completed_at")
-
-  deletedAt DateTime? @map("deleted_at")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  //////////////////////////////////////////////////
-  // RELATIONS
-  //////////////////////////////////////////////////
-
-  creator User @relation("CreatedCollaborations", fields: [creatorId], references: [id])
-
-  members CollaborationMember[]
-
-  chatRoom ChatRoom?
-
-  ratings Rating[]
-
-  //////////////////////////////////////////////////
-  // INDEXES
-  //////////////////////////////////////////////////
-  @@index([title])
-  @@index([fromLocationName])
-  @@index([toLocationName])
-  @@index([creatorId])
-  @@index([category])
-  @@index([status])
-  @@index([scheduledAt])
-  @@index([category, status])
-  @@index([deletedAt])
-  @@map("collaborations")
-}
-
-//////////////////////////////////////////////////
-// COLLABORATION MEMBER
-//////////////////////////////////////////////////
-
-model CollaborationMember {
-  id String @id @default(uuid())
-
-  collaborationId String @map("collaboration_id")
-
-  userId String @map("user_id")
-
-  role MemberRole
-
-  joinStatus JoinStatus @map("join_status")
-
-  joinMessage String? @map("join_message")
-
-  joinedAt DateTime @default(now()) @map("joined_at")
-
-  collaboration Collaboration @relation(fields: [collaborationId], references: [id], onDelete: Cascade)
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([collaborationId, userId])
-  @@index([userId])
-  @@index([collaborationId])
-  @@index([joinStatus])
-  @@map("collaboration_members")
-}
-
-//////////////////////////////////////////////////
-// CHAT ROOM
-//////////////////////////////////////////////////
-
-model ChatRoom {
-  id String @id @default(uuid())
-
-  collaborationId String @unique @map("collaboration_id")
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  collaboration Collaboration @relation(fields: [collaborationId], references: [id], onDelete: Cascade)
-
-  members ChatMember[]
-
-  messages Message[]
-
-  @@map("chat_rooms")
-}
-
-//////////////////////////////////////////////////
-// CHAT MEMBER
-//////////////////////////////////////////////////
-
-model ChatMember {
-  id String @id @default(uuid())
-
-  roomId String @map("room_id")
-
-  userId String @map("user_id")
-
-  joinedAt DateTime @default(now()) @map("joined_at")
-
-  room ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([roomId, userId])
-  @@index([roomId])
-  @@index([userId])
-  @@map("chat_members")
-}
-
-//////////////////////////////////////////////////
-// MESSAGE
-//////////////////////////////////////////////////
-
-model Message {
-  id String @id @default(uuid())
-
-  roomId String @map("room_id")
-
-  senderId String @map("sender_id")
-
-  message String
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  room ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
-
-  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
-
-  @@index([roomId, createdAt])
-  @@map("messages")
-}
-
-//////////////////////////////////////////////////
-// RATINGS
-//////////////////////////////////////////////////
-
-model Rating {
-  id String @id @default(uuid())
-
-  collaborationId String @map("collaboration_id")
-
-  reviewerId String @map("reviewer_id")
-
-  reviewedUserId String @map("reviewed_user_id")
-
-  showUpRating Int @map("show_up_rating")
-
-  friendlyRating Int @map("friendly_rating")
-
-  safeRating Int @map("safe_rating")
-
-  collaborativeRating Int @map("collaborative_rating")
-
-  comment String?
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  collaboration Collaboration @relation(fields: [collaborationId], references: [id], onDelete: Cascade)
-
-  reviewer User @relation("ReviewerRatings", fields: [reviewerId], references: [id], onDelete: Cascade)
-
-  reviewedUser User @relation("ReviewedRatings", fields: [reviewedUserId], references: [id], onDelete: Cascade)
-
-  @@unique([collaborationId, reviewerId, reviewedUserId])
-  @@index([reviewedUserId])
-  @@map("ratings")
-}
-
-//////////////////////////////////////////////////
-// NOTIFICATIONS
-//////////////////////////////////////////////////
-
-model Notification {
-  id String @id @default(uuid())
-
-  userId String @map("user_id")
-
-  type NotificationType
-
-  title String
-
-  body String
-
-  isRead Boolean @default(false) @map("is_read")
-
-  referenceId String?
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, isRead])
-  @@map("notifications")
-}
-
-//////////////////////////////////////////////////
-// DEVICE TOKENS
-//////////////////////////////////////////////////
-
-model DeviceToken {
-  id String @id @default(uuid())
-
-  userId String @map("user_id")
-
-  token String @unique
-
-  platform String
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("device_tokens")
+enum crdb_internal_region {
+  aws_ap_south_1 @map("aws-ap-south-1")
 }
