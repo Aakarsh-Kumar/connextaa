@@ -55,4 +55,4 @@ HEALTHCHECK --interval=30s \
     --retries=3 \
     CMD node -e "fetch('http://127.0.0.1:8080/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
-CMD ["sh", "-c", "npm run prisma:deploy && npm run start:prod"]
+CMD ["npm", "run", "start:prod"]
