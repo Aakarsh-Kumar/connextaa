@@ -22,15 +22,15 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://connectify.aakarsh.xyz"),
+  metadataBase: new URL("https://www.connextaa.in"),
   title: {
-    default: "Connectify | Find People For Anything",
-    template: "%s | Connectify",
+    default: "Connextaa | Find People For Anything",
+    template: "%s | Connextaa",
   },
   description:
     "Find nearby people for study sessions, trips, sports, events, carpooling, and more.",
   keywords: [
-    "connectify",
+    "connextaa",
     "activities",
     "meetups",
     "sports",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Aakarsh Kumar" }, { name: "Aarohi Sahu" }],
   creator: "Aakarsh Kumar & Aarohi Sahu",
-  publisher: "Connectify",
+  publisher: "Connextaa",
   category: "social",
   alternates: {
     canonical: "/",
@@ -53,11 +53,11 @@ export const metadata: Metadata = {
   },
   referrer: "origin-when-cross-origin",
   manifest: "/manifest.webmanifest",
-  applicationName: "Connectify",
+  applicationName: "Connextaa",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Connectify",
+    title: "Connextaa",
   },
   formatDetection: {
     telephone: false,
@@ -73,24 +73,24 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "Connectify",
-    title: "Connectify | Find People For Anything",
+    siteName: "Connextaa",
+    title: "Connextaa | Find People For Anything",
     description:
       "Discover nearby activities and connect with people around you.",
-    url: "https://connectify.aakarsh.xyz",
+    url: "https://www.connextaa.in",
     locale: "en_US",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Connectify - Connect with people nearby",
+        alt: "Connextaa - Connect with people nearby",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Connectify | Find People For Anything",
+    title: "Connextaa | Find People For Anything",
     description:
       "Discover nearby activities and connect with people around you.",
     images: ["/og-image.png"],
@@ -106,21 +106,21 @@ export const metadata: Metadata = {
 const orgSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Connectify",
-  "url": "https://connectify.aakarsh.xyz",
-  "logo": "https://connectify.aakarsh.xyz/logo192x192.png",
+  "name": "Connextaa",
+  "url": "https://www.connextaa.in",
+  "logo": "https://www.connextaa.in/logo192x192.png",
   "description":
-    "Connectify helps you find nearby people for study sessions, trips, sports, events, carpooling, and more.",
+    "Connextaa helps you find nearby people for study sessions, trips, sports, events, carpooling, and more.",
 };
 
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "Connectify",
-  "url": "https://connectify.aakarsh.xyz",
+  "name": "Connextaa",
+  "url": "https://www.connextaa.in",
   "potentialAction": {
     "@type": "SearchAction",
-    "target": "https://connectify.aakarsh.xyz/dashboard?q={search_term_string}",
+    "target": "https://www.connextaa.in/dashboard?q={search_term_string}",
     "query-input": "required name=search_term_string",
   },
 };

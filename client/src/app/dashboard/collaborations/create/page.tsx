@@ -84,7 +84,7 @@ function LocationInput({ id, label, placeholder, value, onChange }: LocationInpu
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5&countrycodes=IN&featurecodes=adm1,adm2,ADM3,ADM4,ADM5`,
-        { headers: { "Accept-Language": "en", "User-Agent": "Connectify/1.0" } }
+        { headers: { "Accept-Language": "en", "User-Agent": "Connextaa/1.0" } }
       );
       const data: NominatimResult[] = await res.json();
       setResults(data);

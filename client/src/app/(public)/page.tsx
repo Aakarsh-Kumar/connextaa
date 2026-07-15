@@ -9,18 +9,18 @@ import TrendingSection from "@/components/landing/TrendingSection";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Connectify | Find People For Anything",
+  title: "Connextaa | Find People For Anything",
   description: "Discover nearby activities, collaborate with people around you, and build meaningful real-world connections. Find people for study sessions, trips, sports, events, carpooling, and more.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Connectify | Find People For Anything",
+    title: "Connextaa | Find People For Anything",
     description: "Discover nearby activities, collaborate with people around you, and build meaningful real-world connections.",
-    url: "https://connectify.aakarsh.xyz",
+    url: "https://www.connextaa.in",
   },
   twitter: {
-    title: "Connectify | Find People For Anything",
+    title: "Connextaa | Find People For Anything",
     description: "Discover nearby activities, collaborate with people around you, and build meaningful real-world connections.",
   },
 };

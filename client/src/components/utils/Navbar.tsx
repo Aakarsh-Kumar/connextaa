@@ -71,7 +71,7 @@ export default function Navbar() {
           className="relative h-12 w-10 md:w-40 shrink-0 flex items-center group"
         >
           <Image
-            alt="Connectify Logo"
+            alt="Connextaa Logo"
             fill
             sizes="(max-width: 768px) 128px, 160px"
             priority

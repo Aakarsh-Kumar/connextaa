@@ -14,22 +14,22 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | Connectify",
+  title: "Terms of Service | Connextaa",
   description:
-    "Connectify Terms of Service covering account use, collaborations, safety, and liability.",
+    "Connextaa Terms of Service covering account use, collaborations, safety, and liability.",
   alternates: {
     canonical: "/terms",
   },
   openGraph: {
-    title: "Terms of Service | Connectify",
+    title: "Terms of Service | Connextaa",
     description:
-      "Connectify Terms of Service covering account use, collaborations, safety, and liability.",
-    url: "https://connectify.aakarsh.xyz/terms",
+      "Connextaa Terms of Service covering account use, collaborations, safety, and liability.",
+    url: "https://www.connextaa.in/terms",
   },
   twitter: {
-    title: "Terms of Service | Connectify",
+    title: "Terms of Service | Connextaa",
     description:
-      "Connectify Terms of Service covering account use, collaborations, safety, and liability.",
+      "Connextaa Terms of Service covering account use, collaborations, safety, and liability.",
   },
 };
 
@@ -37,11 +37,11 @@ const prohibitedActions = [
   "Harass, threaten, bully, or intimidate other users.",
   "Create fake accounts or impersonate another person.",
   "Share illegal, harmful, abusive, or offensive content.",
-  "Use Connectify for fraud, scams, or deceptive activities.",
+  "Use Connextaa for fraud, scams, or deceptive activities.",
   "Attempt to gain unauthorized access to accounts or systems.",
   "Reverse engineer, exploit bugs, or abuse vulnerabilities within the platform.",
   "Use automated tools, bots, or scripts to misuse the service.",
-  "Interfere with the normal operation of Connectify.",
+  "Interfere with the normal operation of Connextaa.",
 ];
 
 const notGuaranteed = [
@@ -81,13 +81,13 @@ const categories = [
 
 const sections = [
   {
-    id: "about-connectify",
+    id: "about-connextaa",
     icon: Layers,
-    title: "About Connectify",
+    title: "About Connextaa",
     content: (
       <div className="space-y-4">
         <p className="text-on-surface-variant font-body-md text-body-md">
-          Connectify is a community platform that helps users discover and
+          Connextaa is a community platform that helps users discover and
           collaborate with nearby people for activities such as:
         </p>
         <div className="flex flex-wrap gap-2">
@@ -101,7 +101,7 @@ const sections = [
           ))}
         </div>
         <p className="text-on-surface-variant font-body-md text-body-md pt-2">
-          Connectify only facilitates connections between users. We do not
+          Connextaa only facilitates connections between users. We do not
           organize, supervise, or guarantee any collaboration.
         </p>
       </div>
@@ -114,7 +114,7 @@ const sections = [
     content: (
       <div className="space-y-4">
         <p className="text-on-surface-variant font-body-md text-body-md">
-          You agree to use Connectify responsibly and respectfully. You must
+          You agree to use Connextaa responsibly and respectfully. You must
           not:
         </p>
         <ul className="space-y-2">
@@ -149,7 +149,7 @@ const sections = [
           collaboration.
         </p>
         <p className="text-on-surface font-body-md text-body-md font-medium">
-          Connectify does not guarantee:
+          Connextaa does not guarantee:
         </p>
         <ul className="space-y-2">
           {notGuaranteed.map((item) => (
@@ -198,7 +198,7 @@ const sections = [
     content: (
       <div className="space-y-4">
         <p className="text-on-surface-variant font-body-md text-body-md">
-          While Connectify aims to build a trusted community,{" "}
+          While Connextaa aims to build a trusted community,{" "}
           <strong className="text-on-surface">
             we cannot verify or guarantee the identity, intentions, or conduct
             of every user.
@@ -210,7 +210,7 @@ const sections = [
         </p>
         <div className="p-5 rounded-[16px] bg-destructive/5 border border-destructive/10 space-y-3">
           <p className="text-on-surface font-body-md text-body-md font-semibold">
-            Connectify is not responsible or liable for:
+            Connextaa is not responsible or liable for:
           </p>
           <ul className="space-y-2">
             {notLiableFor.map((item) => (
@@ -239,7 +239,7 @@ const sections = [
     title: "Platform Availability",
     content: (
       <p className="text-on-surface-variant font-body-md text-body-md">
-        We strive to keep Connectify available and reliable, but we do not
+        We strive to keep Connextaa available and reliable, but we do not
         guarantee uninterrupted access. Features may be modified, suspended, or
         discontinued at any time without prior notice.
       </p>
@@ -274,9 +274,9 @@ const sections = [
     title: "Intellectual Property",
     content: (
       <p className="text-on-surface-variant font-body-md text-body-md">
-        The Connectify platform, branding, design, and software are owned by
-        Connectify. Users retain ownership of the content they create but grant
-        Connectify permission to display and process that content for operating
+        The Connextaa platform, branding, design, and software are owned by
+        Connextaa. Users retain ownership of the content they create but grant
+        Connextaa permission to display and process that content for operating
         the platform.
       </p>
     ),
@@ -287,10 +287,10 @@ const sections = [
     title: "Limitation of Liability",
     content: (
       <p className="text-on-surface-variant font-body-md text-body-md">
-        To the fullest extent permitted by applicable law, Connectify and its
+        To the fullest extent permitted by applicable law, Connextaa and its
         developers shall not be liable for any direct, indirect, incidental,
         consequential, or special damages arising from the use of the platform.
-        Your use of Connectify and participation in collaborations is entirely
+        Your use of Connextaa and participation in collaborations is entirely
         at your own discretion and risk.
       </p>
     ),
@@ -301,7 +301,7 @@ const sections = [
     title: "Changes to These Terms",
     content: (
       <p className="text-on-surface-variant font-body-md text-body-md">
-        We may revise these Terms periodically. Continued use of Connectify
+        We may revise these Terms periodically. Continued use of Connextaa
         after updates constitutes acceptance of the revised Terms.
       </p>
     ),
@@ -313,7 +313,7 @@ const sections = [
     content: (
       <p className="text-on-surface-variant font-body-md text-body-md">
         If you have questions regarding these Terms, please contact the
-        Connectify development team.
+        Connextaa development team.
       </p>
     ),
   },
@@ -347,7 +347,7 @@ export default function TermsOfServicePage() {
             Terms of Service
           </h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-            By using Connectify, you agree to these Terms. Please read them
+            By using Connextaa, you agree to these Terms. Please read them
             carefully before creating an account or using our services.
           </p>
           <p className="mt-6 font-label-md text-label-md text-on-surface-variant/60">
@@ -362,8 +362,8 @@ export default function TermsOfServicePage() {
           {/* Intro card */}
           <div className="p-8 rounded-[24px] bg-white card-shadow mb-12 border border-outline-variant/10">
             <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
-              Welcome to <strong className="text-on-surface">Connectify</strong>
-              . These Terms govern your use of the Connectify platform. By
+              Welcome to <strong className="text-on-surface">Connextaa</strong>
+              . These Terms govern your use of the Connextaa platform. By
               creating an account or using our services, you agree to these
               Terms.
             </p>
@@ -398,7 +398,7 @@ export default function TermsOfServicePage() {
 
           {/* Footer note
           <p className="mt-12 text-center font-label-md text-label-md text-on-surface-variant/60 max-w-2xl mx-auto">
-            Welcome to connectify guys!
+            Welcome to connextaa guys!
           </p> */}
         </div>
       </section>

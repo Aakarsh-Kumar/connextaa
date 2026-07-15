@@ -25,7 +25,7 @@ const logger = winston.createLogger({
     winston.format.json(),
   ),
   defaultMeta: {
-    service: 'connectify-api',
+    service: 'connextaa-api',
     environment: nodeEnv,
   },
   transports,

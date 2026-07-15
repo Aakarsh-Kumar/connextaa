@@ -39,7 +39,7 @@ app.use(
         'http://127.0.0.1:3000',
         'http://127.0.0.1:8080',
         'null', // Allow null origin for local file testing
-        'https://connectify.aakarsh.xyz',
+        'https://www.connextaa.in',
       ];
 
       // Check if origin is in allowed list or starts with localhost
@@ -113,7 +113,7 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   const baseUrl = `${req.protocol}://${req.get('host')}`;
   res.json({
-    message: 'Welcome to Connectify API',
+    message: 'Welcome to Connextaa API',
     status: 'success',
     version: '1.0.0',
     iss: 'Connecity-API',

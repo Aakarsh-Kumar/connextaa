@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import DashboardClientLayout from "./dashboard-client-layout";
 
 export const metadata: Metadata = {
-  title: "Dashboard | Connectify",
+  title: "Dashboard | Connextaa",
   robots: {
     index: false,
     follow: false,

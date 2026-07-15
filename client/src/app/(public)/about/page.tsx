@@ -14,22 +14,22 @@ import AarohiImage from "../../../../public/developers/aarohi.jpg"
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "About Us | Connectify",
+  title: "About Us | Connextaa",
   description:
-    "Learn about the story, mission, and team behind Connectify, the platform helping people connect for real-world collaborations.",
+    "Learn about the story, mission, and team behind Connextaa, the platform helping people connect for real-world collaborations.",
   alternates: {
     canonical: "/about",
   },
   openGraph: {
-    title: "About Us | Connectify",
+    title: "About Us | Connextaa",
     description:
-      "Learn about the story, mission, and team behind Connectify, the platform helping people connect for real-world collaborations.",
-    url: "https://connectify.aakarsh.xyz/about",
+      "Learn about the story, mission, and team behind Connextaa, the platform helping people connect for real-world collaborations.",
+    url: "https://www.connextaa.in/about",
   },
   twitter: {
-    title: "About Us | Connectify",
+    title: "About Us | Connextaa",
     description:
-      "Learn about the story, mission, and team behind Connectify, the platform helping people connect for real-world collaborations.",
+      "Learn about the story, mission, and team behind Connextaa, the platform helping people connect for real-world collaborations.",
   },
 };
 
@@ -52,7 +52,7 @@ const values = [
   {
     icon: TrendingUp,
     title: "Continuous Improvement",
-    desc: "We are always listening, learning, and improving Connectify based on community feedback.",
+    desc: "We are always listening, learning, and improving Connextaa based on community feedback.",
   },
 ];
 
@@ -107,7 +107,7 @@ export default function AboutUsPage() {
           </h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
             Airport to college. Concert to afterparty. Weekend trek with strangers who become friends.
-            Connectify was built for the moments when you just need the right people around.
+            Connextaa was built for the moments when you just need the right people around.
           </p>
         </div>
       </section>
@@ -118,7 +118,7 @@ export default function AboutUsPage() {
           {/* Left: heading + body */}
           <div>
             <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">
-              Why We Built Connectify
+              Why We Built Connextaa
             </h2>
             <p className="font-body-md text-body-md text-on-surface-variant mb-6">
               We have all experienced moments where we wanted to:
@@ -143,7 +143,7 @@ export default function AboutUsPage() {
             </p>
             <div className="h-px bg-outline-variant/30 mb-6" />
             <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-              Connectify was created to fill that gap, a platform focused on
+              Connextaa was created to fill that gap, a platform focused on
               helping people connect{" "}
               <strong className="text-on-surface">with purpose</strong>, not
               just communicate.
@@ -263,7 +263,7 @@ export default function AboutUsPage() {
 
               <div className="space-y-4">
                 <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                  Connectify started as an idea during conversations about how
+                  Connextaa started as an idea during conversations about how
                   difficult it can be to find the right people for everyday
                   activities.
                 </p>
@@ -280,7 +280,7 @@ export default function AboutUsPage() {
                 </p>
                 <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
                   We&rsquo;re continuously learning, improving, and building
-                  Connectify, and we truly appreciate everyone who joins us on
+                  Connextaa, and we truly appreciate everyone who joins us on
                   this journey.
                 </p>
                 <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
@@ -307,7 +307,7 @@ export default function AboutUsPage() {
               Our Values
             </h2>
             <p className="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto">
-              The principles that guide every decision we make at Connectify.
+              The principles that guide every decision we make at Connextaa.
             </p>
           </div>
 

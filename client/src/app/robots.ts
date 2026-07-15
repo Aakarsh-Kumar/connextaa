@@ -14,7 +14,7 @@ export default function robots(): MetadataRoute.Robots {
         "/api",
       ],
     },
-    sitemap: "https://connectify.aakarsh.xyz/sitemap.xml",
-    host: "https://connectify.aakarsh.xyz",
+    sitemap: "https://www.connextaa.in",
+    host: "https://www.connextaa.in",
   };
 }

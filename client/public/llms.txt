@@ -1,18 +1,18 @@
-# Connectify
+# Connextaa
 
-> Connectify is a social collaboration platform that helps you discover nearby people for real-world activities — study sessions, trips, sports, events, carpooling, and more.
+> Connextaa is a social collaboration platform that helps you discover nearby people for real-world activities — study sessions, trips, sports, events, carpooling, and more.
 
-Connectify connects people based on shared activities and proximity, not just social graphs. Users create and join collaborations, communicate in temporary group chats, and rate each other after meetings.
+Connextaa connects people based on shared activities and proximity, not just social graphs. Users create and join collaborations, communicate in temporary group chats, and rate each other after meetings.
 
 ## Homepage
 
-- Homepage: https://connectify.aakarsh.xyz
+- Homepage: https://www.connextaa.in
 
 ## Public Pages
 
-- About: https://connectify.aakarsh.xyz/about
-- Privacy Policy: https://connectify.aakarsh.xyz/privacy
-- Terms of Service: https://connectify.aakarsh.xyz/terms
+- About: https://www.connextaa.in/about
+- Privacy Policy: https://www.connextaa.in/privacy
+- Terms of Service: https://www.connextaa.in/terms
 
 ## Key Features
 

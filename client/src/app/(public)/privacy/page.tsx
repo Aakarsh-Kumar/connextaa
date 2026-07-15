@@ -2,22 +2,22 @@ import type { Metadata } from "next";
 import { Shield, MapPin, Info, Share2, Lock, Building2, Clock, Baby, RefreshCw, Mail } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Connectify",
+  title: "Privacy Policy | Connextaa",
   description:
-    "Learn how Connectify collects, uses, and protects your personal information when you use our collaboration platform.",
+    "Learn how Connextaa collects, uses, and protects your personal information when you use our collaboration platform.",
   alternates: {
     canonical: "/privacy",
   },
   openGraph: {
-    title: "Privacy Policy | Connectify",
+    title: "Privacy Policy | Connextaa",
     description:
-      "Learn how Connectify collects, uses, and protects your personal information when you use our collaboration platform.",
-    url: "https://connectify.aakarsh.xyz/privacy",
+      "Learn how Connextaa collects, uses, and protects your personal information when you use our collaboration platform.",
+    url: "https://www.connextaa.in/privacy",
   },
   twitter: {
-    title: "Privacy Policy | Connectify",
+    title: "Privacy Policy | Connextaa",
     description:
-      "Learn how Connectify collects, uses, and protects your personal information when you use our collaboration platform.",
+      "Learn how Connextaa collects, uses, and protects your personal information when you use our collaboration platform.",
   },
 };
 
@@ -44,7 +44,7 @@ const sections = [
     content: (
       <div className="space-y-4">
         <p className="text-on-surface-variant font-body-md text-body-md">
-          Connectify requests access to your location{" "}
+          Connextaa requests access to your location{" "}
           <strong className="text-on-surface">
             only to recommend nearby collaborations and calculate approximate
             distances between you and activities.
@@ -94,7 +94,7 @@ const sections = [
     content: (
       <div className="space-y-4">
         <p className="text-on-surface-variant font-body-md text-body-md">
-          Some profile information is visible to other Connectify users,
+          Some profile information is visible to other Connextaa users,
           including:
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -142,7 +142,7 @@ const sections = [
     title: "Third-Party Services",
     content: (
       <p className="text-on-surface-variant font-body-md text-body-md">
-        Connectify uses third-party services such as Google Sign-In for
+        Connextaa uses third-party services such as Google Sign-In for
         authentication. These services are governed by their own privacy
         policies.
       </p>
@@ -166,7 +166,7 @@ const sections = [
     title: "Children's Privacy",
     content: (
       <p className="text-on-surface-variant font-body-md text-body-md">
-        Connectify is intended for users who are at least{" "}
+        Connextaa is intended for users who are at least{" "}
         <strong className="text-on-surface">13 years of age</strong>.
       </p>
     ),
@@ -178,7 +178,7 @@ const sections = [
     content: (
       <p className="text-on-surface-variant font-body-md text-body-md">
         We may update this Privacy Policy from time to time. Continued use of
-        Connectify after changes become effective constitutes acceptance of the
+        Connextaa after changes become effective constitutes acceptance of the
         updated policy.
       </p>
     ),
@@ -190,7 +190,7 @@ const sections = [
     content: (
       <p className="text-on-surface-variant font-body-md text-body-md">
         If you have any questions regarding this Privacy Policy, please contact
-        the Connectify development team.
+        the Connextaa development team.
       </p>
     ),
   },
@@ -225,7 +225,7 @@ export default function PrivacyPolicyPage() {
           </h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
             We believe in full transparency. Here&rsquo;s exactly how
-            Connectify collects, uses, and protects your information.
+            Connextaa collects, uses, and protects your information.
           </p>
           <p className="mt-6 font-label-md text-label-md text-on-surface-variant/60">
             Last Updated: July 10, 2026
@@ -239,13 +239,13 @@ export default function PrivacyPolicyPage() {
           {/* Intro card */}
           <div className="p-8 rounded-[24px] bg-white card-shadow mb-12 border border-outline-variant/10">
             <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
-              Welcome to <strong className="text-on-surface">Connectify</strong>
+              Welcome to <strong className="text-on-surface">Connextaa</strong>
               . Your privacy is important to us. This Privacy Policy explains
               what information we collect, how we use it, and the choices you
               have when using our platform.
             </p>
             <p className="mt-4 font-body-md text-body-md text-on-surface-variant">
-              By using Connectify, you agree to the practices described in this
+              By using Connextaa, you agree to the practices described in this
               Privacy Policy.
             </p>
           </div>

@@ -1,10 +1,10 @@
 openapi: 3.1.0
 
 info:
-  title: Connectify API
+  title: Connextaa API
   version: 1.0.0
   description: |
-    Connectify Collaboration Platform API
+    Connextaa Collaboration Platform API
 
     Features:
       - Google Authentication

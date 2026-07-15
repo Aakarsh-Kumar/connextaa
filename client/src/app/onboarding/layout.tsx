@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Onboarding | Connectify",
+  title: "Onboarding | Connextaa",
   robots: {
     index: false,
     follow: false,

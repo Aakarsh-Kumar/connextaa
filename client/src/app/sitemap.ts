@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://connectify.aakarsh.xyz";
+  const baseUrl = "https://www.connextaa.in";
 
   // Static routes
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -33,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Placeholder structure for future dynamic pages (e.g., profiles, collaborations)
   // Example pattern:
-  // const collaborations = await fetch("https://api.connectify.aakarsh.xyz/public/collaborations").then(res => res.json());
+  // const collaborations = await fetch("https://api.connextaa.in/public/collaborations").then(res => res.json());
   // const dynamicCollabRoutes = collaborations.map(collab => ({
   //   url: `${baseUrl}/collaboration/${collab.id}`,
   //   lastModified: new Date(collab.updatedAt),

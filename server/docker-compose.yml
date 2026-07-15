@@ -3,9 +3,9 @@ services:
 
     build: .
 
-    image: connectify-api:latest
+    image: connextaa-api:latest
 
-    container_name: connectify-api
+    container_name: connextaa-api
 
     env_file:
       - .env

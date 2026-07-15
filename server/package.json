@@ -1,5 +1,5 @@
 {
-  "name": "connectify-api",
+  "name": "connextaa-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,7 +13,7 @@
     "db:push": "prisma db push --config src/prisma.config.ts",
     "db:generate": "prisma generate --config src/prisma.config.ts",
     "db:sync": "npm run db:push && npm run db:generate",
-    "gen:postman": "openapi2postmanv2 -s docs/v1_openapi.yaml -o docs/Connectify_V1_Postman_Collection.json",
+    "gen:postman": "openapi2postmanv2 -s docs/v1_openapi.yaml -o docs/Connextaa_V1_Postman_Collection.json",
     "gen:types": "npx openapi-typescript docs/v1_openapi.yaml -o src/types/api.ts",
     "gen:zod": "npx openapi-zod-client docs/v1_openapi.yaml -o src/utils/zod.ts",
     "gen": "npm run gen:postman && npm run gen:types && npm run gen:zod"

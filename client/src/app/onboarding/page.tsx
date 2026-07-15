@@ -145,7 +145,7 @@ export default function OnboardingPage() {
       },
       (error) => {
         setLocationGranted(false);
-        toast.error("Location access is required to use Connectify.");
+        toast.error("Location access is required to use Connextaa.");
       }
     );
   };
@@ -277,14 +277,14 @@ export default function OnboardingPage() {
       <header className="bg-card dark:bg-slate-900 border-b border-border shadow-sm sticky top-0 z-50 transition-colors duration-300">
         <nav className="flex justify-between items-center w-full px-6 md:px-10 py-4 max-w-7xl mx-auto h-16">
           {/* <div className="text-headline-md font-headline-md font-bold text-primary">
-            Connectify
+            Connextaa
           </div> */}
           <Link
             href="/"
             className="relative h-12 w-10 md:w-40 flex-shrink-0 flex items-center group"
           >
             <Image
-              alt="Connectify Logo"
+              alt="Connextaa Logo"
               fill
               sizes="(max-width: 768px) 128px, 160px"
               priority
@@ -559,7 +559,7 @@ export default function OnboardingPage() {
                       App Permissions
                     </h1>
                     <p className="font-body-lg text-body-lg text-muted-foreground max-w-lg mx-auto">
-                      Connectify needs a few permissions to function correctly.
+                      Connextaa needs a few permissions to function correctly.
                     </p>
                   </div>
 
