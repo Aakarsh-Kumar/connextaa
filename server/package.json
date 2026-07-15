@@ -33,7 +33,7 @@
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/ms": "^2.1.0",
-    "@types/node": "^24.0.1",
+    "@types/node": "^24.13.3",
     "@types/winston-loggly-bulk": "^3.0.6",
     "eslint": "^9.29.0",
     "express": "^5.1.0",
