@@ -86,7 +86,7 @@ const developers = [
     pic: AarohiImage,
     role: "Developer",
     tagline: '"Too curious to stay ordinary."',
-    bio: "Aarohi enjoys turning ideas into experiences that feel effortless. Whether it's designing, building, or refining, I'm always chasing work that's thoughtful, useful, and a little different.",
+    bio: "Aarohi enjoys turning ideas into experiences that feel effortless. Whether it's designing, building, or refining, Aarohi is always chasing work that's thoughtful, useful, and a little different.",
     color: "bg-secondary-container",
     links: {
       linkedin: "https://www.linkedin.com/in/aarohi-sahu-5a0013327",
