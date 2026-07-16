@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Globe, AtSign, Mail } from "lucide-react";
+import { Globe, AtSign, Mail, Instagram, Linkedin } from "lucide-react";
 import Image from "next/image";
 import Logo from "@/../public/logo.png";
 
@@ -79,9 +79,12 @@ export default function Footer() {
             <a href="mailto:connextaa@gmail.com" className="text-on-surface-variant hover:text-primary transition-colors">
               <Mail className="w-5 h-5" />
             </a>
-            {/* <a href="#" className="text-on-surface-variant hover:text-primary transition-colors">
-              <AtSign className="w-5 h-5" />
-            </a> */}
+            <a href="https://www.instagram.com/connextaa" target="_blank" className="text-on-surface-variant hover:text-primary transition-colors">
+              <Instagram className="w-5 h-5" />
+            </a>
+            <a href="https://www.linkedin.com/company/connextaa" target="_blank" className="text-on-surface-variant hover:text-primary transition-colors">
+              <Linkedin className="w-5 h-5" />
+            </a>
           </div>
         </div>
       </div>
