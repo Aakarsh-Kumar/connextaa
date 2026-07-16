@@ -495,6 +495,8 @@ export interface paths {
                     lng?: number;
                     radius?: number;
                     search?: string;
+                    date?: string;
+                    time?: string;
                 };
                 header?: never;
                 path?: never;

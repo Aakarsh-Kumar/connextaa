@@ -1467,6 +1467,19 @@ paths:
             type: string
             example: "srm"
 
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+            example: "2026-07-17"
+
+        - name: time
+          in: query
+          schema:
+            type: string
+            example: "14:30"
+
       responses:
         '200':
           description: Collaboration Feed

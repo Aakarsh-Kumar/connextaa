@@ -75,6 +75,8 @@ export default function DashboardPage() {
 
   const [radius, setRadius] = useState(9999);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const [filterDate, setFilterDate] = useState("");
+  const [filterTime, setFilterTime] = useState("");
 
   const {
     data: feedData,
@@ -83,7 +85,7 @@ export default function DashboardPage() {
     isFetchingNextPage,
     isLoading: loading,
   } = useInfiniteQuery({
-    queryKey: ["collaborations", coords.lat, coords.lng, radius, selectedCategory, debouncedSearch],
+    queryKey: ["collaborations", coords.lat, coords.lng, radius, selectedCategory, debouncedSearch, filterDate, filterTime],
     queryFn: ({ pageParam }) =>
       collaborationApi.getCollaborations({
         cursor: pageParam as string | undefined,
@@ -93,6 +95,8 @@ export default function DashboardPage() {
         lng: coords.lng,
         radius: radius === 9999 ? undefined : radius,
         search: debouncedSearch || undefined,
+        date: filterDate || undefined,
+        time: filterTime || undefined,
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
@@ -328,6 +332,50 @@ export default function DashboardPage() {
                   </button>
                 );
               })}
+            </div>
+          </div>
+
+          {/* Date & Time Filters */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-[var(--outline-variant)]/20 pt-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-label-md text-label-md text-[var(--on-surface)] font-medium">
+                  Filter by Date
+                </span>
+                {filterDate && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFilterDate("");
+                      setFilterTime("");
+                    }}
+                    className="text-xs text-[var(--primary)] font-bold hover:underline cursor-pointer"
+                  >
+                    Clear Date/Time
+                  </button>
+                )}
+              </div>
+              <input
+                type="date"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                className="w-full h-11 px-4 bg-[var(--surface-container-low)] border border-[var(--outline-variant)]/30 rounded-xl font-body-md text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10 transition-all cursor-pointer"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-label-md text-label-md text-[var(--on-surface)] font-medium">
+                  Filter by Time (starts at or after)
+                </span>
+              </div>
+              <input
+                type="time"
+                value={filterTime}
+                disabled={!filterDate}
+                onChange={(e) => setFilterTime(e.target.value)}
+                className="w-full h-11 px-4 bg-[var(--surface-container-low)] border border-[var(--outline-variant)]/30 rounded-xl font-body-md text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              />
             </div>
           </div>
 

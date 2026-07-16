@@ -29,6 +29,10 @@ export interface CollaborationDistanceFilter {
   statuses?: string[];
   /** Optional search string for title/from_location_name/to_location_name */
   search?: string;
+  /** Filter collaborations scheduled at or after this date */
+  startDate?: Date;
+  /** Filter collaborations scheduled at or before this date */
+  endDate?: Date;
 }
 
 export interface CollaborationWithDistance {
@@ -109,7 +113,9 @@ export async function getCollaborationsWithDistance(
     excludeUserId,
     orderByDistance,
     statuses,
-    search
+    search,
+    startDate,
+    endDate
   } = filters;
 
   const safeLimitValue = Math.min(limit, 30);
@@ -127,6 +133,12 @@ export async function getCollaborationsWithDistance(
 
     if (excludeDeleted) {
       whereConditions.push(Prisma.sql`c.deleted_at IS NULL`);
+    }
+    if (startDate) {
+      whereConditions.push(Prisma.sql`c.scheduled_at >= ${startDate}`);
+    }
+    if (endDate) {
+      whereConditions.push(Prisma.sql`c.scheduled_at <= ${endDate}`);
     }
     if (creatorId) {
       whereConditions.push(Prisma.sql`c.creator_id = ${creatorId}`);
@@ -267,6 +279,12 @@ export async function getCollaborationsWithDistance(
               joinStatus: 'APPROVED',
             },
           },
+        } : {}),
+        ...(startDate || endDate ? {
+          scheduledAt: {
+            ...(startDate ? { gte: startDate } : {}),
+            ...(endDate ? { lte: endDate } : {}),
+          }
         } : {}),
         ...(search
           ? {

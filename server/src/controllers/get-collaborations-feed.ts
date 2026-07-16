@@ -40,6 +40,35 @@ const getAllCollaborationsController = async (req: Request, res: Response) => {
         const userLat = lat !== undefined && !isNaN(lat) ? lat : undefined;
         const userLng = lng !== undefined && !isNaN(lng) ? lng : undefined;
 
+        // Parse date and time filters
+        const date = typeof req.query.date === 'string' && req.query.date.trim() !== '' ? req.query.date.trim() : undefined;
+        const time = typeof req.query.time === 'string' && req.query.time.trim() !== '' ? req.query.time.trim() : undefined;
+
+        let startDate: Date | undefined = undefined;
+        let endDate: Date | undefined = undefined;
+
+        if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+            const t = time && /^\d{2}:\d{2}$/.test(time) ? time : '00:00';
+            startDate = new Date(`${date}T${t}:00`);
+            endDate = new Date(`${date}T23:59:59.999`);
+            
+            // Validate constructed Date objects
+            if (isNaN(startDate.getTime())) startDate = undefined;
+            if (isNaN(endDate.getTime())) endDate = undefined;
+        } else if (time && /^\d{2}:\d{2}$/.test(time)) {
+            // If only time is provided, default to today's date in local server time
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const localTodayStr = `${year}-${month}-${day}`;
+            startDate = new Date(`${localTodayStr}T${time}:00`);
+            endDate = new Date(`${localTodayStr}T23:59:59.999`);
+            
+            if (isNaN(startDate.getTime())) startDate = undefined;
+            if (isNaN(endDate.getTime())) endDate = undefined;
+        }
+
         // Fetch collaborations with distance using helper
         const collaborations = await getCollaborationsWithDistance({
             excludeDeleted: true,
@@ -53,6 +82,8 @@ const getAllCollaborationsController = async (req: Request, res: Response) => {
             excludeUserId: currentUserId,
             orderByDistance: true,
             statuses: ['OPEN'],
+            startDate,
+            endDate,
         });
 
         // Bulk-fetch membership statuses for all returned collaborations for the current viewer

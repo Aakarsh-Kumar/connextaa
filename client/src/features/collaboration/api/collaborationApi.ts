@@ -25,6 +25,8 @@ export const collaborationApi = {
     lng?: number;
     radius?: number;
     search?: string;
+    date?: string;
+    time?: string;
   }): Promise<CollaborationFeedResponse & { nextCursor?: string | null }> => {
     const response = await api.get<CollaborationFeedResponse & { nextCursor?: string | null }>("/collaborations", {
       params,

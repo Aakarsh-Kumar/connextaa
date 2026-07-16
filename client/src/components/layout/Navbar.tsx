@@ -86,13 +86,13 @@ export function Navbar() {
 
         {/* ── Right: user + logout ── */}
         <div className="flex items-center gap-2 shrink-0">
-          <Link
+          {/* <Link
             href="/dashboard/notifications"
             className="md:hidden relative p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-all"
           >
             <Bell className="h-5 w-5" />
             <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-background" />
-          </Link>
+          </Link> */}
 
           {/* Avatar + name */}
           <Link
