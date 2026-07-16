@@ -585,6 +585,7 @@ export default function OnboardingPage() {
                           </span>
                         </div>
                         <p className="text-sm text-muted-foreground leading-normal">
+                          For iOS devices, do <span className="font-bold text-foreground">Add to Home Screen!</span> from browser.
                           We use your location to find nearby activities, show you neighborhood collaborations, and compute distances.
                         </p>
                         <div className="pt-1">
