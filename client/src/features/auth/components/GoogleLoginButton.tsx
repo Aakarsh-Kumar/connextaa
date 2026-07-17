@@ -5,8 +5,8 @@ import { useGoogleAuth } from "../hooks/useGoogleAuth";
 import { Loader2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-export function GoogleLoginButton({ compactOnMobile }: { compactOnMobile?: boolean }) {
-  const { handleGoogleSuccess, handleGoogleError, loading } = useGoogleAuth();
+export function GoogleLoginButton({ compactOnMobile, from }: { compactOnMobile?: boolean; from?: string }) {
+  const { handleGoogleSuccess, handleGoogleError, loading } = useGoogleAuth({ from });
   const isMobile = useIsMobile();
   
   if (compactOnMobile && isMobile) {

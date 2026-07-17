@@ -28,6 +28,8 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import { GoogleLoginButton } from "@/features/auth/components/GoogleLoginButton";
 
 interface ActivityCardProps {
   activity: CollaborationFeedItem;
@@ -63,6 +65,7 @@ export function ActivityCard({
   isJoined = false,
 }: ActivityCardProps) {
   const router = useRouter()
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -223,26 +226,34 @@ export function ActivityCard({
       </div>
 
       {/* CTA Trigger — pinned to bottom */}
-      {variant === "collaboration" ? (<button
-        disabled={isJoined || isPending || activity.id === "preview"}
-        onClick={() => onOpenJoin?.(activity)}
-        className={`mt-auto w-full py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] shadow-sm text-sm cursor-pointer disabled:opacity-50 ${
-          isJoined
-            ? "bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-300 border border-green-200 dark:border-green-900 cursor-not-allowed font-semibold"
-            : isPending
-            ? "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500 cursor-not-allowed border border-[var(--border)]"
-            : "bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90"
-        }`}
-        
-      >
-        {ctaText}
-      </button>):(
+      {variant === "collaboration" ? (
         <button
-        onClick={() => router.push(`/dashboard/collaborations/${activity.id}`)}
-        className={`mt-auto w-full py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] shadow-sm text-sm cursor-pointer disabled:opacity-50 bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 `}
-      >
-        View Collaboration
-      </button>
+          disabled={isJoined || isPending || activity.id === "preview"}
+          onClick={() => onOpenJoin?.(activity)}
+          className={`mt-auto w-full py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] shadow-sm text-sm cursor-pointer disabled:opacity-50 ${
+            isJoined
+              ? "bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-300 border border-green-200 dark:border-green-900 cursor-not-allowed font-semibold"
+              : isPending
+              ? "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500 cursor-not-allowed border border-[var(--border)]"
+              : "bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90"
+          }`}
+        >
+          {ctaText}
+        </button>
+      ) : isAuthenticated ? (
+        <button
+          onClick={() => router.push(`/dashboard/collaborations/${activity.id}`)}
+          className="mt-auto w-full py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] shadow-sm text-sm cursor-pointer bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90"
+        >
+          View Collaboration
+        </button>
+      ) : (
+        <div className="mt-auto flex flex-col items-center gap-2 border-t border-[var(--outline-variant)]/20 pt-4 w-full">
+          <span className="text-xs text-[var(--on-surface-variant)] font-semibold text-center">
+            Sign in to view details and join
+          </span>
+          <GoogleLoginButton from={`/dashboard/collaborations/${activity.id}`} />
+        </div>
       )}
 
       {/* Share Collaboration Dialog */}
