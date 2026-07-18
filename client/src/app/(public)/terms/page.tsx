@@ -313,7 +313,7 @@ const sections = [
     content: (
       <p className="text-on-surface-variant font-body-md text-body-md">
         If you have questions regarding these Terms, please contact the
-        Connextaa development team at connextaa@gmail.com.
+        Connextaa development team at connextaa23@gmail.com.
       </p>
     ),
   },

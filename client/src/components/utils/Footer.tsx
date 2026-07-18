@@ -76,7 +76,7 @@ export default function Footer() {
             © 2026 Connextaa. Built for people nearby.
           </p>
           <div className="flex gap-6">
-            <a href="mailto:connextaa@gmail.com" className="text-on-surface-variant hover:text-primary transition-colors">
+            <a href="mailto:connextaa23@gmail.com" className="text-on-surface-variant hover:text-primary transition-colors">
               <Mail className="w-5 h-5" />
             </a>
             <a href="https://www.instagram.com/connextaa" target="_blank" className="text-on-surface-variant hover:text-primary transition-colors">
